@@ -72,7 +72,10 @@ Template:
 		if !stdin.ConfirmToContinue() {
 			return
 		}
-		exec.Command("git", "commit", "-m", `"`+content+`"`)
+		cmd2 := exec.Command("git", "commit", "-m", `"`+content+`"`)
+		if err := cmd2.Run(); err != nil {
+			println("Could not git commit. content:", content, " err:", cmd2)
+		}
 	},
 }
 

@@ -55,7 +55,7 @@ func (t *Tzap) LoadTask(filepath string) *Tzap {
 		&Tzap{
 			Name: "WithAddFile",
 			Message: types.Message{
-				Role:    openai.ChatMessageRoleAssistant,
+				Role:    openai.ChatMessageRoleUser,
 				Content: originalContent,
 			},
 			Data: data,

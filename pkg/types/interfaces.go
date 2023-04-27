@@ -10,8 +10,8 @@ type ITzap[Tzap any] interface {
 	LoadFileDir(dir string, ext string) Tzap
 	ChangeFilepath(filepath string) Tzap
 	FetchTask() Tzap
-	LoadTask(filepath string) Tzap
 
+	LoadTask(filepath string) Tzap
 	LoadTaskOrRequestNewTask(filepath string) Tzap
 	LoadTaskOrRequestNewTaskMD5(filepath string) Tzap
 

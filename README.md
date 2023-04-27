@@ -1,6 +1,6 @@
 # Tzap
 
-Tzap is a library for Prompts as Code. It provides a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their chatbot-based applications.
+Tzap is a library for Prompts as Code. It provides a toolkit to build, customize, and extend gpt prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their gpt-based applications.
 
 ## Features
 
