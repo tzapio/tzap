@@ -1,0 +1,13 @@
+go 1.20
+
+use .
+
+use ./pkg/tzapconnect
+
+use ./pkg/connectors/openaiconnector
+
+use ./pkg/connectors/googlevoiceconnector
+
+use ./examples
+
+use ./cli

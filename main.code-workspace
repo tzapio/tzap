@@ -1,0 +1,29 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true,
+      "source.fixAll": false
+    },
+    "go.coverageDecorator": {
+      "type": "highlight",
+      "coveredHighlightColor": "rgba(64,128,128,0.5)",
+      "uncoveredHighlightColor": "rgba(128,64,64,0.25)",
+      "coveredGutterStyle": "blockgreen",
+      "uncoveredGutterStyle": "blockred"
+    },
+    "gopls": {
+      "ui.semanticTokens": true,
+      "build.allowModfileModifications": true,
+    },
+    "go.coverOnTestPackage": true,
+    "go.coverOnSingleTest": true,
+  },
+  "extensions": {
+    "recommendations": []
+  }
+}
