@@ -69,6 +69,10 @@ Template:
 		}
 		content := t.RequestChat().Data["content"].(string)
 		println("\n", content)
+		if !stdin.ConfirmToContinue() {
+			return
+		}
+		exec.Command("git", "commit", "-m", `"`+content+`"`)
 	},
 }
 

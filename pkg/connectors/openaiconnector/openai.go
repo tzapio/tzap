@@ -56,7 +56,7 @@ func (ot OpenaiTgenerator) OffsetTokens(content string, from int, to int) (strin
 	if err != nil {
 		return "", errors.New("error couting tokens while encoding")
 	}
-	if from < len(ids) {
+	if to < len(ids) {
 		ids = ids[from:to]
 	}
 	s, _ := enc.Decode(ids)
