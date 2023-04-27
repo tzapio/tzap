@@ -65,7 +65,7 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 
 	messages := TruncateToMaxWords(GetMessages(t), config.TruncateLimit)
 	filelog.LogData(t.C, t, filelog.TzapLog)
-	result, err := t.TG.GenerateChat(t.C, messages)
+	result, err := t.TG.GenerateChat(t.C, messages, stream)
 
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)

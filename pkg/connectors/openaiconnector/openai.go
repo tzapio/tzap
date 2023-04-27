@@ -24,9 +24,9 @@ func getClient(apikey string) *openai.Client {
 	client := openai.NewClient(apikey)
 	return client
 }
-func (ot OpenaiTgenerator) GenerateChat(ctx context.Context, messages []types.Message) (string, error) {
+func (ot OpenaiTgenerator) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {
 	config := config.FromContext(ctx)
-	content, err := ot.fetchChatResponse(ctx, config.OpenAIModel, false, messages)
+	content, err := ot.fetchChatResponse(ctx, config.OpenAIModel, stream, messages)
 	if err != nil {
 		filelog.LogData(ctx, err.Error(), filelog.ResponseLog)
 		return "", fmt.Errorf("error generating chat prompt result: %v", err)

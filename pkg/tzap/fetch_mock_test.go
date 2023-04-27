@@ -19,7 +19,7 @@ func (tg *mockTG) SpeechToText(ctx context.Context, audioContent *[]byte, langua
 	// Return pre-defined value for testing purposes
 	return "Hello world!", nil
 }
-func (tg *mockTG) GenerateChat(ctx context.Context, messages []types.Message) (string, error) {
+func (tg *mockTG) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {
 
 	if len(messages) == 0 {
 		return "", fmt.Errorf("empty messages")

@@ -20,7 +20,7 @@ var gitcommitCmd = &cobra.Command{
 
 		diff := exec.Command("git", "diff",
 			"--patch-with-raw",
-			"--unified=0",
+			"--unified=2",
 			"--color=never",
 			"--no-renames",
 			"--ignore-space-change",

@@ -42,8 +42,8 @@ type PartialComposite struct {
 func (pc PartialComposite) TextToSpeech(ctx context.Context, content, language, voice string) (*[]byte, error) {
 	return pc.VoiceGenerator.TextToSpeech(ctx, content, language, voice)
 }
-func (pc PartialComposite) GenerateChat(ctx context.Context, messages []types.Message) (string, error) {
-	return pc.OpenaiTgenerator.GenerateChat(ctx, messages)
+func (pc PartialComposite) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {
+	return pc.OpenaiTgenerator.GenerateChat(ctx, messages, stream)
 }
 func (pc PartialComposite) CountTokens(ctx context.Context, content string) (int, error) {
 	return pc.OpenaiTgenerator.CountTokens(content)

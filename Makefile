@@ -1,5 +1,3 @@
-exGenerate:
-	go run example/generate/main.go
 exGithubDoc:
 	go run example/githubdoc/main.go
 exMadebygpt:
