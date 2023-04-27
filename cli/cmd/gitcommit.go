@@ -19,6 +19,7 @@ var gitcommitCmd = &cobra.Command{
 		fmt.Println("gitcommit called")
 
 		diff := exec.Command("git", "diff",
+			"--staged",
 			"--patch-with-raw",
 			"--unified=2",
 			"--color=never",

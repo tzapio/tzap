@@ -56,6 +56,7 @@ func (t *Tzap) CountTokens(content string) (int, error) {
 
 // RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
 func (t *Tzap) OffsetTokens(content string, from int, to int) (string, error) {
+
 	return t.TG.OffsetTokens(t.C, content, from, to)
 }
 
