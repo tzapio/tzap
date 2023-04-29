@@ -1,141 +1,90 @@
 # Tzap
+Tzap is a library designed to seamlessly integrate GPT prompts into your code. It simplifies the process of building, customizing, and extending GPT prompts, making it more efficient for developers to incorporate desired outcomes in their GPT-based applications. With Tzap, you can create reusable instances and combine them in various ways to meet your specific needs.
 
-Tzap is a library for Prompts as Code. It provides a toolkit to build, customize, and extend gpt prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their gpt-based applications.
-
-## Features
-
-- Create reusable Tzap instances and templates
+## Key Features
+- Easily create reusable Tzap instances and templates
 - Apply templates and functions to existing Tzaps
-- Manipulate file paths and directories
-- Fetch chat responses and generate content using OpenAI's GPT-4 model
+- Automate GPT copy-pasting tasks
+- Integrate magic functions that evaluate GPT prompts instead of code
+- Develop magic CLI tools
+- Effortlessly manipulate file paths and directories
+- Generate content using OpenAI's GPT-4 model
 - Provide chat message context in Golang
-- Manage Tzap instances with parent and child relationships
-- Utility methods to read, write and manipulate files
 
-## Example Usage
+## How It Works
+Tzap allows you to create reusable instances and apply templates and functions to them, making it convenient to adapt to new use cases, such as automating GPT copy-pasting, creating magic functions that evaluate GPT prompts, and crafting magic CLI tools. In addition, Tzap makes it simple to apply templates and functions to existing Tzaps, enhancing the library's flexibility.
 
-Here's an example of how you can use Tzap to read a list of Go files and output a README.md: 
+By using Tzap, you can effortlessly manage file paths and directories, fetch chat responses, and generate content using OpenAI's GPT-4 model. Furthermore, the library provides chat message context in Golang, ensuring a smooth integration process.
 
-```go
-package main
+With Tzap's intuitive design and powerful capabilities, you can quickly and efficiently implement desired outcomes in your GPT-based applications. So go ahead and give it a try, and let Tzap work its magic for you!
 
-import (
-	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/types/openai"
-	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/templates/code/documents"
-)
+# Getting Started with Tzap Command Line (GPT Git Commits)
 
-func main() {
-	tzap.NewWithConnector(tzapconnect.WithConfig(
-		config.Configuration{
-			AutoMode:    true,
-			OpenAIModel: openai.GPT4,
-			MD5Rewrites: true,
-		})).
-		ApplyTemplateFN(documents.ReadmeGithub(
-			"Tzap is a library for Prompts as Code.",
-			[]string{
-				"pkg/types/interfaces.go",
-				"pkg/types/structs.go",
-				"pkg/tzap/templates.go",
-				"pkg/tzap/file.go",
-				"pkg/tzap/fetch-chat.go",
-				"pkg/tzap/tzap.go",
-				"examples/githubdoc/main.go",
-				"examples/refactoring/main.go",
-			},
-			"README.md",
-			"",
-		))
-}
+Getting started with Tzap is easy! Follow the steps below to begin using Tzap in your projects.
+
+## Installation
+
+1. To install Tzap, simply download the `install.sh` script:
+
+```bash
+curl -sSL https://github.com/tzapio/tzap/releases/latest/download/install.sh -o install.sh
 ```
 
-Another example uses Tzap to refactor a Go file, improving its readability and adding comments to functions: 
+2. Make the script executable and run it:
 
-```go
-package main
-
-import (
-	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/types/openai"
-	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/tzapconnect"
-
-	"github.com/tzapio/tzap/pkg/util"
-	"github.com/tzapio/tzap/templates/code/codegeneration"
-)
-
-func main() {
-	tzap.NewWithConnector(tzapconnect.WithConfig(
-		config.Configuration{
-			AutoMode:    true,
-			OpenAIModel: openai.GPT4,
-			MD5Rewrites: true,
-		})).
-		LoadFileDir("/workspaces/goman/tzaps", "*.go").
-		Map(func(t *tzap.Tzap) *tzap.Tzap {
-			return t.
-				ApplyTemplateFN(
-					codegeneration.MakeCodeGO(`
-You are helping the user writing a library for chatgpt prompting. You primarely write Golang. Most files already exists. Do not create new data structures.
-### Current interface: 
-//file: /workspaces/goman/tzaps/interfaces.go
-`+util.ReadFileP("/workspaces/goman/tzaps/interfaces.go")+`
-### General Tzap logic
-//file: /workspaces/goman/tzaps/tzap.go
-`+util.ReadFileP("/workspaces/goman/tzaps/tzap.go")+`
-### Additional types
-//file: /workspaces/goman/tzaps/msg/message.go
-`+util.ReadFileP("/workspaces/goman/tzaps/msg/message.go"),
-						//	"Make unit tests. Use testify go. If needed create tmp files. Use package tzap_test. Use testnames Test_{function}_{givenCamelCase}_{expectCamelCase}."),
-						"Analyze what can be improved. Refactor the following file to be more readable. Make comments for the functions. Do not add any new public functions, only rewrite."),
-				)
-		})
-}
+```bash
+chmod +x install.sh
+./install.sh
 ```
 
-## Package Structure
-
-The following files and packages make up the Tzap library:
-
-### `pkg/types/interfaces.go`
-
-This file defines the `ITzap` interface that Tzap instances should implement. It includes methods to manage Tzap instances, load files and directories, request chatbot content, and apply templates.
-
-### `pkg/types/structs.go`
-
-This file defines the `Message` and `MappedInterface` structures. The `Message` structure holds information related to individual chatbot messages, while `MappedInterface` is a type alias for a map of string keys with interface values.
-
-### `pkg/tzap/templates.go`
-
-The `templates.go` file contains the `ApplyTemplate` and `ApplyTemplateFN` methods, which allow you to apply a pre-defined template Tzap instance (`ApplyTemplate`) or a custom function that takes a Tzap instance and returns a modified Tzap instance (`ApplyTemplateFN`).
-
-### `pkg/tzap/file.go`
-
-The `file.go` file contains various utility methods to handle Tzap instances for file operations. These include loading a file or directory of files, preparing a file for output, and handling the case where a file does not exist and new content needs to be requested.
-
-### `pkg/tzap/fetch-chat.go`
-
-This file contains methods to send chatbot requests and fetch the chatbot-generated content. These methods mainly work with OpenAI's GPT models, using the Tzap generation API to generate chatbot responses based on given prompt and context data.
-
-### `pkg/tzap/tzap.go`
-
-This file defines the core logic of the Tzap library. The `Tzap` struct is defined in this file with its fields, methods, and interfaces. The struct contains methods to manage Tzap instances, apply templates, and manipulate files.
-
-### Example files
-
-`examples/githubdoc/main.go` contains an example of how to use the Tzap library to generate a README.md file for a GitHub project, based on an input list of Go files.
-
-`examples/refactoring/main.go` contains a sample usage that demonstrates how to refactor a Go file using the Tzap library, with an emphasis on improving code readability and adding comments to functions.
+Now, Tzap is installed on your system and ready to use!
 
 ## Usage
 
-To get started with Tzap, create a new Tzap instance using the `NewWithConnector` method:
+### Tzap GitCommit
 
-```go
-tzapInstance := tzap.NewWithConnector(tzapconnect.WithConfig(settings))
+Never write a git commit message again with Tzap! To try this feature, simply run:
+
+```bash
+tzap gitcommit
 ```
 
-Then, chain various methods to load and manipulate data, or apply templates and functions. The rendered content can be fetched and used as desired.
+This command will automatically generate a meaningful git commit message based on your recent code changes.
+
+### Dev Container
+
+To start developing with Tzap in a dev container, follow these steps:
+
+1. Ensure you have Docker installed on your machine.
+
+2. Clone the Tzap repository:
+
+```bash
+git clone https://github.com/tzapio/tzap.git
+```
+
+3. Navigate to the Tzap directory:
+
+```bash
+cd tzap
+```
+
+4. Build the dev container:
+
+```bash
+docker-compose build
+```
+
+5. Run the dev container:
+
+```bash
+docker-compose up -d
+```
+
+Now you can access the Tzap development environment in the running container. Edit the source code, run tests, and build new features using Tzap!
+
+## Start Coding
+
+To start coding with Tzap, you can refer to the provided examples in the `examples` directory of the Tzap repository. These examples demonstrate various use cases and will help you understand how to utilize Tzap effectively.
+
+Feel free to explore the Tzap library, experiment with its features, and create powerful GPT-based applications tailored to your requirements. Enjoy the convenience and efficiency that Tzap brings to your projects!
