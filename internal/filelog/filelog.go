@@ -20,11 +20,11 @@ const (
 
 func LogData(ctx context.Context, data interface{}, logType LogType) {
 	config := config.FromContext(ctx)
-	if config.LoggerOutput == nil {
+	if config.LoggerOutput == "" {
 		return
 	}
 	for i := 100000; i >= 0; i-- {
-		dir := path.Join(*config.LoggerOutput, string(logType))
+		dir := path.Join(config.LoggerOutput, string(logType))
 		filename := path.Join(dir, fmt.Sprintf("out_%d.log", i))
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
 			os.MkdirAll(dir, 0700)

@@ -17,7 +17,8 @@ func main() {
 		}))
 
 	// Load all Go files in the directory.
-	t.LoadFileDir("/path/to/your/codebase", "*.go").
+	t.
+		LoadFileDir("/path/to/your/codebase", "*.go").
 		// Apply improvements using GPT-3.5-turbo.
 		Map(func(t *tzap.Tzap) *tzap.Tzap {
 			return t.ApplyTemplateFN(

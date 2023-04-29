@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -14,35 +14,28 @@ import (
 )
 
 var magicCmd = &cobra.Command{
-	Use:   "magic",
-	Short: "attaches your file and adds your prompt",
-	Long:  `tbd`,
+	Use:   "magic <file> <prompt>",
+	Short: "Attach a file and add a prompt to a Tzap message",
+	Long:  `Attach a file and add a prompt to a Tzap message.`,
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("magic called")
-		println(args[0])
-		if len(args) < 2 {
-			fmt.Println("tzap magic <file> <prompt...>")
-			os.Exit(1)
-		}
 		filename := args[0]
-		if _, err := os.Open(filename); err != nil {
-			absoluteFilePath := path.Join(os.Getenv("PWD"), filename)
+		if _, err := os.Stat(filename); os.IsNotExist(err) {
+			absoluteFilePath, _ := filepath.Abs(filename)
 			fmt.Println("Could not find file:", absoluteFilePath, " err:", err)
 			os.Exit(1)
 		}
+
 		content := strings.Join(args[1:], " ")
 		tzap.
-			NewWithConnector(
-				tzapconnect.WithConfig(config.Configuration{SupressLogs: true, MD5Rewrites: true}),
-			).
-			SetHeader(`Task: ` + content).
-			LoadTask(filename). //add as message
+			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true, MD5Rewrites: true})).
+			AddSystemMessage(fmt.Sprintf("Task: %s", content)).
+			LoadTask(filename).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 				t.Message.Role = openai.ChatMessageRoleUser
 				return t
 			}).
-			LoadTaskOrRequestNewTaskMD5(filename) // ask to rewrite.
-
+			LoadTaskOrRequestNewTaskMD5(filename)
 	},
 }
 

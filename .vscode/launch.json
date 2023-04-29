@@ -9,7 +9,10 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/example/githubdoc/main.go",
+            "env": {
+                "OPENAI_APIKEY": "fordebug"
+            },
+            "program": "${relativeFile}",
             "cwd": "${workspaceFolder}"
         }
     ]

@@ -13,8 +13,8 @@ import (
 
 var gitcommitCmd = &cobra.Command{
 	Use:   "gitcommit",
-	Short: "prompts chatgpt to generate a commit message and commits it to the current git repo",
-	Long:  `tbd`,
+	Short: "Prompts ChatGPT to generate a commit message and commits it to the current git repo",
+	Long:  `Prompts ChatGPT to generate a commit message and commits it to the current git repo.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("gitcommit called")
 
@@ -29,52 +29,51 @@ var gitcommitCmd = &cobra.Command{
 			"--ignore-blank-lines",
 		)
 		out, err := diff.CombinedOutput()
-
 		if err != nil {
 			fmt.Println("Could not get diff:", err)
 			return
 		}
-		println(string(out))
+		fmt.Println(string(out))
 
 		t := tzap.
-			NewWithConnector(
-				tzapconnect.WithConfig(config.Configuration{SupressLogs: true}),
-			).
+			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true})).
 			SetHeader(`Write a git commit message maximum 30 words.
 			
 Template:
 {brief git commit message}`).
 			AddUserMessage(string(out))
+
 		c, err := t.CountTokens(t.Message.Content)
 		if err != nil {
 			fmt.Println("Could not count tokens:", err)
 			return
 		}
 		if c >= 3900 {
-			println("\n\n\n\n")
-			fmt.Printf(
-				"WARNING: diff is too long. TRUNCATING TO 3900 of %d estimated tokens\n",
-				c)
+			fmt.Printf("WARNING: diff is too long. TRUNCATING TO 3900 of %d estimated tokens\n", c)
 		}
-		fmt.Printf(
-			"Summarizing %d estimated tokens\n",
-			c)
+		fmt.Printf("Summarizing %d estimated tokens\n", c)
 		if !stdin.ConfirmToContinue() {
 			return
 		}
-		t.Message.Content, err = t.OffsetTokens(t.Message.Content, 0, 3900)
+
+		offsetStart := 7000
+		offsetEnd := offsetStart + 3900
+		t.Message.Content, err = t.OffsetTokens(t.Message.Content, offsetStart, offsetEnd)
 		if err != nil {
 			fmt.Println("Could not offset tokens:", err)
 			return
 		}
+
 		content := t.RequestChat().Data["content"].(string)
-		println("\n", content)
+		fmt.Println("\n", content)
 		if !stdin.ConfirmToContinue() {
 			return
 		}
-		cmd2 := exec.Command("git", "commit", "-m", `"`+content+`"`)
+
+		cmd2 := exec.Command("git", "commit", "-m", content)
 		if err := cmd2.Run(); err != nil {
-			println("Could not git commit. content:", content, " err:", cmd2)
+			fmt.Printf("Could not git commit. Content: %s, Error: %s\n", content, err)
+			return
 		}
 	},
 }
