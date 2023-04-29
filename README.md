@@ -46,6 +46,7 @@ Now, Tzap is installed on your system and ready to use!
 Never write a git commit message again with Tzap! To try this feature, simply run:
 
 ```bash
+export OPENAI_APIKEY=<openai_key>
 tzap gitcommit
 ```
 
