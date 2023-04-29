@@ -1,5 +1,5 @@
-buildCli:
-	cd cli && make
+buildCli: gomodtidy
+	cd cli && make release
 
 
 exGithubDoc:

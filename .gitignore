@@ -2,3 +2,4 @@ out
 *.md5
 node_modules
 *.js
+release
