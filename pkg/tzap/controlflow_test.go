@@ -28,7 +28,7 @@ func Test_MutationTzap_givenTzap_expectMutated(t *testing.T) {
 func Test_BubbleTzap_givenTzap_expectUnchanged(t *testing.T) {
 	tt := tzap.InternalNew()
 	tt.Message = (types.Message{Role: "user", Content: "Hello"})
-	bubbledTzap := tt.BubbleTzap(func(t *tzap.Tzap) {
+	bubbledTzap := tt.WorkTzap(func(t *tzap.Tzap) {
 		t.Message.Content = "Changed2" // should this usecase be allowed
 	})
 

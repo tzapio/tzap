@@ -14,7 +14,7 @@ import (
 func (t *Tzap) AddUserMessage(contents ...string) *Tzap {
 	content := strings.Join(contents, "\n")
 	return t.AddTzap(&Tzap{
-		Name: "AddUserTask",
+		Name: "AddUserMessage",
 		Message: types.Message{
 			Role:    openai.ChatMessageRoleUser,
 			Content: content,
@@ -47,7 +47,7 @@ func (t *Tzap) LoadUserMessageFromFileOrStdinInput(filepath string, task string)
 func (t *Tzap) AddSystemMessage(contents ...string) *Tzap {
 	content := strings.Join(contents, "\n")
 	return t.AddTzap(&Tzap{
-		Name: "AddSystemTask",
+		Name: "AddSystemMessage",
 		Message: types.Message{
 			Role:    openai.ChatMessageRoleSystem,
 			Content: content,

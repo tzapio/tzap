@@ -9,10 +9,11 @@ func (t *Tzap) MutationTzap(fn func(*Tzap) *Tzap) *Tzap {
 	return fn(t)
 }
 
-// BubbleTzap executes the provided function and returns the Tzap object.
-func (t *Tzap) BubbleTzap(fn func(*Tzap)) *Tzap {
-	Log(t, "Bubble Tzap")
-	fn(t)
+// WorkTzap executes the provided function and returns the Tzap object.
+func (t *Tzap) WorkTzap(fn func(*Tzap)) *Tzap {
+	Log(t, "Work Tzap")
+	tb := t.CloneTzap(&Tzap{Name: "Work"})
+	fn(tb)
 	return t
 }
 
@@ -41,7 +42,7 @@ func (t *Tzap) Map(fn func(*Tzap) *Tzap) *Tzap {
 		Log(t, "MAP child I", i)
 		mappedChildren[i] = fn(child)
 	}
-	tzmapped := t.HijackTzap(&Tzap{Name: "Map", Message: t.Message, Data: types.MappedInterface{"children": mappedChildren}})
+	tzmapped := t.AddTzap(&Tzap{Name: "Map", Message: t.Message, Data: types.MappedInterface{"children": mappedChildren}})
 	return tzmapped
 }
 
@@ -51,7 +52,7 @@ func (t *Tzap) Accumulate(fn func(*Tzap) *Tzap) *Tzap {
 	tzmapped := t.AddTzap(&Tzap{Name: "Accumulate"})
 	for _, child := range children {
 		child.Parent = tzmapped
-		tzmapped = tzmapped.ApplyTemplate(fn(child))
+		tzmapped = tzmapped.ApplyTemplateP(fn(child))
 	}
 	return tzmapped
 }

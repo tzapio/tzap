@@ -56,8 +56,8 @@ Template:
 			return
 		}
 
-		offsetStart := 7000
-		offsetEnd := offsetStart + 3900
+		offsetStart := 0
+		offsetEnd := 0 + 3900
 		t.Message.Content, err = t.OffsetTokens(t.Message.Content, offsetStart, offsetEnd)
 		if err != nil {
 			fmt.Println("Could not offset tokens:", err)

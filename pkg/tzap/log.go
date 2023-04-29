@@ -48,7 +48,7 @@ func Log(t *Tzap, messages ...interface{}) {
 	spacer := "---> " + fmt.Sprintf("%d", (len(names))) + util.CreateSpaces(len(names))
 	message := fmt.Sprintf("%s%s\n%s\\____", spacer, paths, util.CreateSpaces(len(spacer+paths)))
 	message += sprintWithSpace(messages...) + " " + recentStack()
-	message += fmt.Sprintf("\n%s\\____", util.CreateSpaces(len(spacer+paths)+5))
+	message += fmt.Sprintf("\n%s\\____\n", util.CreateSpaces(len(spacer+paths)+5))
 
 	// if time has passed since last message print without adding.
 

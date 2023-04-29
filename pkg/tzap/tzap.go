@@ -7,8 +7,22 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
+var count = 1
+
+func addId(t *Tzap) {
+	if t.Id > 0 {
+		println("Tzap already has an id", t.Id, t.Name)
+		panic(t)
+	}
+	t.Id = count
+	count += 1
+	println("Added tzap", t.Id, t.Name)
+	GlobalTzaps = append(GlobalTzaps, t)
+}
+
 // Tzap is a structure that holds data and methods related to Tzap objects.
 type Tzap struct {
+	Id      int
 	Name    string
 	Header  string
 	Message types.Message
@@ -26,36 +40,39 @@ type Tzap struct {
 // Mainly for mocking purposes. Does not have a connector, will likely crash.
 func InternalNew() *Tzap {
 	t := &Tzap{
-		Name:    "RootTzap",
+		Name:    "ConnectionLess",
 		Message: types.Message{},
 		Data:    types.MappedInterface{},
 		C:       context.Background(),
 	}
-
+	addId(t)
 	return t
 }
 
 func NewWithConnector(connector types.TzapConnector) *Tzap {
 	tg, conf := connector()
 	t := &Tzap{
-		Name:    "RootTzap",
+		Name:    "Connection",
 		Message: types.Message{},
 		Data:    types.MappedInterface{},
 		C:       config.NewContext(context.Background(), conf),
 		TG:      tg,
 	}
+	addId(t)
 	return t
 }
 
 // New returns a new Tzap with default values.
 func (t *Tzap) New() *Tzap {
-	return &Tzap{
-		Name:    "RootTzap",
+	tc := &Tzap{
+		Name:    "NewConnection",
 		Message: types.Message{},
 		Data:    types.MappedInterface{},
 		C:       context.Background(),
 		TG:      t.TG,
 	}
+	addId(tc)
+	return tc
 }
 
 // AppendParentContext assigns the parent's context to the Tzap object, if present.
@@ -69,12 +86,14 @@ func (t *Tzap) AppendParentContext() *Tzap {
 
 // onNewTzap is a helper method that appends the parent's context to the Tzap object.
 func (t *Tzap) onNew() *Tzap {
+
 	return t.AppendParentContext()
 }
 
 // AddTzap (mostly internal use) initializes and adds a new Tzap child to the current Tzap object.
 func (t *Tzap) AddTzap(tc *Tzap) *Tzap {
 	Logf(t, "Add tzap (%s)", tc.Name)
+	addId(tc)
 	tc.Parent = t
 	return (tc).onNew()
 }
@@ -109,7 +128,7 @@ func (t *Tzap) CloneTzap(tc *Tzap) *Tzap {
 	if len(tc.Data) > 0 {
 		tz.Data = tc.Data
 	}
-
+	addId(tz)
 	return tz.onNew()
 }
 
@@ -120,5 +139,6 @@ func (t *Tzap) HijackTzap(tc *Tzap) *Tzap {
 	tc.C = t.C
 	tc.TG = t.TG
 	tc.Parent = t.Parent
+	addId(tc)
 	return tc
 }

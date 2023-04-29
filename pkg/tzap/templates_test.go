@@ -16,7 +16,7 @@ func Test_ApplyTemplate_RootTzap_ReturnTzapWithAppliedTemplate(t *testing.T) {
 	)
 
 	// Act
-	result := rootTzap.ApplyTemplate(template)
+	result := rootTzap.ApplyTemplateP(template)
 
 	// Assert
 	if result.Message.Role != openai.ChatMessageRoleUser {

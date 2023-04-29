@@ -1,3 +1,7 @@
+buildCli:
+	cd cli && make
+
+
 exGithubDoc:
 	go run example/githubdoc/main.go
 exMadebygpt:
@@ -15,3 +19,6 @@ gomodtidy:
 	cd examples && go mod tidy
 	cd cli && go mod tidy
 	go work sync
+
+ts-build:
+	cd ts && npm run build
