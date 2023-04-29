@@ -3,13 +3,13 @@ buildCli: gomodtidy
 
 
 exGithubDoc:
-	go run example/githubdoc/main.go
+	go run examples/githubdoc/main.go
 exMadebygpt:
-	go run example/madebygpt/main.go
+	go run examples/madebygpt/main.go
 exRefactoring:
-	go run example/refactoring/main.go
+	go run examples/refactoring/main.go
 exTesting:
-	go run example/testing/main.go
+	go run examples/testing/main.go
 
 gomodtidy:
 	go mod tidy

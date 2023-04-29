@@ -12,6 +12,11 @@ import (
 
 // LoadFileDir exposes an array of Tzaps in the previous elements .Data["children"]. Each child is a .LoadTask(file)
 func (t *Tzap) LoadFileDir(dir string, match string) *Tzap {
+	_, err := os.ReadDir(dir)
+	if err != nil {
+		fmt.Printf("Error reading directory: %v\n", err)
+		panic(err)
+	}
 	pattern := filepath.Join(dir, match)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
@@ -34,7 +39,7 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 	}
 
 	return t.AddTzap(&Tzap{
-		Name: "WithAddFile",
+		Name: "LoadFiles",
 		Data: types.MappedInterface{"children": ts},
 	})
 }
@@ -51,16 +56,17 @@ func (t *Tzap) LoadTask(filepath string) *Tzap {
 		"filepath": filepath,
 		"content":  originalContent,
 	}
-	withAddFile := t.AddTzap(
+	loadTaskFromFile := t.AddTzap(
 		&Tzap{
-			Name: "WithAddFile",
+			Name: "LoadTaskFromFile",
 			Message: types.Message{
-				Role:    openai.ChatMessageRoleUser,
+				Role:    openai.ChatMessageRoleAssistant,
 				Content: originalContent,
 			},
 			Data: data,
 		})
-	return withAddFile
+	getMessagesGraphViz(loadTaskFromFile)
+	return loadTaskFromFile
 }
 
 // PrepareOutputTask creates a Tzap with an empty file content to be used for outputting to a file
@@ -79,11 +85,16 @@ func (t *Tzap) PrepareOutputTask(filepath string) *Tzap {
 // LoadTaskOrRequestNewTask loads a file if it exists, otherwise requests a new file content from OpenAI and applies the changes to the original file
 func (t *Tzap) LoadTaskOrRequestNewTask(filepath string) *Tzap {
 	Log(t, "Opening", filepath)
+	t = t.AddTzap(&Tzap{
+		Name: "LoadTaskOrRequestNewTask"})
+
+	var out *Tzap
 	if _, err := os.Stat(filepath); err != nil {
-		return t.
+		out = t.
 			PrepareOutputTask(filepath).
 			FetchTask()
 	} else {
-		return t.LoadTask(filepath)
+		out = t.LoadTask(filepath)
 	}
+	return out
 }

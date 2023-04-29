@@ -22,6 +22,7 @@ func Test_LoadTask_given_existing_file_path_expect_tzap_with_file_contents(t *te
 
 	// Load the file with Tzap
 	tt := tzap.InternalNew()
+	tt.TG = &mockTG{}
 	loadedTzap := tt.LoadTask(tempFile.Name())
 
 	// Check if the loadedTzap contains the correct content
@@ -57,6 +58,7 @@ func Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents(t *te
 	path := os.TempDir()
 	match := "Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents_*"
 	tt := tzap.InternalNew()
+	tt.TG = &mockTG{}
 	loadedTzap := tt.LoadFileDir(path, match)
 
 	// Check if the loadedTzap contains two tzaps with the correct content
@@ -118,6 +120,8 @@ func Test_LoadTaskOrRequestNewTask_given_existing_file_path_expect_tzap_with_fil
 
 	// Load the file with Tzap
 	tt := tzap.InternalNew()
+
+	tt.TG = &mockTG{}
 	loadedTzap := tt.LoadTaskOrRequestNewTask(tempFile.Name())
 
 	// Check if the loadedTzap contains the correct content

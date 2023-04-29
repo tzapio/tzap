@@ -10,8 +10,8 @@ import (
 func Test_NewTzap_Defaults_RootTzapWithEmptyMessage(t *testing.T) {
 	tt := tzap.InternalNew()
 
-	if tt.Name != "RootTzap" {
-		t.Errorf("expected name to be RootTzap but got %s", tt.Name)
+	if tt.Name != "ConnectionLess" {
+		t.Errorf("expected name to be ConnectionLess but got %s", tt.Name)
 	}
 	if tt.Header != "" {
 		t.Errorf("expected header to be empty but got %s", tt.Header)

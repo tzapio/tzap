@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/templates/code/files"
 )
 
 func ReadmeGithub(libraryDescription string, inspirationFiles []string, outputFile string, extraInstruction string) func(*tzap.Tzap) *tzap.Tzap {
@@ -14,13 +15,8 @@ func ReadmeGithub(libraryDescription string, inspirationFiles []string, outputFi
 			AddSystemMessage(
 				"Library Description: "+libraryDescription,
 				"Output: Write github README.md presentation about the project.").
-			LoadFiles(inspirationFiles).
-			Accumulate(func(t *tzap.Tzap) *tzap.Tzap {
-				return t.AddUserMessage(
-					"//file: "+t.Data["filepath"].(string),
-					t.Data["content"].(string))
-			}).
+			ApplyTemplate(files.InspirationTemplate(inspirationFiles)).
 			AddUserMessage(extraInstruction).
-			LoadTaskOrRequestNewTaskMD5(outputFile)
+			LoadTaskOrRequestNewTask(outputFile)
 	}
 }

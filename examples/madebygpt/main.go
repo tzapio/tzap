@@ -25,12 +25,12 @@ func main() {
 				"pkg/tzap/file.go",
 				"pkg/tzap/fetch-openai.go",
 				"pkg/tzap/tzap.go",
-				"example/githubdoc/main.go",
-				"example/selfimprovement/main.go",
+				"examples/githubdoc/main.go",
+				"examples/selfimprovement/main.go",
 			},
 			"README.md",
 			"",
 		)).
 		AddUserMessage("Show me an example of how to create a Tzap Chain to improve this whole codebase.").
-		LoadTaskOrRequestNewTask("example/madebygpt/chatGPTmadeThis/SomeSolution.go")
+		LoadTaskOrRequestNewTask("examples/madebygpt/chatGPTmadeThis/SomeSolution.go")
 }

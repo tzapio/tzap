@@ -25,15 +25,15 @@ func Test_MutationTzap_givenTzap_expectMutated(t *testing.T) {
 
 }
 
-func Test_BubbleTzap_givenTzap_expectUnchanged(t *testing.T) {
+func Test_WorkTzap_givenTzap_expectUnchanged(t *testing.T) {
 	tt := tzap.InternalNew()
 	tt.Message = (types.Message{Role: "user", Content: "Hello"})
 	bubbledTzap := tt.WorkTzap(func(t *tzap.Tzap) {
-		t.Message.Content = "Changed2" // should this usecase be allowed
+		t.Message.Content = "Changed2"
 	})
 
-	if bubbledTzap.Message.Content != "Changed2" {
-		t.Errorf("Expected content to be 'Changed2', but got '%s'", bubbledTzap.Message.Content)
+	if bubbledTzap.Message.Content != "Hello" {
+		t.Errorf("Expected content to be 'Hello', but got '%s'", bubbledTzap.Message.Content)
 	}
 }
 

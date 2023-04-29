@@ -13,11 +13,15 @@ import (
 	"github.com/tzapio/tzap/pkg/tzapconnect"
 )
 
-var magicCmd = &cobra.Command{
-	Use:   "magic <file> <prompt>",
-	Short: "Attach a file and add a prompt to a Tzap message",
-	Long:  `Attach a file and add a prompt to a Tzap message.`,
-	Args:  cobra.ExactArgs(2),
+var magicWandCmd = &cobra.Command{
+	Use:   "magicwand <file> <prompt>",
+	Short: "Use the magicwand to perform quick edits on code or documents, including adding functions, comments, and clarifying error messages.",
+	Long: `The 'magicwand' command allows you to use a magicwand to make quick edits to existing code or documents, 
+including adding functions, comments, and clarifying error messages. The command takes two arguments, the 
+file name and your prompt. The file must exist in the current directory or you should provide the absolute
+path for the file. If the file is not found, an error message will be printed on the console. Use this 
+command to make quick edits and seek help from your teammates versus an AI model.`,
+	Args: cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		filename := args[0]
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
@@ -40,5 +44,5 @@ var magicCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(magicCmd)
+	rootCmd.AddCommand(magicWandCmd)
 }
