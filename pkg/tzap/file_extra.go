@@ -47,6 +47,7 @@ func (t *Tzap) LoadTaskOrRequestNewTaskMD5(filepath string) *Tzap {
 			}
 		}
 	}
+	GenerateGraphvizDotFile2("out/tzap2.dot", FillGraphVizGraph())
 	Log(t, "LoadTaskMD5 Matching", filepath, "enabled", config.MD5Rewrites)
 	return t.LoadTask(filepath)
 
