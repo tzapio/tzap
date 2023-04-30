@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
-VERSION=v0.7.3
-#VERSION=$(shell git describe --tags --always)
+#VERSION=v0.7.3
+VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
 
 build:
@@ -13,6 +13,9 @@ test:
 clean:
 	rm -f ../release/tzap*
 
+tag:
+	gh release create v0.7.4 --title "v0.7.4 hotfixes" --notes "Contains mainly bugfixes" --prerelease
+
 release: clean
 	mkdir -p ../release
 	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-amd64 .
@@ -21,6 +24,7 @@ release: clean
 	GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-arm64 .
 	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-linux-arm64 .
 	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-arm64.exe .
+
 
 gh-upload:
 	gh release upload $(VERSION) ../release/tzap*

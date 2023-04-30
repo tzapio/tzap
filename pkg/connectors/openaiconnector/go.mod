@@ -7,7 +7,7 @@ replace github.com/tzapio/tzap => ../../../
 require (
 	github.com/sashabaranov/go-openai v1.9.0
 	github.com/tiktoken-go/tokenizer v0.1.0
-	github.com/tzapio/tzap v0.7.3
+	github.com/tzapio/tzap v0.7.4
 )
 
 require github.com/dlclark/regexp2 v1.9.0 // indirect
