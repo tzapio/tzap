@@ -39,6 +39,7 @@ Once you have installed Tzap, you can start using it immediately by typing `tzap
 Never write a git commit message again with Tzap! To try this feature, simply run:
 
 ```bash
+export OPENAI_APIKEY=<openai_key>
 tzap gitcommit
 ```
 
@@ -48,7 +49,7 @@ This command will automatically generate a meaningful git commit message based o
 
 To start developing with Tzap in a dev container, follow these steps:
 
-1. Ensure you have Docker installed on your machine.
+1. Ensure you have Docker and vscode installed on your machine.
 
 2. Clone the Tzap repository:
 
@@ -60,21 +61,10 @@ git clone https://github.com/tzapio/tzap.git
 
 ```bash
 cd tzap
+code .
 ```
 
-4. Build the dev container:
-
-```bash
-docker-compose build
-```
-
-5. Run the dev container:
-
-```bash
-docker-compose up -d
-```
-
-Now you can access the Tzap development environment in the running container. Edit the source code, run tests, and build new features using Tzap!
+Now you can access the Tzap development environment through starting a dev container. Edit the source code, run tests, and build new features using Tzap!
 
 ## Start Coding
 
