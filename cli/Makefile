@@ -14,7 +14,7 @@ clean:
 	rm -f ../release/tzap*
 
 tag:
-	gh release create v0.7.4 --title "v0.7.4 hotfixes" --notes "Contains mainly bugfixes" --prerelease
+	gh release create v0.7.5 --title "v0.7.5 hotfixes" --notes "Contains mainly bugfixes" --prerelease
 
 release: clean
 	mkdir -p ../release

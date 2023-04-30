@@ -11,13 +11,13 @@ replace github.com/tzapio/tzap/pkg/connectors/openaiconnector => ../pkg/connecto
 replace github.com/tzapio/tzap/pkg/tzapconnect => ../pkg/tzapconnect
 
 require (
-	github.com/tzapio/tzap v0.7.4
-	github.com/tzapio/tzap/pkg/tzapconnect v0.7.4
+	github.com/tzapio/tzap v0.7.5
+	github.com/tzapio/tzap/pkg/tzapconnect v0.7.5
 )
 
 require (
 	github.com/dlclark/regexp2 v1.9.0 // indirect
 	github.com/sashabaranov/go-openai v1.9.0 // indirect
 	github.com/tiktoken-go/tokenizer v0.1.0 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.4 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.5 // indirect
 )
