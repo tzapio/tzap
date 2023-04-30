@@ -1,5 +1,7 @@
+
 BINARY_NAME=tzap
-VERSION=$(shell git describe --tags --always)
+VERSION=v0.7.3
+#VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
 
 build:

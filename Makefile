@@ -1,6 +1,6 @@
 build: gomodtidy
 	cd cli && make release
-release:
+releaseGH:
 	cd cli && make gh-upload
 
 exGithubDoc:
