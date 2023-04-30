@@ -7,8 +7,8 @@ replace github.com/tzapio/tzap => ../../
 replace github.com/tzapio/tzap/pkg/connectors/openaiconnector => ../connectors/openaiconnector
 
 require (
-	github.com/tzapio/tzap v0.0.0-00010101000000-000000000000
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.0.0-00010101000000-000000000000
+	github.com/tzapio/tzap v0.7.3
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.3
 )
 
 require (

@@ -11,7 +11,7 @@ replace github.com/tzapio/tzap/pkg/tzapconnect => ../../tzapconnect
 require (
 	cloud.google.com/go/speech v1.15.0
 	cloud.google.com/go/texttospeech v1.6.0
-	github.com/tzapio/tzap v0.0.0-00010101000000-000000000000
+	github.com/tzapio/tzap v0.7.3
 	github.com/tzapio/tzap/pkg/tzapconnect v0.0.0-00010101000000-000000000000
 	google.golang.org/api v0.120.0
 )
@@ -30,7 +30,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/sashabaranov/go-openai v1.9.0 // indirect
 	github.com/tiktoken-go/tokenizer v0.1.0 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.0.0-00010101000000-000000000000 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
