@@ -54,7 +54,7 @@ func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, fro
 func getOpenAIAPIKeyFromEnv() (string, error) {
 	apiKey := os.Getenv("OPENAI_APIKEY")
 	if apiKey == "" {
-		return "", fmt.Errorf("OPENAI_APIKEY environment variable not set")
+		return "", fmt.Errorf("OPENAI_APIKEY environment variable not set\n\n\t\texport OPENAI_APIKEY=<apikey>")
 	}
 
 	return apiKey, nil

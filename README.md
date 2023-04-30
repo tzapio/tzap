@@ -22,24 +22,17 @@ With Tzap's intuitive design and powerful capabilities, you can quickly and effi
 
 Getting started with Tzap is easy! Follow the steps below to begin using Tzap in your projects.
 
-## Installation
+## Installation and Usage
 
-1. To install Tzap, simply download the `install.sh` script:
-
-```bash
-curl -sSL https://github.com/tzapio/tzap/releases/latest/download/install.sh -o install.sh
-```
-
-2. Make the script executable and run it:
+To install and run Tzap immediately, simply run the following command:
 
 ```bash
-chmod +x install.sh
-./install.sh
+curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash
 ```
 
-Now, Tzap is installed on your system and ready to use!
+This command will download and run the latest version of `install.sh`, which installs Tzap on your system and makes it ready to use.
 
-## Usage
+Once you have installed Tzap, you can start using it immediately by typing `tzap` in your terminal. 
 
 ### Tzap GitCommit
 

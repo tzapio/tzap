@@ -1,6 +1,7 @@
-buildCli: gomodtidy
+build: gomodtidy
 	cd cli && make release
-
+release:
+	cd cli && make gh-upload
 
 exGithubDoc:
 	go run examples/githubdoc/main.go
