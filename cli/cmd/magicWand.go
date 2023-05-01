@@ -32,7 +32,7 @@ command to make quick edits and seek help from your teammates versus an AI model
 
 		content := strings.Join(args[1:], " ")
 		tzap.
-			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true, MD5Rewrites: true})).
+			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true, MD5Rewrites: true, OpenAIModel: modelMap[settings.Model]})).
 			AddSystemMessage(fmt.Sprintf("Task: %s", content)).
 			LoadTask(filename).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
