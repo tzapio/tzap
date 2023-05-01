@@ -11,14 +11,16 @@ import (
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
+const (
+	maxTokensForGPT4    = 8000
+	maxTokensForDefault = 4000
+)
+
 var gitcommit2Cmd = &cobra.Command{
 	Use:   "gitcommit2",
 	Short: "Generate a git commit message using ChatGPT",
-	Long: `Prompts ChatGPT to generate a commit message and commits it to the current git repo. 
-	The generated commit message is based on the diff of the currently staged files.`,
+	Long:  `Prompts ChatGPT to generate a commit message and commits it to the current git repo. The generated commit message is based on the diff of the currently staged files.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gitcommit2 called")
-
 		diff := exec.Command("git", "diff",
 			"--staged",
 			"--patch-with-raw",
@@ -35,12 +37,16 @@ var gitcommit2Cmd = &cobra.Command{
 			return
 		}
 		fmt.Println(string(out))
-		contextSize := 4000
+
+		var contextSize int
 		if settings.Model == "gpt4" {
-			contextSize = 8000
+			contextSize = maxTokensForGPT4
+		} else {
+			contextSize = maxTokensForDefault
 		}
-		t := tzap.
-			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true, OpenAIModel: modelMap[settings.Model]})).
+
+		tzapConnector := tzapconnect.WithConfig(config.Configuration{SupressLogs: true, OpenAIModel: modelMap[settings.Model]})
+		t := tzap.NewWithConnector(tzapConnector).
 			SetHeader(`Write using semantic commits specification. \n\n` + CV100).
 			AddUserMessage(string(out))
 
@@ -59,8 +65,8 @@ var gitcommit2Cmd = &cobra.Command{
 		if c >= max {
 			fmt.Printf("WARNING: diff is too long. TRUNCATING TO %d of %d estimated tokens\n", max, c)
 		}
-		fmt.Printf("Summarizing %d estimated tokens\n", c)
-		if !stdin.ConfirmToContinue() {
+		ok := stdin.ConfirmToContinue()
+		if !ok {
 			return
 		}
 
@@ -74,7 +80,8 @@ var gitcommit2Cmd = &cobra.Command{
 
 		content := t.RequestChat().Data["content"].(string)
 		fmt.Println("\n", content)
-		if !stdin.ConfirmToContinue() {
+		ok = stdin.ConfirmToContinue()
+		if !ok {
 			return
 		}
 
@@ -88,5 +95,4 @@ var gitcommit2Cmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(gitcommit2Cmd)
-
 }
