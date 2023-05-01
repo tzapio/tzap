@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/pkg/config"
@@ -17,10 +18,11 @@ const (
 )
 
 var gitcommit2Cmd = &cobra.Command{
-	Use:   "gitcommit2",
+	Use:   "gitcommit2 [extra prompt]",
 	Short: "Generate a git commit message using ChatGPT",
 	Long:  `Prompts ChatGPT to generate a commit message and commits it to the current git repo. The generated commit message is based on the diff of the currently staged files.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		extraPrompt := strings.Join(args, " ")
 		diff := exec.Command("git", "diff",
 			"--staged",
 			"--patch-with-raw",
@@ -47,8 +49,11 @@ var gitcommit2Cmd = &cobra.Command{
 
 		tzapConnector := tzapconnect.WithConfig(config.Configuration{SupressLogs: true, OpenAIModel: modelMap[settings.Model]})
 		t := tzap.NewWithConnector(tzapConnector).
-			SetHeader(`Write using semantic commits specification. \n\n` + CV100).
-			AddUserMessage(string(out))
+			SetHeader(`Write using semantic commits specification. \n\n` + CV100)
+		if extraPrompt != "" {
+			t = t.AddUserMessage(extraPrompt)
+		}
+		t = t.AddUserMessage(string(out))
 
 		headerCount, err := t.CountTokens(t.Parent.Header)
 		if err != nil {
@@ -65,6 +70,7 @@ var gitcommit2Cmd = &cobra.Command{
 		if c >= max {
 			fmt.Printf("WARNING: diff is too long. TRUNCATING TO %d of %d estimated tokens\n", max, c)
 		}
+		println("Estimated tokens:", c)
 		ok := stdin.ConfirmToContinue()
 		if !ok {
 			return
