@@ -33,10 +33,8 @@ func getClient(secret string) *texttospeech.Client {
 	}
 	return client
 }
-func (g *GoogleTgenerator) SynthesizeSpeech(outputText, language, voice string) (*[]byte, error) {
+func (g *GoogleTgenerator) TextToSpeech(ctx context.Context, outputText, language, voice string) (*[]byte, error) {
 	// Set up the client
-	ctx := context.Background()
-
 	// Configure the request
 	request := &texttospeechpb.SynthesizeSpeechRequest{
 		Input: &texttospeechpb.SynthesisInput{
