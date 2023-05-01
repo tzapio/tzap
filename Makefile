@@ -1,7 +1,10 @@
 build: gomodtidy
 	cd cli && make release
-
-releaseGH:
+releaseTag:
+	cd cli && make tag
+release:
+	cd cli && make tag
+releaseUpload:
 	cd cli && make gh-upload
 
 exGithubDoc:
