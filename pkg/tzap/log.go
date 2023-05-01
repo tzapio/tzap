@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/util"
 )
 
@@ -35,6 +36,10 @@ var (
 )
 
 func Log(t *Tzap, messages ...interface{}) {
+	configuration := config.FromContext(t.C)
+	if configuration.SupressLogs {
+		return
+	}
 	globalMutex.Lock()
 	defer globalMutex.Unlock()
 
