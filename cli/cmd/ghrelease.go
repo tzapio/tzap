@@ -55,7 +55,7 @@ var ghrelease = &cobra.Command{
 
 		t := tzap.
 			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true, OpenAIModel: modelMap[settings.Model]})).
-			SetHeader(fmt.Sprintf(`User will post a changelog. You will output the Github release. Include a compare tag url.
+			SetHeader(fmt.Sprintf(`You will output a Github release. Include a compare tag url.
 
 Template:
 {"title":{title}, "notes":{github release in markdown}\}
