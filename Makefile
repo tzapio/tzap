@@ -1,6 +1,6 @@
 build: gomodtidy
 	cd cli && make release
-	cd cli && make tag
+
 releaseGH:
 	cd cli && make gh-upload
 
