@@ -1,4 +1,4 @@
 release:
 	mkdir -p release
-	cp ../release ./release
+	cp -r ../release ./
 	npm publish

@@ -11,7 +11,7 @@ var settings struct {
 	Model string
 }
 var rootCmd = &cobra.Command{
-	Use:   "cli",
+	Use:   "tzap",
 	Short: "Tzap Cli!",
 	Long:  `tbd`,
 }
