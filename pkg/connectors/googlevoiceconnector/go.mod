@@ -4,15 +4,13 @@ go 1.20
 
 replace github.com/tzapio/tzap => ../../../
 
-replace github.com/tzapio/tzap/pkg/connectors/openaiconnector => ../openaiconnector
-
 replace github.com/tzapio/tzap/pkg/tzapconnect => ../../tzapconnect
 
 require (
 	cloud.google.com/go/speech v1.15.0
 	cloud.google.com/go/texttospeech v1.6.0
-	github.com/tzapio/tzap v0.7.10
-	github.com/tzapio/tzap/pkg/tzapconnect v0.7.10
+	github.com/tzapio/tzap v0.7.11
+	github.com/tzapio/tzap/pkg/tzapconnect v0.7.11
 	google.golang.org/api v0.120.0
 )
 
@@ -30,7 +28,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/sashabaranov/go-openai v1.9.0 // indirect
 	github.com/tiktoken-go/tokenizer v0.1.0 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.10 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.11 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.8.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
