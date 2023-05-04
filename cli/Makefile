@@ -1,5 +1,6 @@
 
 BINARY_NAME=tzap
+PREVIOUS_VERSION=v0.7.7
 VERSION=v0.7.8
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
@@ -20,7 +21,7 @@ build: clean
 	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-arm64.exe .
 
 tzapWriteRelease:
-	tzap ghrelease $(VERSION) \
+	tzap ghrelease $(PREVIOUS_VERSION) $(VERSION) \
 
 
 
