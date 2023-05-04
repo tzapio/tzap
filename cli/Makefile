@@ -10,13 +10,6 @@ test:
 clean:
 	rm -rf ../release
 
-tzapWriteRelease:
-	if [ -n "$(shell gh release list | grep -E '^$(VERSION)\b')" ]; then \
-		tzap ghrelease $(VERSION) \
-	else \
-		$(error Release $(VERSION) does not exist yet); \
-	fi
-
 build: clean
 	mkdir -p ../release
 	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-amd64 .
@@ -26,13 +19,13 @@ build: clean
 	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-linux-arm64 .
 	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-arm64.exe .
 
+tzapWriteRelease:
+	tzap ghrelease $(VERSION) \
+
+
 
 gh-upload:
-	if [ -n "$(shell gh release list | grep -E '^$(VERSION)\b')" ]; then \
-		gh release upload $(VERSION) ../release/tzap* \
-	else \
-		$(error Release $(VERSION) does not exist yet); \
-	fi
+	gh release upload $(VERSION) ../release/tzap* \
 	
 	
 github-pre-release:
@@ -45,11 +38,10 @@ github-pre-release:
 	if [ -z "$(shell gh release list | grep -F pkg/connectors/googlevoiceconnector/$(VERSION))" ]; then \
 		gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
-	if [ -z "$(shell gh release list | grep -E '^$(VERSION)\b')" ]; then \
-		git tag -d $(git tag -l); \
-		gh release create $(VERSION) --prerelease --title "Release $(VERSION)" --notes ""; \
-		git fetch; \
-	fi
+	git tag -d $(git tag -l);
+	gh release create $(VERSION) --prerelease --title "Release $(VERSION)" --notes "";
+	git fetch;
+
 
 remove-releases:
 	gh release delete pkg/tzapconnect/$(VERSION) --yes
