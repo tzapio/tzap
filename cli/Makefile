@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
 PREVIOUS_VERSION=v0.7.7
-VERSION=v0.7.8
+VERSION=v0.7.10
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
 
@@ -21,15 +21,18 @@ build: clean
 	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-arm64.exe .
 
 tzapWriteRelease:
-	tzap ghrelease $(PREVIOUS_VERSION) $(VERSION) \
+	go run ./main.go ghrelease $(PREVIOUS_VERSION) $(VERSION) \
 
 
 
-gh-upload:
-	gh release upload $(VERSION) ../release/tzap* \
+github-upload:
+	gh release upload $(VERSION) ../release/tzap*
 	
 	
 github-pre-release:
+	git tag -d $(git tag -l);
+	gh release create $(VERSION) --prerelease --title "Release $(VERSION)" --notes "";
+	git fetch;
 	if [ -z "$(shell gh release list | grep -F pkg/tzapconnect/$(VERSION))" ]; then \
 		gh release create pkg/tzapconnect/$(VERSION) --prerelease --title "Release pkg/tzapconnect/$(VERSION)" --notes "Golang specific release"; \
 	fi
@@ -39,9 +42,7 @@ github-pre-release:
 	if [ -z "$(shell gh release list | grep -F pkg/connectors/googlevoiceconnector/$(VERSION))" ]; then \
 		gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
-	git tag -d $(git tag -l);
-	gh release create $(VERSION) --prerelease --title "Release $(VERSION)" --notes "";
-	git fetch;
+
 
 
 remove-releases:

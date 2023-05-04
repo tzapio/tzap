@@ -10,8 +10,8 @@ replace github.com/tzapio/tzap/pkg/connectors/openaiconnector => ../pkg/connecto
 
 require (
 	github.com/spf13/cobra v1.7.0
-	github.com/tzapio/tzap v0.7.8
-	github.com/tzapio/tzap/pkg/tzapconnect v0.7.8
+	github.com/tzapio/tzap v0.7.10
+	github.com/tzapio/tzap/pkg/tzapconnect v0.7.10
 )
 
 require (
@@ -20,5 +20,5 @@ require (
 	github.com/sashabaranov/go-openai v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tiktoken-go/tokenizer v0.1.0 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.8 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.10 // indirect
 )
