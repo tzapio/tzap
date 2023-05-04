@@ -3,8 +3,8 @@ build: gomodtidy
 release:
 	go test ./...
 	make -C cli build
-	make -C cli github-release
-	make -C cli createNewTag
+	make -C cli github-pre-release
+	make -C cli tzapWriteRelease
 	make -C cli gh-upload
 
 exGithubDoc:
