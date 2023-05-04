@@ -1,12 +1,12 @@
 build: gomodtidy
-	cd cli && make release
+	cd cli && make build
 release:
 	make gomodtidy
 	go test ./...
 	make -C cli build
 	make -C cli github-pre-release
 	make -C cli tzapWriteRelease
-	make -C cli gh-upload
+	make -C cli github-upload
 
 exGithubDoc:
 	go run examples/githubdoc/main.go
