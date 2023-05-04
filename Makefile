@@ -1,12 +1,11 @@
 build: gomodtidy
 	cd cli && make release
 release:
-	cd cli && make test
-	cd cli && make build
-	cd cli && make github-release
-releaseZ:
-	cd cli && make tag
-	cd cli && make gh-upload
+	go test ./...
+	make -C cli build
+	make -C cli github-release
+	make -C cli tag
+	make -C cli gh-upload
 
 exGithubDoc:
 	go run examples/githubdoc/main.go
@@ -28,3 +27,5 @@ gomodtidy:
 
 ts-build:
 	cd ts && npm run build
+
+.PHONY: release
