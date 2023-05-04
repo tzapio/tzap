@@ -6,26 +6,26 @@ import (
 
 // RequestTextToSpeech requests synthesized speech using specific (google voices) language and voice.
 // It returns a pointer to a new Tzap containing the synthesised speech 'audioContent'.
-func (t *Tzap) RequestTextToSpeech(language string, voice string) *Tzap {
+func (t *Tzap) RequestTextToSpeech(language string, voice string) *ErrorTzap {
 	println(t.TG)
 	audioContent, err := t.TG.TextToSpeech(t.C, t.Data["content"].(string), language, voice)
 	if err != nil {
-		panic(err)
+		return t.ErrorTzap(err)
 	}
 	data := types.MappedInterface{
 		"audioContent": audioContent,
 	}
 	withRequestGoogleVoice := t.AddTzap(&Tzap{Name: "withRequestGoogleVoice", Data: data})
-	return withRequestGoogleVoice
+	return withRequestGoogleVoice.ErrorTzap(nil)
 }
-func (t *Tzap) RequestTextifySpeech(audioContent *[]byte, language string) *Tzap {
+func (t *Tzap) RequestTextifySpeech(audioContent *[]byte, language string) *ErrorTzap {
 	text, err := t.TG.SpeechToText(t.C, audioContent, language)
 	if err != nil {
-		panic(err)
+		return t.ErrorTzap(err)
 	}
 	data := types.MappedInterface{
 		"spoken": text,
 	}
 	withRequestGoogleVoice := t.AddTzap(&Tzap{Name: "withRequestGoogleVoice", Data: data})
-	return withRequestGoogleVoice
+	return withRequestGoogleVoice.ErrorTzap(nil)
 }

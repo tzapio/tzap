@@ -17,7 +17,10 @@ func Test_RequestTextToSpeech_SynthesizeSpeech(t *testing.T) {
 	sampleLanguage := "en-US"
 	sampleVoice := "en-US-Wavenet-A"
 
-	resultTzap := rootTzap.RequestTextToSpeech(sampleLanguage, sampleVoice)
+	resultTzap := rootTzap.RequestTextToSpeech(sampleLanguage, sampleVoice).HandleError(func(et *tzap.ErrorTzap) *tzap.Tzap {
+		t.Errorf("ErrorTzap should not be called")
+		return nil
+	})
 	audioContent, ok := resultTzap.Data["audioContent"].(*[]byte)
 
 	if !ok {
@@ -43,7 +46,10 @@ func Test_RequestSpeechToText_TextifySpeech(t *testing.T) {
 	// Adjust this value to proper sample value for your testing needs.
 	sampleLanguage := "en-US"
 
-	resultTzap := rootTzap.RequestTextifySpeech(&sampleAudioContent, sampleLanguage)
+	resultTzap := rootTzap.RequestTextifySpeech(&sampleAudioContent, sampleLanguage).HandleError(func(et *tzap.ErrorTzap) *tzap.Tzap {
+		t.Errorf("ErrorTzap should not be called")
+		return nil
+	})
 	spokenText, ok := resultTzap.Data["spoken"].(string)
 
 	if !ok {
