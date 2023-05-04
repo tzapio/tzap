@@ -85,17 +85,16 @@ func (t *Tzap) AppendParentContext() *Tzap {
 }
 
 // onNewTzap is a helper method that appends the parent's context to the Tzap object.
-func (t *Tzap) onNew() *Tzap {
-
+func (t *Tzap) AddContext() *Tzap {
+	addId(t)
 	return t.AppendParentContext()
 }
 
 // AddTzap (mostly internal use) initializes and adds a new Tzap child to the current Tzap object.
 func (t *Tzap) AddTzap(tc *Tzap) *Tzap {
 	Logf(t, "Add tzap (%s)", tc.Name)
-	addId(tc)
 	tc.Parent = t
-	return (tc).onNew()
+	return tc.AddContext()
 }
 
 // CloneTzap (mostly internal use) clones a Tzap object and assigns values based on the provided Tzap object.
@@ -128,17 +127,14 @@ func (t *Tzap) CloneTzap(tc *Tzap) *Tzap {
 	if len(tc.Data) > 0 {
 		tz.Data = tc.Data
 	}
-	addId(tz)
-	return tz.onNew()
+
+	return tz.AddContext()
 }
 
 // HijackTzap (mostly internal use) effectively de-attaches from previous Tzap by changing the own parent to parents parent.
 // This can be used AddUserMessage("H").LoadTaskOrRequestNewTask().Hijack() .() Tzap replaces the current Tzap's context and parent with the provided Tzap's context and parent.
 func (t *Tzap) HijackTzap(tc *Tzap) *Tzap {
 	Logf(t, "Hijack tzap (%s)", tc.Name)
-	tc.C = t.C
-	tc.TG = t.TG
 	tc.Parent = t.Parent
-	addId(tc)
-	return tc
+	return tc.AddContext()
 }

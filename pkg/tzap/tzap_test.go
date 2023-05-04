@@ -84,7 +84,7 @@ func Test_CloneTzap_Defaults_ClonedTzapWithInitialProperties(t *testing.T) {
 }
 
 func Test_HijackTzap_Defaults_HijackedTzapWithParentProperties(t *testing.T) {
-	parent := tzap.InternalNew()
+	parent := tzap.InternalNew().AddUserMessage("Skip me")
 	child := &tzap.Tzap{
 		Name:   "ChildTzap",
 		Header: "ChildHeader",
@@ -97,12 +97,19 @@ func Test_HijackTzap_Defaults_HijackedTzapWithParentProperties(t *testing.T) {
 		},
 	}
 
-	hijackedChild := parent.HijackTzap(child)
-
-	if hijackedChild != child {
-		t.Errorf("expected hijacked child to be child but got %v", hijackedChild)
+	hijackedTzap := parent.HijackTzap(child)
+	if parent.Message.Content != "Skip me" {
+		t.Errorf("expected parent to have message 'Skip Me' but got %s", parent.Message.Content)
 	}
-	if hijackedChild.C == nil {
+	if hijackedTzap != child {
+		t.Errorf("expected hijacked child to be child but got %v", hijackedTzap)
+	}
+	if hijackedTzap.C == nil {
 		t.Errorf("expected context to be not nil")
 	}
+
+	if hijackedTzap.Parent.Message.Content == "Skip me" {
+		t.Errorf("expected hijacked child parent to not have message 'Skip Me' but got %s", hijackedTzap.Parent.Message.Content)
+	}
+
 }
