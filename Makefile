@@ -4,7 +4,7 @@ release:
 	go test ./...
 	make -C cli build
 	make -C cli github-release
-	make -C cli tag
+	make -C cli createNewTag
 	make -C cli gh-upload
 
 exGithubDoc:

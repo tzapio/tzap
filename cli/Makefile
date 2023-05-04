@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
 VERSION=v0.7.8
-#VERSION=$(shell git describe --tags --always)
+VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
 
 test:
@@ -10,8 +10,12 @@ test:
 clean:
 	rm -rf ../release
 
-tag:
-	tzap ghrelease $(VERSION)
+createNewTag:
+	if [ -n "$(shell gh release list | grep -E '^$(VERSION)\b')" ]; then \
+		tzap ghrelease $(VERSION) \
+	else \
+		$(error Release $(VERSION) does not exist yet); \
+	fi
 
 build: clean
 	mkdir -p ../release
@@ -24,11 +28,24 @@ build: clean
 
 
 gh-upload:
-	gh release upload $(VERSION) ../release/tzap*
+	if [ -n "$(shell gh release list | grep -E '^$(VERSION)\b')" ]; then \
+		gh release upload $(VERSION) ../release/tzap* \
+	else \
+		$(error Release $(VERSION) does not exist yet); \
+	fi
+	
 	
 github-release:
-	gh release create pkg/tzapconnect/$(VERSION) --prerelease --title "Release pkg/tzapconnect/$(VERSION)" --notes "Golang specific release"
-	gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"
-	gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"
-
+	if [ -z "$(shell gh release list | grep -F pkg/tzapconnect/$(VERSION))" ]; then \
+		gh release create pkg/tzapconnect/$(VERSION) --prerelease --title "Release pkg/tzapconnect/$(VERSION)" --notes "Golang specific release"; \
+	fi
+	if [ -z "$(shell gh release list | grep -F pkg/connectors/openaiconnector/$(VERSION))" ]; then \
+		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
+	fi
+	if [ -z "$(shell gh release list | grep -F pkg/connectors/googlevoiceconnector/$(VERSION))" ]; then \
+		gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"; \
+	fi
+	if [ -z "$(shell gh release list | grep -E '^$(VERSION)\b')" ]; then \
+		gh release create $(VERSION) --prerelease; \
+	fi
 .PHONY:
