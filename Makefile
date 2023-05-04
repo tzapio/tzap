@@ -1,13 +1,12 @@
 build: gomodtidy
 	cd cli && make release
-releaseTag:
-	cd cli && make tag
-
-releaseUpload:
+release:
 	cd cli && make test
 	cd cli && make build
-	cd cli && make gh-upload
 	cd cli && make github-release
+releaseZ:
+	cd cli && make tag
+	cd cli && make gh-upload
 
 exGithubDoc:
 	go run examples/githubdoc/main.go

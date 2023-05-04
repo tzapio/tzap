@@ -1,6 +1,6 @@
 
 BINARY_NAME=tzap
-VERSION=v0.7.9
+VERSION=v0.7.8
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
 
@@ -10,10 +10,10 @@ test:
 clean:
 	rm -rf ../release
 
-tag: release github-release
-	go run ./main.go ghrelease $(VERSION)
+tag:
+	tzap ghrelease $(VERSION)
 
-build: clean 
+build: clean
 	mkdir -p ../release
 	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-amd64 .
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-linux-amd64 .
@@ -23,7 +23,7 @@ build: clean
 	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-arm64.exe .
 
 
-gh-upload: release github-release
+gh-upload:
 	gh release upload $(VERSION) ../release/tzap*
 	
 github-release:
