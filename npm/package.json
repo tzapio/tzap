@@ -1,14 +1,12 @@
 {
   "name": "tzap",
-  "version": "0.7.11",
+  "version": "0.7.11-j",
   "description": "Tzap is a library designed to run GPT prompts in the terminal and seamlessly integrate GPT prompts into your code. ",
   "main": "",
-  "directories": {
-    "example": "examples"
-  },
+  "bin":"./bin/tzap",
   "scripts": {
     "test": "cd ../ && go test ./...",
-    "install": "node npm/install.js"
+    "install": "node install.js"
   },
   "repository": {
     "type": "git",

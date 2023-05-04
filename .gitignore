@@ -2,3 +2,6 @@ out
 *.md5
 node_modules
 release
+npm/README.md
+npm/bin
+npm/release

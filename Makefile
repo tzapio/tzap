@@ -1,7 +1,6 @@
 build: gomodtidy
 	cd cli && make build
 release:
-	make gomodtidy
 	go test ./...
 	make -C cli build
 	make -C cli github-pre-release
