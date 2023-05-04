@@ -70,6 +70,10 @@ var gitcommit2Cmd = &cobra.Command{
 		if c >= max {
 			fmt.Printf("WARNING: diff is too long. TRUNCATING TO %d of %d estimated tokens\n", max, c)
 		}
+		if c == 0 {
+			fmt.Printf("Diff is empty. Stage files to continue.\n")
+			return
+		}
 		println("Estimated tokens:", c)
 		ok := stdin.ConfirmToContinue()
 		if !ok {
