@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
+#!/usr/bin/env node
+const { spawn } = require('child_process');
 const os = require('os');
-const releaseDir = path.join(__dirname, 'release');
-const binDir = path.join(__dirname, 'bin');
+const path = require('path');
+
 const platform = os.platform();
 let arch = os.arch();
 
@@ -24,10 +24,20 @@ if (platform === 'win32') {
   process.exit(1);
 }
 
-const sourcePath = path.join(releaseDir, binaryName);
-const targetPath = path.join(binDir, 'tzap');
-if (!fs.existsSync(binDir)){
-  fs.mkdirSync(binDir);
-}
-fs.copyFileSync(sourcePath, targetPath);
-fs.chmodSync(targetPath, 0o755);
+const binDir = path.join(__dirname, 'release');
+const binaryPath = path.join(binDir, binaryName);
+
+// Run the tzap binary
+const tzap = spawn(binaryPath, []);
+
+tzap.stdout.on('data', (data) => {
+  console.log(`stdout: ${data}`);
+});
+
+tzap.stderr.on('data', (data) => {
+  console.error(`stderr: ${data}`);
+});
+
+tzap.on('close', (code) => {
+  console.log(`tzap process exited with code ${code}`);
+});
