@@ -18,14 +18,13 @@ func main() {
 		ApplyTemplateFN(documents.ReadmeGithub(
 			"Tzap is a library for Prompts as Code.",
 			[]string{
+				".tzap/usecases",
 				"pkg/types/interfaces.go",
-				"pkg/types/structs.go",
-				"pkg/tzap/templates.go",
-				"pkg/tzap/file.go",
-				"pkg/tzap/fetch-chat.go",
+				".tzap/examples",
+				"cli/cmd/semanticgitcommit.go",
 				"pkg/tzap/tzap.go",
 				"examples/githubdoc/main.go",
-				"examples/refactoring/main.go",
+				"README.md",
 			},
 			"README.md",
 			"",

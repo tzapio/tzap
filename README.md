@@ -1,7 +1,9 @@
-# Tzap
+# Tzap: Your Gateway to Prompt as Code
+
 Tzap is a library designed to seamlessly integrate GPT prompts into your code. It simplifies the process of building, customizing, and extending GPT prompts, making it more efficient for developers to incorporate desired outcomes in their GPT-based applications. With Tzap, you can create reusable instances and combine them in various ways to meet your specific needs.
 
 ## Key Features
+
 - Easily create reusable Tzap instances and templates
 - Apply templates and functions to existing Tzaps
 - Automate GPT copy-pasting tasks
@@ -12,59 +14,47 @@ Tzap is a library designed to seamlessly integrate GPT prompts into your code. I
 - Provide chat message context in Golang
 
 ## How It Works
+
 Tzap allows you to create reusable instances and apply templates and functions to them, making it convenient to adapt to new use cases, such as automating GPT copy-pasting, creating magic functions that evaluate GPT prompts, and crafting magic CLI tools. In addition, Tzap makes it simple to apply templates and functions to existing Tzaps, enhancing the library's flexibility.
 
 By using Tzap, you can effortlessly manage file paths and directories, fetch chat responses, and generate content using OpenAI's GPT-4 model. Furthermore, the library provides chat message context in Golang, ensuring a smooth integration process.
 
 With Tzap's intuitive design and powerful capabilities, you can quickly and efficiently implement desired outcomes in your GPT-based applications. So go ahead and give it a try, and let Tzap work its magic for you!
 
-# Getting Started with Tzap Command Line (GPT Git Commits)
+## Getting Started
 
-Getting started with Tzap is easy! Follow the steps below to begin using Tzap in your projects.
+### Installation and Usage
 
-## Installation and Usage
-
-To install and run Tzap immediately, simply run the following command:
+To install and run Tzap, simply use the following commands:
 
 ```bash
 npm install -g tzap
 ```
 
-Once you have installed Tzap, you can start using it immediately by typing `tzap` in your terminal. 
+```bash
+npx tzap
+```
 
-### Tzap GitCommit
+or
+
+```bash
+curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash 
+```
+
+Once you have installed Tzap, you can start using it immediately by typing `tzap` in your terminal.
+
+### Tzap Semantic Git Commit
 
 Never write a git commit message again with Tzap! To try this feature, simply run:
 
 ```bash
 export OPENAI_APIKEY=<openai_key>
-tzap gitcommit
+tzap semantic:gitcommit
 ```
 
 This command will automatically generate a meaningful git commit message based on your recent code changes.
 
-### Dev Container
-
-To start developing with Tzap in a dev container, follow these steps:
-
-1. Ensure you have Docker and vscode installed on your machine.
-
-2. Clone the Tzap repository:
-
-```bash
-git clone https://github.com/tzapio/tzap.git
-```
-
-3. Navigate to the Tzap directory:
-
-```bash
-cd tzap
-code .
-```
-
-Now you can access the Tzap development environment through starting a dev container. Edit the source code, run tests, and build new features using Tzap!
-
-## Start Coding
+## Example Code
 
 To start coding with Tzap, you can refer to the provided examples in the `examples` directory of the Tzap repository. These examples demonstrate various use cases and will help you understand how to utilize Tzap effectively.
 

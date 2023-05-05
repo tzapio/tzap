@@ -14,7 +14,6 @@ import (
 var gitcommitCmd = &cobra.Command{
 	Use:   "gitcommit",
 	Short: "Prompts ChatGPT to generate a commit message and commits it to the current git repo",
-	Long:  `Prompts ChatGPT to generate a commit message and commits it to the current git repo.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("gitcommit called")
 

@@ -21,7 +21,7 @@ var generateCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		filename := args[0]
-		if _, err := os.Stat(filename); os.IsNotExist(err) {
+		if _, err := os.Stat(filename); os.IsExist(err) {
 			absoluteFilePath, _ := filepath.Abs(filename)
 			fmt.Println("Could not find file:", absoluteFilePath, " err:", err)
 			os.Exit(1)
@@ -38,16 +38,17 @@ var generateCmd = &cobra.Command{
 					})).
 			ApplyTemplate(files.InspirationTemplate(
 				[]string{
-					"pkg/types/interfaces.go",
+					"cli/cmd/semanticgitcommit.go",
+					//"pkg/types/interfaces.go",
 					"pkg/types/structs.go",
 					"pkg/tzap/templates.go",
 					//"pkg/tzap/splitter/splitter.go",
-					"pkg/tzap/file.go",
+					//"pkg/tzap/file.go",
 					//"pkg/tzap/fetch-chat.go",
 					"pkg/tzap/tzap.go",
 					//"examples/githubdoc/main.go",
 					"examples/refactoring/main.go",
-					"templates/code/translate/translatecodefromto.go",
+					"templates/code/gocode/arguments.go",
 				},
 			)).
 			AddUserMessage(content).

@@ -1,4 +1,24 @@
+###
+Do not use these words: POWERFUL, INNOVATIVE
+Rewrite a new README.md, just use material as inspiration.
+First reason: How can the text be improved. Then make a strategy. Then write a new github document.
+###
+
+Tzap is a CLI tool that simplifies mundane tasks with both code and managing ChatGPT. It's terminal tool usge is: "tzap semantic:gitcommit" and "magicwand <file> <prompt>" It also offers a solid prompt engine with control flow, loops, recursion and templates.
+
+
+It makes it a breeze when I use to make Semantic Commits!
+
 - Automate GPT copy pasting
+- Prompt string concat
 - Create magic functions that evaluate gpt prompts rather than code.
-- Create magic CLI tools
+- Use semantic commits
 - Apply templates and functions to existing Tzaps
+
+It can be installed using 
+
+npm install -g tzap
+
+or
+
+curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash 
