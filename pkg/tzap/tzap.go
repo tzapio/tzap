@@ -29,7 +29,7 @@ type Tzap struct {
 	Data    types.MappedInterface `json:"-"`
 	C       context.Context       `json:"-"`
 
-	types.ITzap[*Tzap] `json:"-"`
+	types.ITzap[*Tzap, any] `json:"-"`
 
 	Parent *Tzap
 
