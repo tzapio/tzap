@@ -10,8 +10,8 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-func FindRelevantFile(workdir, language, prompt, selectionCriteria string) types.NamedTemplate[*tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap]{
+func FindRelevantFile(workdir, language, prompt, selectionCriteria string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "findRelevantFile",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 

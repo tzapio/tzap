@@ -13,6 +13,7 @@ import (
 	"github.com/tzapio/tzap/internal/filelog"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
+
 	"github.com/tzapio/tzap/pkg/types"
 )
 
