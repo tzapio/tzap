@@ -1,6 +1,6 @@
 package types
 
-type ITzap[T any] interface {
+type ITzap[T any, Z any] interface {
 	//
 	AddUserMessage(contents ...string) T
 	AddAssistantMessage(contents ...string) T
@@ -31,16 +31,16 @@ type ITzap[T any] interface {
 	Accumulate(func(T) T) T
 	Exit() T
 
-	//ApplyTemplate(template T) T
+	ApplyTemplate(nt NamedTemplate[T, Z]) T
 	ApplyTemplateFN(nt func(T) T) T
-	ApplyTemplate2(nt NamedTemplate[T]) T
+	ApplyTemplateP(T) T
 
 	Recursive(func(tzapThatCreatesNewChildren T) T) T
 	CheckAndHandleGlobalOccurrences(references int, filename string, noOccurrence, handleOccurrence func(T) T) T
 	CheckAndHandleRecurrences(references int, filename string, noReccurance, handleRecurrence func(T) T) T
 	FileMustContainHandleGlobalOccurrences(references int, filename string, noOccurrence, handleOccurrence func(T) T) T
 }
-type NamedTemplate[T any] struct {
+type NamedTemplate[T any, Z any] struct {
 	Name     string
-	Template func(T) T // Assuming the function takes no arguments and returns no values
+	Template func(T) Z // Assuming the function takes no arguments and returns no values
 }
