@@ -8,8 +8,8 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedTemplate[*tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap]{
+func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "translateCodeFromTo",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 			filein := t.Data["filepath"].(string)
@@ -42,8 +42,8 @@ func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedTemp
 
 }
 
-func MakeCodeTSMessage(mission, task, filein, fileout string) types.NamedTemplate[*tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap]{
+func MakeCodeTSMessage(mission, task, filein, fileout string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "makeCodeTSMessage",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.

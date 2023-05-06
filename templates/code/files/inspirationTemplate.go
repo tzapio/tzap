@@ -5,8 +5,8 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func InspirationTemplate(inspirationFiles []string) types.NamedTemplate[*tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap]{
+func InspirationTemplate(inspirationFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "inspirationFiles",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.
