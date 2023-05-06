@@ -16,7 +16,7 @@ func RequestChat() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			extraPrompt := t.Data["extraPrompt"].(string)
 			diff := t.Data["git-diff"].(string)
-			t = t.SetHeader(`Write using semantic commits specification. \n\n` + CV100)
+			t = t.SetHeader(`Write one commit using semantic commit specification. \n\n` + CV100)
 			if extraPrompt != "" {
 				t = t.AddUserMessage(extraPrompt)
 			}
