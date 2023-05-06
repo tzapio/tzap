@@ -23,8 +23,8 @@ func Test_ErrorTzap_ErrorNotHandled_ReturnsError(t *testing.T) {
 				},
 			}).
 			ErrorTzap(fmt.Errorf("MOCK ERROR")).
-			HandleError(func(et *tzap.ErrorTzap) *tzap.Tzap {
-				return nil
+			HandleError(func(et *tzap.ErrorTzap) error {
+				return et.Err
 			}).
 			AddSystemMessage("Hello!")
 	})

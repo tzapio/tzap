@@ -16,11 +16,11 @@ func (t *Tzap) ErrorTzap(err error) *ErrorTzap {
 	}
 }
 
-func (t *ErrorTzap) HandleError(cb func(*ErrorTzap) *Tzap) *Tzap {
+func (t *ErrorTzap) HandleError(cb func(*ErrorTzap) error) *Tzap {
 	if t.Err != nil {
 		r := cb(t)
-		if r == nil {
-			panic(t.Err)
+		if r != nil {
+			panic(r)
 		}
 	}
 	return t.Tzap
