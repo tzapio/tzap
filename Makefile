@@ -3,9 +3,14 @@ build: gomodtidy
 release:
 	go test ./...
 	make -C cli build
-	make -C cli github-pre-release
+	make -C cli tzapPrepareRelease
 	make -C cli tzapWriteRelease
+
 	make -C cli github-upload
+releaseOther:
+	make -C cli github-otherpkgs-release
+
+
 
 exGithubDoc:
 	go run examples/githubdoc/main.go
