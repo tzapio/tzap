@@ -28,16 +28,16 @@ const binDir = path.join(__dirname, 'release');
 const binaryPath = path.join(binDir, binaryName);
 
 // Run the tzap binary
-const tzap = spawn(binaryPath, []);
-
+const tzap = spawn(binaryPath, process.argv.slice(2));
+process.stdin.pipe(tzap.stdin);
 tzap.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`);
+  console.log(`${data}`);
 });
 
 tzap.stderr.on('data', (data) => {
-  console.error(`stderr: ${data}`);
+  console.error(`${data}`);
 });
 
 tzap.on('close', (code) => {
-  console.log(`tzap process exited with code ${code}`);
+  process.exit(code);
 });
