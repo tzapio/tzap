@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tiktoken-go/tokenizer"
 	"github.com/tzapio/tzap/internal/filelog"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
@@ -34,35 +33,6 @@ func (ot OpenaiTgenerator) GenerateChat(ctx context.Context, messages []types.Me
 	}
 	return content, nil
 }
-func (ot OpenaiTgenerator) CountTokens(content string) (int, error) {
-	enc, err := tokenizer.Get(tokenizer.Cl100kBase)
-	if err != nil {
-		panic("error getting tokenizer")
-	}
-
-	ids, _, err := enc.Encode(content)
-	if err != nil {
-		return 0, errors.New("error couting tokens while encoding")
-	}
-	return len(ids), err
-}
-
-func (ot OpenaiTgenerator) OffsetTokens(content string, from int, to int) (string, error) {
-	enc, err := tokenizer.Get(tokenizer.Cl100kBase)
-	if err != nil {
-		panic("error getting tokenizer")
-	}
-
-	ids, _, err := enc.Encode(content)
-	if err != nil {
-		return "", errors.New("error couting tokens while encoding")
-	}
-	if to < len(ids) {
-		ids = ids[from:to]
-	}
-	s, _ := enc.Decode(ids)
-	return s, err
-}
 
 // fetchChatResponse requests openai-chat completion for the given Tzap and returns the modified content.
 func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel string, stream bool, messages []types.Message) (string, error) {
@@ -76,17 +46,17 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 	filelog.LogData(ctx, request, filelog.RequestLog)
 	var content string
 	if stream {
-		cntnt, err := ot.streamCompletion(request)
+		streamContent, err := ot.streamCompletion(request)
 		if err != nil {
 			return "", fmt.Errorf("chatcompletion error: %v", err)
 		}
-		content = cntnt
+		content = streamContent
 	} else {
-		cntnt, err := ot.createChatCompletion(request)
+		responseContent, err := ot.createChatCompletion(request)
 		if err != nil {
 			return "", fmt.Errorf("chatcompletion error: %v", err)
 		}
-		content = cntnt
+		content = responseContent
 	}
 	filelog.LogData(ctx, content, filelog.ResponseLog)
 	return content, nil
