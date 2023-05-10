@@ -33,7 +33,6 @@ func Test_ApplyTemplateFN_RootTzap_ReturnTzapWithAppliedTemplate(t *testing.T) {
 	expectedMessage := "Hello Template!"
 	templateFunc := func(t *tzap.Tzap) *tzap.Tzap {
 		appended := t.AddAssistantMessage(expectedMessage)
-		println("ran!")
 		return appended
 	}
 
