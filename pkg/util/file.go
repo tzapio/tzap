@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func ReadFile(filepath string) (string, error) {
@@ -43,4 +44,34 @@ func ListFilesInDir(dir string) []string {
 	}
 
 	return files
+}
+func WalkFilesInDir(root string) ([]string, error) {
+	goFiles := []string{}
+
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+
+		if !info.IsDir() {
+			goFiles = append(goFiles, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return goFiles, nil
+}
+
+func FilterFiles(files []string, ext string) []string {
+	filtered := []string{}
+	for _, file := range files {
+		if strings.HasSuffix(file, ext) {
+			filtered = append(filtered, file)
+		}
+	}
+	return filtered
 }
