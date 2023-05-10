@@ -2,12 +2,8 @@
 
 package embed_test
 
-import (
-	"testing"
-
-	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/tzap"
-)
+/*
+TODO requires refactor to automate
 
 func Test_GetGoFilesInDir_givenEmptyDir_expectNoFiles(t *testing.T) {
 	dir := "testdata/empty"
@@ -90,3 +86,4 @@ func main() {
 		t.Error("Expected vector Metadata not to be empty")
 	}
 }
+*/

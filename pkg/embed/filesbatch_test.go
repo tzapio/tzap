@@ -63,6 +63,7 @@ func Test_SplitCachedUncachedEmbeddings_GivenEmbeddings_SplitsCorrectly(t *testi
 func Test_SaveBatchToFile_GivenBatch_SavesToFile(t *testing.T) {
 	/*
 		TODO requires refactor to automate
+
 		// Create test input data
 		testBatch := []types.Vector{
 			{
