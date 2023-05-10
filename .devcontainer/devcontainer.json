@@ -1,19 +1,15 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+
 {
   "name": "tzap",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  // "image": "mcr.microsoft.com/devcontainers/base:bullseye"
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "context": ".."
-  },
+  "dockerComposeFile": "./docker-compose.yml",
+  "service":"app",
   "workspaceFolder": "/home/vscode/go/src/github.com/tzapio/tzap",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/vscode/go/src/github.com/tzapio/tzap,type=bind",
-  // Features to add to the dev container. More info: https://containers.dev/features.
+    // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker": {}
   },
+  
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [3333, 8787],
   // Configure tool-specific properties.
@@ -21,10 +17,12 @@
     "vscode": {
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
-        "golang.Go",
-        "tintinweb.graphviz-interactive-preview",
-        "mhutchie.git-graph"
-      ]
+		"golang.Go",
+		"tintinweb.graphviz-interactive-preview",
+		"mhutchie.git-graph",
+		"ms-azuretools.vscode-docker",
+		"GitHub.copilot"
+	]
     }
   }
 }

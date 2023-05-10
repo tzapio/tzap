@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    volumes:
+      - ..:/home/vscode/go/src/github.com/tzapio/tzap
+    working_dir: /home/vscode/go/src/github.com/tzapio/tzap
+    command: sleep infinity
+  #  depends_on:
+  #    - redis
+  #redis:
+  #  build: 
+  #    context: .
+  #    dockerfile: Dockerfile.redis
+  #  command: ["redis-server", "--appendonly", "yes", "--protected-mode","no", "--loadmodule","/RediSearch/bin/linux-x64-release/search/redisearch.so"]
+  #  volumes:
+  #    - ../.redis-data/:/data
+  #  ports:
+  #    - "6379:6379"

@@ -1,0 +1,14 @@
+FROM redis/redis-stack-server:latest
+
+RUN apt-get update
+RUN apt-get install -y git build-essential make
+RUN apt-get install -y git python3 pip
+
+RUN git clone --recursive https://github.com/RediSearch/RediSearch.git
+RUN cd RediSearch && make setup
+RUN cd RediSearch && make build
+CMD ["redis-server", "--appendonly", "yes", "--loadmodule","/RediSearch/bin/linux-x64-release/search/redisearch.so"]
+
+VOLUME /data
+
+EXPOSE 6379
