@@ -1,7 +1,6 @@
 package types
 
 type ITzap[T any, Z any] interface {
-	//
 	AddUserMessage(contents ...string) T
 	AddAssistantMessage(contents ...string) T
 	AddSystemMessage(contents ...string) T
@@ -24,7 +23,7 @@ type ITzap[T any, Z any] interface {
 	HijackTzap(tc T) T
 
 	//ControlFlow
-	BubbleTzap(fn func(t T)) T
+	WorkTzap(fn func(t T)) T
 	IsolatedTzap(fn func(t T)) T
 	MutationTzap(fn func(t T) T) T
 	Map(func(T) T) T
