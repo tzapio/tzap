@@ -8,6 +8,8 @@ use ./pkg/connectors/openaiconnector
 
 use ./pkg/connectors/googlevoiceconnector
 
+use ./pkg/connectors/redisembeddbconnector
+
 use ./examples
 
 use ./cli
