@@ -9,6 +9,12 @@ import (
 type TGenerator interface {
 	TextToSpeech(ctx context.Context, content, language, voice string) (*[]byte, error)
 	SpeechToText(ctx context.Context, audioContent *[]byte, language string) (string, error)
+	FetchEmbedding(ctx context.Context, content ...string) ([][]float32, error)
+	AddEmbeddingDocument(ctx context.Context, id string, embedding []float32, metadata map[string]string) error
+	GetEmbeddingDocument(ctx context.Context, id string) (Vector, bool, error)
+	DeleteEmbeddingDocument(ctx context.Context, id string) error
+	SearchWithEmbedding(ctx context.Context, embedding QueryFilter, k int) (SearchResults, error)
+	ListAllEmbeddingsIds(ctx context.Context) (SearchResults, error)
 	GenerateChat(ctx context.Context, messages []Message, stream bool) (string, error)
 	CountTokens(ctx context.Context, content string) (int, error)
 	OffsetTokens(ctx context.Context, content string, from int, to int) (string, error)
