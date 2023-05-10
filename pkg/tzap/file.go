@@ -29,6 +29,7 @@ func (t *Tzap) LoadFileDir(dir string, match string) *Tzap {
 func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 	var ts []*Tzap
 	for _, file := range filepaths {
+		println(file, len(file))
 		// Check if the file is a regular file and its name contains "test" if test is true.
 		if info, err := os.Stat(file); err == nil && !info.IsDir() {
 			// Load the file content and create a Tzap with the file content as the message content.
@@ -66,35 +67,23 @@ func (t *Tzap) LoadTask(filepath string) *Tzap {
 			Data: data,
 		})
 	getMessagesGraphViz(loadTaskFromFile)
+	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
 	return loadTaskFromFile
 }
 
-// PrepareOutputTask creates a Tzap with an empty file content to be used for outputting to a file
-func (t *Tzap) PrepareOutputTask(filepath string) *Tzap {
-	data := types.MappedInterface{
-		"filepath": filepath,
-		"content":  "",
-	}
-	withOutputTask := t.AddTzap(&Tzap{
-		Name: "withOutputTask",
-		Data: data,
-	})
-	return withOutputTask
-}
-
 // LoadTaskOrRequestNewTask loads a file if it exists, otherwise requests a new file content from OpenAI and applies the changes to the original file
-func (t *Tzap) LoadTaskOrRequestNewTask(filepath string) *Tzap {
-	Log(t, "Opening", filepath)
+func (t *Tzap) LoadTaskOrRequestNewTask(filePath string) *Tzap {
+	Log(t, "Opening", filePath)
 	t = t.AddTzap(&Tzap{
 		Name: "LoadTaskOrRequestNewTask"})
 
 	var out *Tzap
-	if _, err := os.Stat(filepath); err != nil {
+	if _, err := os.Stat(filePath); err != nil {
 		out = t.
-			PrepareOutputTask(filepath).
-			FetchTask()
+			FetchTask(filePath)
 	} else {
-		out = t.LoadTask(filepath)
+		out = t.LoadTask(filePath)
 	}
+
 	return out
 }
