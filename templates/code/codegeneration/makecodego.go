@@ -9,7 +9,7 @@ import (
 func MakeCodeGO(mission, task string) func(t *tzap.Tzap) *tzap.Tzap {
 	return func(t *tzap.Tzap) *tzap.Tzap {
 		filein := t.Data["filepath"].(string)
-		fileout := strings.TrimSuffix(t.Data["filepath"].(string), ".go") + ".go"
+		fileout := strings.TrimSuffix(t.Data["filepath"].(string), ".go") + "_test.go"
 		if strings.HasSuffix(filein, "_test.go") || strings.Contains(filein, "file2") || strings.Contains(filein, "interfaces.go") {
 			return t
 		}
@@ -28,7 +28,7 @@ func MakeCodeGO(mission, task string) func(t *tzap.Tzap) *tzap.Tzap {
 				"{golang code}").
 			AddSystemMessage(
 				"###",
-				"//file: "+filein+"\n",
+				"###file: "+filein+"\n",
 				t.Data["content"].(string),
 			).
 			LoadTaskOrRequestNewTaskMD5(fileout)

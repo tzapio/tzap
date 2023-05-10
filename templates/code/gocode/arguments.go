@@ -16,7 +16,7 @@ const (
 
 func DeserializedArguments(dataname string, args []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
-		Name: "DeserializedArguments",
+		Name: "deserializedArguments",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 			t.Data[dataname] = strings.Join(args, " ")
 			return t
@@ -24,7 +24,7 @@ func DeserializedArguments(dataname string, args []string) types.NamedTemplate[*
 }
 func SetContextSize() types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
-		Name: "SetContextSize",
+		Name: "setContextSize",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 			settings := config.FromContext(t.C)
 			var contextSize int
@@ -41,7 +41,7 @@ func SetContextSize() types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 
 func CountTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
-		Name: "CountTokens",
+		Name: "countTokens",
 		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			diff := t.Data["git-diff"].(string)
 			headerCount, err := t.CountTokens(t.Parent.Header)
@@ -61,14 +61,13 @@ func CountTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 
 func TruncateTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
-		Name: "TruncateTokens",
+		Name: "truncateTokens",
 		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			contextSize := t.Data["contextSize"].(int)
 			headerTokens := t.Data["headerTokens"].(int)
 			contentTokens := t.Data["contentTokens"].(int)
 
 			max := contextSize - headerTokens - 1500
-			println(contextSize, headerTokens, contentTokens, max)
 			if contentTokens >= max {
 				offsetStart := 0
 				offsetEnd := 0 + max
@@ -77,7 +76,6 @@ func TruncateTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 				if err != nil {
 					return t.ErrorTzap(fmt.Errorf("could not offset tokens: %v", err))
 				}
-				println(len(diff), len(truncatedDiff))
 				t.Data["git-diff"] = truncatedDiff
 			}
 
