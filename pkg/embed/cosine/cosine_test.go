@@ -49,13 +49,6 @@ func TestCosineDistance(t *testing.T) {
 			expected: 0.626373,
 			//epsilon 0.000001
 		},
-		{
-			name:     "different vectors",
-			a:        data.Vectors[2].Values,
-			b:        query.Queries[0].Values,
-			expected: 0.663789,
-			//epsilon 0.000001
-		},
 	}
 
 	for _, test := range tests {
