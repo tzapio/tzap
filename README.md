@@ -1,17 +1,27 @@
-# Tzap: Your Gateway to Prompt as Code
+# Tzap: Think it and it's there. A toolset for GPT templating, prompt as Code and simple CLI automations
 
-Tzap is a library designed to seamlessly integrate GPT prompts into your code. It simplifies the process of building, customizing, and extending GPT prompts, making it more efficient for developers to incorporate desired outcomes in their GPT-based applications. With Tzap, you can create reusable instances and combine them in various ways to meet your specific needs.
+### Quick install (NPM):
+```bash
+npm install -g tzap
+export OPENAI_APIKEY=<apikey>
+# Do a git add <file> then do:
+tzap semantic:gitcommit
+# Adapt below to your project!
+tzap embeddedprompt outputfile.go "can you add a tzap cli command that enables users to generate code based on the users code without requiring them to manage prompts themselves? Utilize Tzap embedding search."
+```
+
+## What is Tzap?
+Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their chatbot-based applications.
 
 ## Key Features
 
-- Easily create reusable Tzap instances and templates
-- Apply templates and functions to existing Tzaps
+- Simple CLI tool
+- Easily create prompts with domain specific contexts using Tzap functions, templates, loops and control flows.
+- Build apps on top of Tzap and GPT
 - Automate GPT copy-pasting tasks
 - Integrate magic functions that evaluate GPT prompts instead of code
-- Develop magic CLI tools
 - Effortlessly manipulate file paths and directories
-- Generate content using OpenAI's GPT-4 model
-- Provide chat message context in Golang
+- Generate multi-modal content 
 
 ## How It Works
 
@@ -30,6 +40,8 @@ To install and run Tzap, simply use the following commands:
 ```bash
 npm install -g tzap
 ```
+
+or 
 
 ```bash
 npx tzap
