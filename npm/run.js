@@ -12,7 +12,7 @@ if (arch === 'x64') {
 }
 
 let binaryName;
-const version = "v0.7.11"
+const version = "v0.7.12"
 if (platform === 'win32') {
   binaryName = `tzap-${version}-windows-${arch}.exe`;
 } else if (platform === 'darwin') {
@@ -31,11 +31,11 @@ const binaryPath = path.join(binDir, binaryName);
 const tzap = spawn(binaryPath, process.argv.slice(2));
 process.stdin.pipe(tzap.stdin);
 tzap.stdout.on('data', (data) => {
-  console.log(`${data}`);
+  process.stdout.write(`${data}`);
 });
 
 tzap.stderr.on('data', (data) => {
-  console.error(`${data}`);
+  process.stderr.write(`${data}`);
 });
 
 tzap.on('close', (code) => {
