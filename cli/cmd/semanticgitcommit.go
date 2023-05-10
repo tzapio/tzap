@@ -10,6 +10,7 @@ import (
 	"github.com/tzapio/tzap/templates/code/gocode"
 )
 
+// RequestChat is a template that requests a chat from ChatGPT.
 func RequestChat() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "RequestChat",
@@ -31,7 +32,8 @@ var semanticGitcommitCmd = &cobra.Command{
 	Short: "Generate a git commit message using ChatGPT",
 	Long:  `Prompts ChatGPT to generate a commit message and commits it to the current git repo. The generated commit message is based on the diff of the currently staged files.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tzapConnector := tzapconnect.WithConfig(config.Configuration{SupressLogs: true, OpenAIModel: modelMap[settings.Model]})
+		defer tzap.HandleShutdown()
+		tzapConnector := tzapconnect.WithConfig(config.Configuration{OpenAIModel: modelMap[settings.Model]})
 		err := tzap.HandlePanic(func() {
 			tzap.NewWithConnector(tzapConnector).
 				ApplyTemplate(gocode.DeserializedArguments("extraPrompt", args)).
@@ -58,7 +60,9 @@ var semanticGitcommitCmd = &cobra.Command{
 					return et.Err
 				})
 		})
-		println(err)
+		if err != nil {
+			println(err.Error())
+		}
 	},
 }
 

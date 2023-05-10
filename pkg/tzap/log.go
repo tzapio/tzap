@@ -37,7 +37,7 @@ var (
 
 func Log(t *Tzap, messages ...interface{}) {
 	configuration := config.FromContext(t.C)
-	if configuration.SupressLogs {
+	if !configuration.EnableLogs {
 		return
 	}
 	globalMutex.Lock()

@@ -15,7 +15,6 @@ var gitcommitCmd = &cobra.Command{
 	Use:   "gitcommit",
 	Short: "Prompts ChatGPT to generate a commit message and commits it to the current git repo",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("gitcommit called")
 
 		diff := exec.Command("git", "diff",
 			"--staged",
@@ -35,7 +34,7 @@ var gitcommitCmd = &cobra.Command{
 		fmt.Println(string(out))
 
 		t := tzap.
-			NewWithConnector(tzapconnect.WithConfig(config.Configuration{SupressLogs: true})).
+			NewWithConnector(tzapconnect.WithConfig(config.Configuration{})).
 			SetHeader(`Write a git commit message maximum 30 words.
 			
 Template:

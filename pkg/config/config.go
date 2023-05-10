@@ -15,7 +15,7 @@ type Configuration struct {
 	MD5Rewrites   bool
 	// Simple strings.Contains(file,include) matching. Default [""] = include all.
 	MD5IncludeList []string
-	SupressLogs    bool
+	EnableLogs     bool
 	LoggerOutput   string
 }
 
@@ -25,7 +25,7 @@ var defaultConfig = Configuration{
 	TruncateLimit:  0,
 	MD5Rewrites:    false,
 	MD5IncludeList: []string{""},
-	SupressLogs:    false,
+	EnableLogs:     false,
 	LoggerOutput:   "",
 }
 
@@ -57,7 +57,7 @@ func withDefaults(userConfig Configuration) Configuration {
 		TruncateLimit:  userConfig.TruncateLimit,
 		MD5Rewrites:    userConfig.MD5Rewrites || defaults.MD5Rewrites,
 		MD5IncludeList: userConfig.MD5IncludeList,
-		SupressLogs:    userConfig.SupressLogs || defaults.SupressLogs,
+		EnableLogs:     userConfig.EnableLogs || defaults.EnableLogs,
 		LoggerOutput:   userConfig.LoggerOutput,
 	}
 }

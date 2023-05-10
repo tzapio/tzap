@@ -1,14 +1,20 @@
 package tzap_test
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
 func Test_Log_singleMessage_messageBuffered(t *testing.T) {
-	tt := tzap.InternalNew()
+	ctx := context.Background()
+	ctx = config.NewContext(ctx, config.Configuration{
+		EnableLogs: true,
+	})
+	tt := &tzap.Tzap{C: ctx}
 	tt.Name = "TestTzap"
 
 	tzap.ResetFlush()
@@ -23,7 +29,11 @@ func Test_Log_singleMessage_messageBuffered(t *testing.T) {
 }
 
 func Test_Log_multipleMessages_messageBufferOverflow(t *testing.T) {
-	tt := tzap.InternalNew()
+	ctx := context.Background()
+	ctx = config.NewContext(ctx, config.Configuration{
+		EnableLogs: true,
+	})
+	tt := &tzap.Tzap{C: ctx}
 	tt.Name = "TestTzap"
 
 	for i := 0; i < 20; i++ {
@@ -71,7 +81,11 @@ func Test_LastExecutionTime_limitedLogging(t *testing.T) {
 }
 
 func Test_LastExecutionTime_unlimitedLogging(t *testing.T) {
-	tt := tzap.InternalNew()
+	ctx := context.Background()
+	ctx = config.NewContext(ctx, config.Configuration{
+		EnableLogs: true,
+	})
+	tt := &tzap.Tzap{C: ctx}
 	tt.Name = "TestTzap"
 
 	tzap.Log(tt, "Initial log")
