@@ -18,6 +18,7 @@ Tzap is a library that simplifies all things GPT and code. It provides both a CL
 
 ## Notes:
 Tzap is in a beta phase.
+Tzap has the power to overwrite existing files, so commit local changes first. 
 Using embeddings will upload most files to OpenAIs servers. (Alternative solutions are being looked into)
 Using external APIs incurs small costs, read [Cost Estimation](#cost-estimation).
 
@@ -65,7 +66,30 @@ curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | ba
 
 Once you have installed Tzap, you can start using it immediately by typing `tzap` in your terminal.
 
-### Tzap Semantic Git Commit
+## Tzap Embedding Prompt CLI
+
+The `tzap embeddingprompt` command allows you to generate code or content based on embedding search from your existing code. This enables GPT to incorporate your code knowledge and provide more relevant and accurate outputs. By providing additional context, GPT can generate even more accurate code snippets or content based on the provided files.
+
+1. Use the `tzap embeddingprompt` command with the following syntax:
+ ```
+ tzap embeddingprompt <output_file> "<prompt>" [--inspiration=filepath1,filepath2,...]
+ ```
+
+ - `<output_file>`: The name of the file you want to store the generated content.
+ - `<prompt>`: The text prompt you want to provide to GPT. Make your prompt as clear as possible and enclose it in double quotes.
+ - `--inspiration`: (Optional) A flag followed by a comma-separated list of file paths, which are used as inspiration files to enhance GPT's general understanding.
+
+For example, this text was generated using:
+
+```
+npx tzap embeddingprompt -m gpt4 README.md2 "Add to the README.md an explanation on how to use the cli command tzap embeddingprompt" -i README.md 
+``` 
+
+Feel free to customize the `<output_file>` and `<prompt>` according to your desired outcomes.
+
+You can also use the `--inspiration` flag to specify relevant inspiration files to provide GPT with better context:
+
+### Tzap Semantic Git Commit CLI
 
 Never write a git commit message again with Tzap! To try this feature, simply run:
 
