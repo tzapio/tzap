@@ -1,9 +1,11 @@
 package tzap
 
 import (
+	"errors"
 	"fmt"
 	"html"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -39,7 +41,29 @@ type GraphVizGraph struct {
 	SubGraphs []*GraphVizSubgraph
 }
 
-func GenerateGraphvizDotFile2(filename string, graph *GraphVizGraph) error {
+func ConvertGraphvizToSVG(inputFile string, outputFile string) error {
+	// Check if the input file exists
+	if _, err := os.Stat(inputFile); os.IsNotExist(err) {
+		return errors.New("input file does not exist")
+	}
+
+	// Run the dot command to convert the input to SVG
+	cmd := exec.Command("dot", "-Tsvg", inputFile)
+	output, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+
+	// Write the SVG output to the output file
+	err = os.WriteFile(outputFile, output, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func GenerateGraphvizDotFile(filename string, graph *GraphVizGraph) error {
+	return nil
 	var dotBuilder strings.Builder
 
 	dotBuilder.WriteString("digraph G {\n")
@@ -65,7 +89,13 @@ func GenerateGraphvizDotFile2(filename string, graph *GraphVizGraph) error {
 
 	return os.WriteFile(filename, []byte(dotBuilder.String()), 0644)
 }
-
+func getLayout() string {
+	return `
+	graph [bgcolor="#222222", fontcolor="white", fontname="Arial", fontsize=10];
+    node [shape=box, style=filled, fillcolor="#3a3a3a", fontcolor="white", fontname="Arial", fontsize=10, color="#888888"];
+    edge [color="#ffffff", fontcolor="white", fontname="Arial", fontsize=10];
+`
+}
 func nodeString(node *GraphVizNode) string {
 	bracket := ""
 	if node.Tooltip != "" {
@@ -81,6 +111,9 @@ func nodeString(node *GraphVizNode) string {
 func edgeString(edge *GraphVizEdge) string {
 	if edge.Style != "" {
 		return fmt.Sprintf("\"%s\" -> \"%s\" [style=%s];\n", edge.FromNode.Id, edge.ToNode.Id, edge.Style)
+	}
+	if edge.FromNode == nil {
+		return "\n"
 	}
 	return fmt.Sprintf("\"%s\" -> \"%s\";\n", edge.FromNode.Id, edge.ToNode.Id)
 }
@@ -151,7 +184,10 @@ func FillGraphVizGraph() *GraphVizGraph {
 			}
 
 			if i > 0 {
-				previousMessageNode := messageNodes[i-1]
+				previousMessageNode, ok := messageNodes[i-1]
+				if !ok {
+					continue
+				}
 				edge := &GraphVizEdge{Style: "dotted", FromNode: previousMessageNode, ToNode: messageNode}
 				messageEdges = append(messageEdges, edge)
 			}

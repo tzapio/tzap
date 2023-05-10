@@ -56,6 +56,7 @@ func (t *Tzap) Accumulate(fn func(*Tzap) *Tzap) *Tzap {
 	}
 	return tzmapped
 }
+
 func (t *Tzap) Each(fn func(*Tzap)) *Tzap {
 	children := t.Data["children"].([]*Tzap)
 	Log(t, "Each start", len(children))

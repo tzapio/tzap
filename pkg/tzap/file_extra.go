@@ -27,8 +27,7 @@ func (t *Tzap) LoadTaskOrRequestNewTaskMD5(filepath string) *Tzap {
 	if _, err := os.Stat(filepath); err != nil {
 		Log(t, "LoadTaskMD5 new file", filepath)
 		return t.
-			PrepareOutputTask(filepath).
-			FetchTask()
+			FetchTask(filepath)
 	}
 	if config.MD5Rewrites {
 		if md5memory != md5file {
@@ -42,12 +41,10 @@ func (t *Tzap) LoadTaskOrRequestNewTaskMD5(filepath string) *Tzap {
 				filelog.LogData(t.C, t, filelog.TzapLog)
 				Log(t, "LoadTaskMD5 not matching", filepath)
 				return t.
-					PrepareOutputTask(filepath).
-					FetchTask()
+					FetchTask(filepath)
 			}
 		}
 	}
-	//GenerateGraphvizDotFile2("out/tzap2.dot", FillGraphVizGraph())
 	Log(t, "LoadTaskMD5 Matching", filepath, "enabled", config.MD5Rewrites)
 	return t.LoadTask(filepath)
 
@@ -59,7 +56,7 @@ func getMessageMD5(t *Tzap) string {
 	for _, message := range GetMessages(t) {
 		tmpStr += message.Content
 	}
-	return util.GetMD5Hash(tmpStr)
+	return util.MD5Hash(tmpStr)
 }
 
 // writeMessageMD5 writes the MD5 checksum of messages content in a Tzap to a file
@@ -68,9 +65,6 @@ func writeMessageMD5(filename string, t *Tzap) error {
 	return os.WriteFile(filename+".md5", []byte(md5memory), 0755)
 }
 func CheckData(data types.MappedInterface) error {
-	if _, ok := data["filepath"].(string); !ok {
-		return fmt.Errorf("filepath key is not string: %+v", data["filepath"])
-	}
 	if _, ok := data["content"].(string); !ok {
 		return fmt.Errorf("content key is not string: %+v", data["content"])
 	}

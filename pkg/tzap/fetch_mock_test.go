@@ -40,5 +40,22 @@ func (tg *mockTG) CountTokens(ctx context.Context, content string) (int, error) 
 func (tg *mockTG) OffsetTokens(ctx context.Context, content string, from int, to int) (string, error) {
 	// Return pre-defined value for testing purposes
 	return "Hello world!", nil
-
+}
+func (tg *mockTG) FetchEmbedding(ctx context.Context, content ...string) ([][]float32, error) {
+	return [][]float32{}, nil
+}
+func (tg *mockTG) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+	return types.SearchResults{}, nil
+}
+func (tg *mockTG) AddEmbeddingDocument(ctx context.Context, docID string, embedding []float32, metadata map[string]string) error {
+	return nil
+}
+func (tg *mockTG) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
+	return types.Vector{}, false, nil
+}
+func (tg *mockTG) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
+	return nil
+}
+func (tg *mockTG) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
+	return types.SearchResults{}, nil
 }

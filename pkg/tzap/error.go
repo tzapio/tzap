@@ -28,7 +28,6 @@ func (t *ErrorTzap) HandleError(cb func(*ErrorTzap) error) *Tzap {
 
 func tzapHandlePanic(err *error) {
 	if r := recover(); r != nil {
-		println("Hello world!!!", r.(error).Error())
 		*err = r.(error)
 	}
 }

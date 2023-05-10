@@ -88,22 +88,6 @@ func Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents(t *te
 		t.Errorf("Expected to find content2 '%s', but did not", content2)
 	}
 }
-func Test_PrepareOutputTask_given_file_path_expect_tzap_with_empty_content(t *testing.T) {
-	filepath := "test_output.txt"
-
-	// Prepare Tzap
-	tt := tzap.InternalNew()
-	preparedTzap := tt.PrepareOutputTask(filepath)
-
-	// Check if the preparedTzap has the correct filepath and empty content
-	data := preparedTzap.Data
-	if data["filepath"] != filepath {
-		t.Errorf("Expected filepath to be %s but got %s", filepath, data["filepath"])
-	}
-	if data["content"] != "" {
-		t.Errorf("Expected content to be empty but got %s", data["content"])
-	}
-}
 
 func Test_LoadTaskOrRequestNewTask_given_existing_file_path_expect_tzap_with_file_contents(t *testing.T) {
 	// Prepare a temp file with content

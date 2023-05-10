@@ -7,7 +7,6 @@ import (
 // RequestTextToSpeech requests synthesized speech using specific (google voices) language and voice.
 // It returns a pointer to a new Tzap containing the synthesised speech 'audioContent'.
 func (t *Tzap) RequestTextToSpeech(language string, voice string) *ErrorTzap {
-	println(t.TG)
 	audioContent, err := t.TG.TextToSpeech(t.C, t.Data["content"].(string), language, voice)
 	if err != nil {
 		return t.ErrorTzap(err)

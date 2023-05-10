@@ -16,7 +16,7 @@ func addId(t *Tzap) {
 	}
 	t.Id = count
 	count += 1
-	println("Added tzap", t.Id, t.Name)
+
 	GlobalTzaps = append(GlobalTzaps, t)
 }
 

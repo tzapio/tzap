@@ -7,25 +7,24 @@ import (
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
-func applyChanges(t *Tzap, editedContent string) *Tzap {
+func applyChanges(t *Tzap, filePath, editedContent string) *Tzap {
 	config := config.FromContext(t.C)
-	filepathValue := t.Data["filepath"].(string)
 
 	autoMode := config.AutoMode
 	makeChange := autoMode
 	if !autoMode {
-		if err := stdin.ConfirmAndApplyChanges(filepathValue, editedContent, stdin.ApplyChanges); err == nil {
+		if err := stdin.ConfirmAndApplyChanges(filePath, editedContent, stdin.ApplyChanges); err == nil {
 			makeChange = true
 		}
 	}
 	if makeChange {
-		stdin.ApplyChanges(filepathValue, editedContent)
-		writeMessageMD5(filepathValue, t)
+		stdin.ApplyChanges(filePath, editedContent)
+		writeMessageMD5(filePath, t)
 		data := types.MappedInterface{
-			"filepath": filepathValue,
+			"filepath": filePath,
 			"content":  editedContent,
 		}
-		withEditFile := t.HijackTzap(&Tzap{Name: "withEditFile", Message: types.Message{
+		withEditFile := t.AddTzap(&Tzap{Name: "withEditFile", Message: types.Message{
 			Role:    openai.ChatMessageRoleAssistant,
 			Content: editedContent,
 		}, Data: data})

@@ -10,28 +10,26 @@ import (
 )
 
 // FetchTask initializes the chat completion request, fetches the edited content, and sets up the environment.
-func (t *Tzap) FetchTask() *Tzap {
+func (t *Tzap) FetchTask(filePath string) *Tzap {
 	config := config.FromContext(t.C)
-	if err := CheckData(t.Data); err != nil {
-		panic(err)
-	}
-
 	// force print all recent logs.
 	Flush()
 
-	filepathValue := t.Data["filepath"].(string)
+	filepathValue := filePath
 	fmt.Println("requesting edit file for (" + filepathValue + ")")
-
+	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
 	editedContent, err := fetchChatResponse(t, true)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(editedContent)
-	t = applyChanges(t, editedContent)
+
+	t = applyChanges(t, filepathValue, editedContent)
+	getMessagesGraphViz(t)
+	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
 
 	if config.AutoMode || stdin.ConfirmToContinue() {
-		getMessagesGraphViz(t)
 		return t
 	}
 	panic("Do not continue selected")
@@ -39,6 +37,7 @@ func (t *Tzap) FetchTask() *Tzap {
 
 // RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
 func (t *Tzap) RequestChat() *Tzap {
+	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
 	output, err := fetchChatResponse(t, true)
 	if err != nil {
 		panic(err)
@@ -46,8 +45,11 @@ func (t *Tzap) RequestChat() *Tzap {
 	data := types.MappedInterface{
 		"content": output,
 	}
-	withRequestFile := t.AddTzap(&Tzap{Name: "requestChat", Data: data})
-	return withRequestFile
+	requestChat := t.AddTzap(&Tzap{Name: "requestChat", Data: data})
+	getMessagesGraphViz(requestChat)
+	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
+
+	return requestChat
 }
 
 // RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
@@ -73,5 +75,6 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 		return "", err
 	}
 	filelog.LogData(t.C, result, filelog.ResponseLog)
+
 	return result, nil
 }

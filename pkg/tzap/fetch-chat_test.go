@@ -54,13 +54,12 @@ func Test_FetchTask_ValidFetch_ChangesApplied(t *testing.T) {
 		Name:    "Mock",
 		Message: types.Message{Role: "mocked", Content: "Hello!"},
 		Data: types.MappedInterface{
-			"filepath": filename,
-			"content":  "someOldFile",
+			"content": "someOldFile",
 		},
 	})
 
 	// When
-	responseTzap := tzapObj.FetchTask()
+	responseTzap := tzapObj.FetchTask(filename)
 
 	// Expect
 	if responseTzap.Header != "" {

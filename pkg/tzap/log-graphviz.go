@@ -7,7 +7,8 @@ import (
 var GlobalTzaps []*Tzap
 
 func HandleShutdown() {
-	GenerateGraphvizDotFile2("out/tzap2.dot", FillGraphVizGraph())
+
+	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
 	Flush()
 }
 
@@ -27,13 +28,6 @@ var GlobalGraphVizLogThreads []GraphVizLogMessages
 
 func replaceNewLines(s string) string {
 	return strings.ReplaceAll(s, "\n", "<br/>")
-}
-func getLayout() string {
-	return `
-	graph [bgcolor="#222222", fontcolor="white", fontname="Arial", fontsize=10];
-    node [shape=box, style=filled, fillcolor="#3a3a3a", fontcolor="white", fontname="Arial", fontsize=10, color="#888888"];
-    edge [color="#ffffff", fontcolor="white", fontname="Arial", fontsize=10];
-`
 }
 
 func getMessagesGraphViz(t *Tzap) {
