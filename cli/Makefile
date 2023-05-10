@@ -42,23 +42,28 @@ github-pre-release:
 	if [ -z "$(shell gh release list | grep -F pkg/connectors/googlevoiceconnector/$(VERSION))" ]; then \
 		gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
-
+	if [ -z "$(shell gh release list | grep -F pkg/connectors/redisembeddbconnector/$(VERSION))" ]; then \
+		gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"; \
+	fi
 
 
 remove-releases:
 	gh release delete pkg/tzapconnect/$(VERSION) --yes
 	gh release delete pkg/connectors/openaiconnector/$(VERSION) --yes
 	gh release delete pkg/connectors/googlevoiceconnector/$(VERSION) --yes
+	gh release delete pkg/connectors/redisembeddbconnector/$(VERSION) --yes
 	gh release delete $(VERSION) --yes
 
 	git push --delete origin pkg/tzapconnect/$(VERSION)
 	git push --delete origin pkg/connectors/openaiconnector/$(VERSION)
+	git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
 	git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
 	git push --delete origin $(VERSION)
 
 	git tag -d pkg/tzapconnect/$(VERSION)
 	git tag -d pkg/connectors/openaiconnector/$(VERSION)
 	git tag -d pkg/connectors/googlevoiceconnector/$(VERSION)
+	git tag -d pkg/connectors/redisembeddbconnector/$(VERSION)
 	git tag -d $(VERSION)
 
 .PHONY:
