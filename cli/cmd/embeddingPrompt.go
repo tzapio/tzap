@@ -19,8 +19,8 @@ func init() {
 
 var embeddingPromptCmd = &cobra.Command{
 	Use:   "embeddingprompt <filename> <prompt>",
-	Short: "Generate code or document content using embedding inspiration template",
-	Long: `The 'embeddingprompt' command generates content based on the prompt and inspiration files provided.
+	Short: "Generate code or document content using code-search",
+	Long: `The 'embeddingprompt' command generates content based on code-searching existing files. This enables GPT to be able to generate code with depth. To add breadth, the user can recommend needed Inspiration files like interfaces and types to enhance GPTs general understanding.
 The inspiration files should be a comma-separated list of file paths.`,
 	Args: cobra.MinimumNArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
