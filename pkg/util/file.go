@@ -1,3 +1,4 @@
+// Package util provides utility functions for working with files and directories.
 package util
 
 import (
@@ -7,6 +8,8 @@ import (
 	"strings"
 )
 
+// ReadFile reads the contents of a file given its path and returns the contents as a string.
+// If the file cannot be read, the function returns an error.
 func ReadFile(filepath string) (string, error) {
 	b, err := os.ReadFile(filepath)
 	if err != nil {
@@ -14,6 +17,8 @@ func ReadFile(filepath string) (string, error) {
 	}
 	return string(b), err
 }
+
+// ReadFileP is a convenience function that calls ReadFile and panics if an error occurs.
 func ReadFileP(filepath string) string {
 	b, err := ReadFile(filepath)
 	if err != nil {
@@ -22,39 +27,31 @@ func ReadFileP(filepath string) string {
 	return string(b)
 }
 
-func ListFilesInDir(dir string) []string {
+func ListFilesInDir(dir string) ([]string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil, fmt.Errorf("directory %q does not exist", dir)
+	}
 	var files []string
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			panic(err)
+			fmt.Printf("Warning: ListFilesInDir, error walking path %q: %v\n", path, err)
+			return nil
 		}
 		if !info.IsDir() {
 			absPath, err := filepath.Abs(path)
 			if err != nil {
 				return err
 			}
-			files = append(files, filepath.ToSlash(absPath))
-		}
-		return nil
-	})
-
-	if err != nil {
-		panic(err)
-
-	}
-
-	return files
-}
-func WalkFilesInDir(root string) ([]string, error) {
-	goFiles := []string{}
-
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-
-		if !info.IsDir() {
-			goFiles = append(goFiles, path)
+			relPath, err := filepath.Rel(cwd, absPath)
+			if err != nil {
+				return err
+			}
+			relPath = strings.TrimPrefix(relPath, "./")
+			files = append(files, filepath.ToSlash(relPath))
 		}
 		return nil
 	})
@@ -63,15 +60,5 @@ func WalkFilesInDir(root string) ([]string, error) {
 		return nil, err
 	}
 
-	return goFiles, nil
-}
-
-func FilterFiles(files []string, ext string) []string {
-	filtered := []string{}
-	for _, file := range files {
-		if strings.HasSuffix(file, ext) {
-			filtered = append(filtered, file)
-		}
-	}
-	return filtered
+	return files, nil
 }
