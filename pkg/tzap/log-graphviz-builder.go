@@ -63,7 +63,7 @@ func ConvertGraphvizToSVG(inputFile string, outputFile string) error {
 	return nil
 }
 func GenerateGraphvizDotFile(filename string, graph *GraphVizGraph) error {
-	return nil
+	println("Saving to ", filename)
 	var dotBuilder strings.Builder
 
 	dotBuilder.WriteString("digraph G {\n")
@@ -217,7 +217,6 @@ func generateGraphvizDotFile2(t *Tzap) string {
 }
 
 func escapeContent(s string) string {
-	s = strings.ReplaceAll(s, "/", "\\/")
 	s = strings.ReplaceAll(s, "\\", "\\\\")
 	s = strings.ReplaceAll(s, "\"", "\\\"")
 	s = strings.ReplaceAll(s, "<", "\\<")
@@ -234,6 +233,6 @@ func htmlEscapeNewLine(s string) string {
 	return newLined
 }
 func escapeNewLine(s string) string {
-	newLined := strings.ReplaceAll(s, "\n", "\\n")
+	newLined := s //strings.ReplaceAll(s, "\n", "\\n")
 	return newLined
 }

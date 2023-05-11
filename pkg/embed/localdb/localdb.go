@@ -127,7 +127,12 @@ func (db *FileDB) BatchSet(pairs []types.KeyValue) (int, error) {
 			return c, err
 		}
 		db.scanKeyList = append(db.scanKeyList, kv)
-		db.data[kv.Key] = kv.Value
+
+		if kv.Value != "" {
+			db.data[kv.Key] = kv.Value
+		} else {
+			delete(db.data, kv.Key)
+		}
 	}
 	if err := file.Sync(); err != nil {
 		return c, err

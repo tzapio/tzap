@@ -19,7 +19,10 @@ func (t *Tzap) ApplyTemplateFN(nt func(*Tzap) *Tzap) *Tzap {
 }
 func (t *Tzap) ApplyTemplate(nt types.NamedTemplate[*Tzap, *Tzap]) *Tzap {
 	Log(t, "Applying template FN")
-	return nt.Template(t.CloneTzap(&Tzap{Name: "ApplyTemplate (" + nt.Name + ")"}))
+	templateResult := nt.Template(t.CloneTzap(&Tzap{Name: "ApplyTemplate (" + nt.Name + ") Start"}))
+	endTemplate := templateResult.CloneTzap(&Tzap{Name: "ApplyTemplate (" + nt.Name + ") End"})
+	endTemplate.Message = types.Message{}
+	return endTemplate
 }
 
 func (t *Tzap) ApplyErrorTemplate(nt types.NamedTemplate[*Tzap, *ErrorTzap], fn func(*ErrorTzap) error) *Tzap {
