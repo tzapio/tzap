@@ -81,7 +81,7 @@ func (ot OpenaiTgenerator) streamCompletion(request openai.ChatCompletionRequest
 			break
 		}
 		if err != nil {
-			return "", (fmt.Errorf("\n\nStream error: %v", err))
+			return resultBuilder.String(), (fmt.Errorf("stream error: %v", err))
 		}
 		token := response.Choices[0].Delta.Content
 		print(token)
