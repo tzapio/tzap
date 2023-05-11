@@ -1,5 +1,8 @@
 # Tzap: Think it and it's there. A toolset for GPT templating, prompt as Code and simple CLI automations
 
+## What is Tzap?
+Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their GPT-based applications.
+
 ### Quick install (NPM):
 ```bash
 npm install -g tzap
@@ -12,9 +15,6 @@ tzap embeddingprompt outputfile.txt "can you add a tzap cli command that enables
 to generate code based on the users code without requiring them to manage prompts themselves? \
 Utilize Tzap embedding search."
 ```
-
-## What is Tzap?
-Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their GPT-based applications.
 
 ## Notes:
 Tzap is in a beta phase.
@@ -32,7 +32,6 @@ Using external APIs incurs small costs, read [Cost Estimation](#cost-estimation)
 - Integrate magic functions that evaluate GPT prompts instead of code
 - Effortlessly manipulate file paths and directories
 - Generate multi-modal content 
-
 
 ## How It Works
 
@@ -100,14 +99,23 @@ tzap semantic:gitcommit
 
 This command will automatically generate a meaningful git commit message based on your recent code changes.
 
-## Cost estimations:
-In order to search for relevant code Tzap index all files. This is done with openais    
-Initialization of embeddings for this project: 0.04$ (Run once). (200 files, 6500 lines of code)
-Re-fetch when generating with new code changes: 0.0004$ per 1000 "words/tokens"
+## Cost Estimation
 
-You can chose to use GPT4 or GPT3.5 (default usually). 
-The ceiling per file for gpt4, is 0.1$. (8k "word/token" limit) 
-The ceiling per file for gpt3.5, is 0.008$. (4k "word/token" limit) 
+Using embeddings and external APIs comes with certain costs. Here's a breakdown of those costs:
+
+### Embeddings
+
+Initialization of embeddings for this project cost: $0.04 (Run once). (200 files, 6,500 lines of code)
+Re-fetch when generating with new code changes: $0.0004 per 1,000 "words/tokens"
+
+### GPT Model
+
+You can choose to use GPT-4 or GPT-3.5 (default usually).
+
+The maximum cost per file for GPT-4 is $0.1 (8,000 "word/token" limit).
+The maximum cost per file for GPT-3.5 is $0.008 (4,000 "word/token" limit).
+
+It is important to understand and manage these costs while using Tzap.
 
 ## Example Code
 
