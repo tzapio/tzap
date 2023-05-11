@@ -31,7 +31,7 @@ func SplitCachedUncachedEmbeddings(embeddings types.Embeddings) ([]types.Vector,
 				}
 				if len(float32Vector) == 1536 {
 					vector := types.Vector{
-						ID:        kv.Key,
+						ID:        vector.Metadata["filename"] + "-" + vector.Metadata["start"] + "-" + vector.Metadata["end"],
 						TimeStamp: 0,
 						Metadata:  vector.Metadata,
 						Values:    float32Vector,
