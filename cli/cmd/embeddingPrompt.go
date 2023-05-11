@@ -4,10 +4,12 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/cmd/util"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/templates/code/files"
+	tutil "github.com/tzapio/tzap/pkg/util"
+	"github.com/tzapio/tzap/templates/code/embed"
 )
 
 var inspirationFilesFlag string
@@ -30,6 +32,12 @@ The inspiration files should be a comma-separated list of file paths.`,
 		if inspirationFilesFlag != "" {
 			inspirationFiles = strings.Split(inspirationFilesFlag, ",")
 		}
+		files, err := tutil.ListFilesInDir("./")
+		if err != nil {
+			panic(err)
+		}
+		files = util.GetNonExcludedFiles(files)
+
 		tzap.NewWithConnector(
 			tzapconnect.WithConfig(
 				config.Configuration{
@@ -40,8 +48,11 @@ The inspiration files should be a comma-separated list of file paths.`,
 			WorkTzap(func(t *tzap.Tzap) {
 
 			}).
-			ApplyTemplate(files.ProcessAndEmbedFilesTzapTemplate("./")).
-			ApplyTemplate(files.EmbeddingInspirationTemplate(content, inspirationFiles)).
+			// Process and create embeddings for all files in the current directory
+			ApplyTemplate(embed.ProcessAndEmbedFilesTzapTemplate(files)).
+
+			// Search for embeddings in the current directory
+			ApplyTemplate(embed.EmbeddingInspirationTemplate(content, inspirationFiles)).
 			AddUserMessage(content).
 			LoadTaskOrRequestNewTaskMD5(filename)
 	},

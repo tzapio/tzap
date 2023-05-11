@@ -32,7 +32,11 @@ or you should provide the absolute path to the file. If the file is not found, a
 
 		content := strings.Join(args[1:], " ")
 		tzap.
-			NewWithConnector(tzapconnect.WithConfig(config.Configuration{MD5Rewrites: true, OpenAIModel: modelMap[settings.Model]})).
+			NewWithConnector(tzapconnect.WithConfig(
+				config.Configuration{
+					MD5Rewrites: true,
+					OpenAIModel: modelMap[settings.Model],
+				})).
 			AddSystemMessage(fmt.Sprintf("Task: %s", content)).
 			LoadTask(filename).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {

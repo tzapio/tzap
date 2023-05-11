@@ -8,7 +8,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/templates/code/files"
+	"github.com/tzapio/tzap/templates/code/embed"
 )
 
 func main() {
@@ -21,7 +21,7 @@ func main() {
 					MD5Rewrites: true,
 					OpenAIModel: openai.GPT4,
 				})).
-		ApplyTemplate(files.InspirationTemplate(
+		ApplyTemplate(embed.InspirationTemplate(
 			[]string{
 				"README.md",
 				"cli/cmd/semanticgitcommit.go",
