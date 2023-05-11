@@ -1,3 +1,20 @@
-go.sum
-go.work
-go.mod
+# This file uses same syntax( see note ) as .gitignore.
+# Note: The library used for this might not be 100% compliant with how .gitignore is used, use with caution.
+#
+# Intended usage:
+# If the current working directory has subfolders that contain "inclusion files" like a git submodule, then this ignore file can exclude those projects. 
+#
+# Definitions:
+# "absolute path" is regarded from the root of the current working directory. 
+# Files from outside the current working directory. currently not supported.
+# 
+vendor
+npm
+.tzap
+.devcontainer
+.vscode
+pkg/connectors/googlevoiceconnector
+pkg/connectors/redisembeddbconnector
+
+# sometimes, you want to ignore test files:
+## *_test.go

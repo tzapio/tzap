@@ -1,4 +1,4 @@
-out
+out/
 *.md5
 node_modules
 release
@@ -6,4 +6,4 @@ npm/README.md
 npm/bin
 npm/release
 .tzap-data/
-.redis-data
+.redis-data/
