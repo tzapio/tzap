@@ -1,4 +1,4 @@
-package files
+package embed
 
 import (
 	"fmt"
@@ -9,10 +9,9 @@ import (
 
 func InspirationTemplate(inspirationFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
-		Name: "inspirationFiles",
+		Name: "inspirationTemplate",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
-			// print inspirationFiles
-			fmt.Printf("%+v\n", inspirationFiles)
+			fmt.Printf("Including static inspiration files: %+v\n", inspirationFiles)
 			return t.
 				LoadFiles(inspirationFiles).
 				Accumulate(func(t *tzap.Tzap) *tzap.Tzap {

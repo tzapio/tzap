@@ -1,4 +1,4 @@
-package files
+package embed
 
 import (
 	"github.com/tzapio/tzap/pkg/embed"
@@ -6,22 +6,19 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func EmbeddingInspirationTemplate(input string, excludedFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+func EmbeddingInspirationTemplate(input string, inspirationFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "embeddingInspirationTemplate",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.
-				IsolatedTzap(func(t *tzap.Tzap) {
-					//check if index exists
-				}).
-				ApplyTemplate(InspirationTemplate(excludedFiles)).
-				ApplyTemplate(SearchFilesTemplate(input, excludedFiles))
+				ApplyTemplate(InspirationTemplate(inspirationFiles)).
+				ApplyTemplate(SearchFilesTemplate(input, inspirationFiles))
 
 		},
 	}
 }
 
-func SearchFilesTemplate(input string, excludedFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+func SearchFilesTemplate(input string, excludeFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "searchFilesTemplate",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
@@ -37,31 +34,27 @@ func SearchFilesTemplate(input string, excludedFiles []string) types.NamedTempla
 				panic("should only return one embedding")
 			}
 			embedding := query.Queries[0]
-			searchResults, err := t.TG.SearchWithEmbedding(t.C, embedding, 10)
+			searchResults, err := t.TG.SearchWithEmbedding(t.C, embedding, 20)
 			if err != nil {
 				panic(err)
 			}
-			filteredResults := filterSearchResults(searchResults, excludedFiles)
+			filteredResults := filterSearchResults(searchResults, excludeFiles, 15)
 
-			s := ""
-
-			for i, result := range filteredResults.Results {
-				if i > 0 {
-					s += "\n"
-				}
-				s += "###file: " + result.Metadata["filename"] + "\n"
-				s += result.Metadata["splitPart"] + "\n"
+			t = t.AddSystemMessage(
+				"The following file contents are embeddings for the user input:",
+			)
+			println("Using embeddings:")
+			for _, result := range filteredResults.Results {
+				t = t.AddSystemMessage(result.Metadata["splitPart"])
+				println(result.ID)
 			}
 
-			return t.AddSystemMessage(
-				"The following file contents are embeddings for the user input:",
-				s,
-			)
+			return t
 		},
 	}
 }
 
-func filterSearchResults(searchResults types.SearchResults, excludedFiles []string) types.SearchResults {
+func filterSearchResults(searchResults types.SearchResults, excludedFiles []string, k int) types.SearchResults {
 	filteredResults := []types.Vector{}
 	for _, result := range searchResults.Results {
 		fileName := result.Metadata["filename"]
@@ -74,6 +67,9 @@ func filterSearchResults(searchResults types.SearchResults, excludedFiles []stri
 		}
 		if !isExcluded {
 			filteredResults = append(filteredResults, result)
+		}
+		if len(filteredResults) >= k {
+			break
 		}
 	}
 	return types.SearchResults{Results: filteredResults}

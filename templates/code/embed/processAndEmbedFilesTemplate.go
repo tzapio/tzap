@@ -1,4 +1,4 @@
-package files
+package embed
 
 import (
 	"github.com/tzapio/tzap/pkg/embed"
@@ -6,19 +6,23 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func ProcessAndEmbedFilesTzapTemplate(dir string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
+func ProcessAndEmbedFilesTzapTemplate(files []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
 		Name: "processAndEmbedFilesTzapTemplate",
 		Template: func(t *tzap.Tzap) *tzap.Tzap {
-			embeddings := generateEmbeddings(t, dir)
+			// Generate and load embedding files.
+			embeddings := generateEmbeddings(t, files)
+			// Store in local vector db (if default tzapconnector)
 			return saveEmbeddingsToTzap(t, embeddings)
 		},
 	}
 }
 
-func generateEmbeddings(t *tzap.Tzap, dir string) types.Embeddings {
-	embed.ProcessDirectory(t, dir)
-	embeddings, err := embed.GetEmbeddings(t, dir)
+func generateEmbeddings(t *tzap.Tzap, files []string) types.Embeddings {
+	// Generate embedding files.
+	embed.OutputEmbeddingsToFile(t, files)
+	// Load embeddings from file.
+	embeddings, err := embed.GetEmbeddingsFromFile()
 	if err != nil {
 		panic(err)
 	}
