@@ -1,5 +1,6 @@
 build: gomodtidy
-	cd cli && make build
+	go test ./...
+	make -C cli build
 release:
 	go test ./...
 	make -C cli build
