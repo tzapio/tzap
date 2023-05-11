@@ -8,7 +8,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/templates/code/files"
+	"github.com/tzapio/tzap/templates/code/embed"
 )
 
 func main() {
@@ -23,7 +23,7 @@ func main() {
 					OpenAIModel: openai.GPT4,
 					EnableLogs:  true,
 				})).
-		ApplyTemplate(files.EmbeddingInspirationTemplate(
+		ApplyTemplate(embed.EmbeddingInspirationTemplate(
 			content,
 			[]string{
 				"./pkg/types/interfaces.go",

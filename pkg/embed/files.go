@@ -12,8 +12,7 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-func ProcessDirectory(t *tzap.Tzap, dir string) {
-	files := GetGoFilesInDir(dir)
+func OutputEmbeddingsToFile(t *tzap.Tzap, files []string) {
 	embeddings, totalTokens, totalLines := ProcessFiles(t, files)
 	idsToDelete, err := GetDrift(t, embeddings)
 	if err != nil {
@@ -27,7 +26,7 @@ func ProcessDirectory(t *tzap.Tzap, dir string) {
 	}
 	fmt.Printf("Total Files: %d, Total Embeddings: %d, Total Tokens: %d, Total Lines: %d\n", len(files), len(embeddings.Vectors), totalTokens, totalLines)
 }
-func GetEmbeddings(t *tzap.Tzap, dir string) (types.Embeddings, error) {
+func GetEmbeddingsFromFile() (types.Embeddings, error) {
 	filecontent, err := os.ReadFile("./.tzap-data/files.json")
 	if err != nil {
 		return types.Embeddings{}, err
@@ -38,13 +37,6 @@ func GetEmbeddings(t *tzap.Tzap, dir string) (types.Embeddings, error) {
 		return types.Embeddings{}, err
 	}
 	return embeddings, nil
-}
-func GetGoFilesInDir(dir string) []string {
-	files, err := util.WalkFilesInDir(dir)
-	if err != nil {
-		panic(err)
-	}
-	return util.FilterFiles(files, ".go")
 }
 
 func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
@@ -61,7 +53,7 @@ func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
 		totalLines += lines
 		totalTokens += fileTokens
 
-		//fmt.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
+		fmt.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
 
 		fileEmbeddings, err := ProcessFileOffsets(t, file, content, fileTokens)
 		if err != nil {
@@ -82,7 +74,6 @@ func GetDrift(t *tzap.Tzap, nowEmbeddings types.Embeddings) ([]string, error) {
 
 	nowEmbeddingsIds := make(map[string]struct{})
 	for _, vectorID := range nowEmbeddings.Vectors {
-
 		nowEmbeddingsIds[vectorID.ID] = struct{}{}
 	}
 	missingIds := []string{}
@@ -152,15 +143,21 @@ func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, f
 	if err != nil {
 		return types.Vector{}, err
 	}
+	splitPart = "###embedding from file: " + filename + "\n" + splitPart
+	metadataStart := fmt.Sprintf("%d", start)
+	metadataEnd := fmt.Sprintf("%d", end)
+	metadataTruncatedEnd := fmt.Sprintf("%d", truncatedEnd)
+	metadataSplitMd5 := util.MD5Hash(splitPart)
+	id := filename + "-" + metadataStart + "-" + metadataEnd
 
 	metadata := map[string]string{
+		"id":           id,
 		"filename":     filename,
-		"start":        fmt.Sprintf("%d", start),
-		"end":          fmt.Sprintf("%d", end),
-		"truncatedEnd": fmt.Sprintf("%d", truncatedEnd),
+		"start":        metadataStart,
+		"end":          metadataEnd,
+		"truncatedEnd": metadataTruncatedEnd,
 		"splitPart":    splitPart,
-		"splitMd5":     util.MD5Hash(splitPart),
+		"splitMd5":     metadataSplitMd5,
 	}
-	id := metadata["filename"] + "-" + metadata["start"] + "-" + metadata["end"]
 	return types.Vector{ID: id, Metadata: metadata}, nil
 }
