@@ -23,7 +23,6 @@ func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context) (type
 	return listEmbeddings, nil
 }
 func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
-	println("searching with embedding")
 	res := idx.db.GetAll()
 	floatVectors := [][]float32{}
 	vectors := []types.Vector{}

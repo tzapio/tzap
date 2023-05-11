@@ -24,8 +24,8 @@ func InitiateRedisClient(addr string) (types.TGenerator, error) {
 func NewEmbeddingIndex(addr string, indexName, fieldName string, dimensions int) (*redisearch.Client, error) {
 	client := redisearch.NewClient(addr, indexName)
 	// Create the index
-	println("creating index", indexName, "field", fieldName, "dimensions", dimensions)
-	client.Drop()
+	println("Creating index", indexName, "field", fieldName, "dimensions", dimensions)
+	//client.Drop()
 	schema := redisearch.NewSchema(redisearch.DefaultOptions).
 		AddField(redisearch.NewVectorFieldOptions(fieldName, redisearch.VectorFieldOptions{
 			Algorithm: redisearch.HNSW,
