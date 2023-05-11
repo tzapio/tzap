@@ -10,6 +10,11 @@ export OPENAI_APIKEY=<apikey>
 
 # Do a git add <file> then do:
 tzap semantic:gitcommit
+
+touch .tzapignore
+touch .tzapinclude
+#Adapt to your programming language
+echo -e "*.tsx\n*.ts" > .tzapinclude
 # Adapt below to your project!
 tzap embeddingprompt outputfile.txt "can you add a tzap cli command that enables users \
 to generate code based on the users code without requiring them to manage prompts themselves? \

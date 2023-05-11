@@ -2,6 +2,7 @@ build: gomodtidy
 	go test ./...
 	make -C cli build
 release:
+	make gomodtidy
 	go test ./...
 	make -C cli build
 	make -C cli tzapPrepareRelease
