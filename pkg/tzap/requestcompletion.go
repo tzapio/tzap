@@ -75,12 +75,19 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 	config := config.FromContext(t.C)
 
 	messages := TruncateToMaxWords(GetMessages(t), config.TruncateLimit)
+
 	filelog.LogData(t.C, t, filelog.TzapLog)
+	GenerateGraphvizDotFile(t, FillGraphVizGraph())
+	filelog.LogData(t.C, messages, filelog.RequestLog)
+	println("--- Completion:")
 	result, err := t.TG.GenerateChat(t.C, messages, stream)
+
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)
 		return "", err
 	}
+	println("\n---")
+	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, result, filelog.ResponseLog)
 
 	return result, nil

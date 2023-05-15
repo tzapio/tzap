@@ -16,9 +16,10 @@ var semanticGitcommitCmd = &cobra.Command{
 	Short:   "Generate a git commit message using ChatGPT",
 	Long:    `Prompts ChatGPT to generate a commit message and commits it to the current git repo. The generated commit message is based on the diff of the currently staged files.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		defer tzap.HandleShutdown()
 		err := tzap.HandlePanic(func() {
-			cmdutil.GetTzapFromContext(cmd.Context()).
+			t := cmdutil.GetTzapFromContext(cmd.Context())
+			defer t.HandleShutdown()
+			t.
 				ApplyWorkflow(gocode.DeserializedArguments("extraPrompt", args)).
 				ApplyErrorWorkflow(git.GitDiff(), func(et *tzap.ErrorTzap) error {
 					return et.Err

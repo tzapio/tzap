@@ -48,29 +48,34 @@ The inspiration files should be a comma-separated list of file paths.`,
 			panic(err)
 		}
 		files = cmdutil.GetNonExcludedFiles(files)
-		cmdutil.GetTzapFromContext(cmd.Context()).
-			// Process and create embeddings for all files in the current directory
-			ApplyWorkflow(embed.PrepareEmbedFilesTzapWorkflow(files)).
-			WorkTzap(func(t *tzap.Tzap) {
-				uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
-				if !ok {
-					panic("Loading embeddings went wrong")
-				}
-				if len(uncachedEmbeddings.Vectors) > 20 {
-					ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed?", len(uncachedEmbeddings.Vectors)))
+		err = tzap.HandlePanic(func() {
+			t := cmdutil.GetTzapFromContext(cmd.Context())
+			defer t.HandleShutdown()
+			t.
+				// Process and create embeddings for all files in the current directory
+				ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
+				WorkTzap(func(t *tzap.Tzap) {
+					uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
 					if !ok {
-						panic("commit aborted by user")
+						panic("Loading embeddings went wrong")
 					}
-				}
-			}).
-			ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesTzapWorkflow()).
-			ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB()).
-
-			// Search for embeddings in the current directory
-			ApplyWorkflow(embed.EmbeddingInspirationWorkflow(content, inspirationFiles, embedsCount, nCount)).
-			AddUserMessage(content).
-			RequestChatCompletion().
-			StoreCompletion(filePath)
+					if len(uncachedEmbeddings.Vectors) > 19 {
+						ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed?", len(uncachedEmbeddings.Vectors)))
+						if !ok {
+							panic("commit aborted by user")
+						}
+					}
+				}).
+				ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
+				ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB()).
+				ApplyWorkflow(embed.EmbeddingInspirationWorkflow(content, inspirationFiles, embedsCount, nCount)).
+				AddUserMessage(content).
+				RequestChatCompletion().
+				StoreCompletion(filePath)
+		})
+		if err != nil {
+			println(err.Error())
+		}
 		//.ApplyWorkflow(codegeneration.GenerateCodeAndApplyWorkflow())
 	},
 }

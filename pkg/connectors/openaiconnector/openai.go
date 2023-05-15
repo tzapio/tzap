@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tzapio/tzap/internal/logging/filelog"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
 
@@ -42,8 +41,6 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		Messages:    output.GetOpenAICompletionMessage(messages),
 		Temperature: 1,
 	}
-	filelog.LogData(ctx, request, filelog.RequestLog)
-	println("\n--- Completion:\n")
 	var content string
 	if stream {
 		streamContent, err := ot.streamCompletion(ctx, request)
@@ -58,7 +55,6 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		}
 		content = responseContent
 	}
-	println("\n---\n")
 	return content, nil
 }
 
