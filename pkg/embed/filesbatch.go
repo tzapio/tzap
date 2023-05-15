@@ -10,9 +10,8 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func SplitCachedUncachedEmbeddings(embeddings types.Embeddings) ([]types.Vector, []types.Vector) {
+func GetCachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
 	var cachedEmbeddings []types.Vector
-	var uncachedEmbeddings []types.Vector
 	db, err := localdb.NewFileDB("./.tzap-data/embeddingsCache.db")
 	if err != nil {
 		panic(err)
@@ -22,16 +21,15 @@ func SplitCachedUncachedEmbeddings(embeddings types.Embeddings) ([]types.Vector,
 		splitPart := vector.Metadata["splitPart"]
 		kv, exists := db.ScanGet(splitPart)
 		if exists {
-			float32Vector := []float32{}
-
 			if kv.Value != "" {
+				float32Vector := []float32{}
 				if err := json.Unmarshal([]byte(kv.Value), &float32Vector); err != nil {
 					fmt.Println("cannot unmarshal", splitPart, err.Error())
 					continue
 				}
 				if len(float32Vector) == 1536 {
 					vector := types.Vector{
-						ID:        vector.Metadata["filename"] + "-" + vector.Metadata["start"] + "-" + vector.Metadata["end"],
+						ID:        vector.ID,
 						TimeStamp: 0,
 						Metadata:  vector.Metadata,
 						Values:    float32Vector,
@@ -45,21 +43,36 @@ func SplitCachedUncachedEmbeddings(embeddings types.Embeddings) ([]types.Vector,
 				}
 			}
 		}
-		uncachedEmbeddings = append(uncachedEmbeddings, vector)
+		println("Warning: %s is uncached.", vector.ID)
 	}
-	return cachedEmbeddings, uncachedEmbeddings
+	return types.Embeddings{Vectors: cachedEmbeddings}
 }
-func ProcessEmbeddings(t *tzap.Tzap, embeddings types.Embeddings) error {
-	cachedEmbeddings, uncachedEmbeddings := SplitCachedUncachedEmbeddings(embeddings)
-	var combinedVectors []types.Vector = cachedEmbeddings
 
-	if len(uncachedEmbeddings) > 0 {
+func GetUncachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
+	var uncachedEmbeddings []types.Vector
+	db, err := localdb.NewFileDB("./.tzap-data/embeddingsCache.db")
+	if err != nil {
+		panic(err)
+	}
 
+	for _, vector := range embeddings.Vectors {
+		splitPart := vector.Metadata["splitPart"]
+		kv, exists := db.ScanGet(splitPart)
+		if !exists || kv.Value == "" {
+			uncachedEmbeddings = append(uncachedEmbeddings, vector)
+		}
+
+	}
+	return types.Embeddings{Vectors: uncachedEmbeddings}
+}
+
+func FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embeddings) error {
+	if len(uncachedEmbeddings.Vectors) > 0 {
 		var inputStrings []string
-		for _, vector := range uncachedEmbeddings {
+		for _, vector := range uncachedEmbeddings.Vectors {
 			inputStrings = append(inputStrings, vector.Metadata["splitPart"])
 		}
-		println("getting embeddings ", len(uncachedEmbeddings))
+
 		embeddingsResult, err := t.TG.FetchEmbedding(t.C, inputStrings...)
 		if err != nil {
 			panic(err)
@@ -68,63 +81,41 @@ func ProcessEmbeddings(t *tzap.Tzap, embeddings types.Embeddings) error {
 		if err != nil {
 			panic(err)
 		}
-		var embeddingVectors []types.Vector
+
 		cacheKeyVal := []types.KeyValue{}
 		for i, embedding := range embeddingsResult {
-			metadata := embeddings.Vectors[i].Metadata
 			embeddingByte, err := json.Marshal(embedding)
 			if err != nil {
 				panic(err)
 			}
 			cacheKeyVal = append(cacheKeyVal, types.KeyValue{Key: inputStrings[i], Value: string(embeddingByte)})
-			embeddingVectors = append(embeddingVectors, types.Vector{
-				ID:        metadata["filename"] + "-" + metadata["start"] + "-" + metadata["end"],
-				TimeStamp: 0,
-				Metadata:  metadata,
-				Values:    embedding,
-			})
 		}
 		added, err := db.BatchSet(cacheKeyVal)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Added", added, "embeddings to cache out of ", len(inputStrings))
-		combinedVectors = append(combinedVectors, embeddingVectors...)
+		fmt.Println("Added", added, "embeddings to cache")
 	}
-
-	embeddingJson := types.Embeddings{
-		Vectors: combinedVectors,
-	}
-
-	if err := BatchEmbeddings(embeddingJson); err != nil {
-		panic(err)
-	}
-	embeddingJSON, err := json.Marshal(embeddingJson)
-	if err != nil {
-		panic(err)
-	}
-
-	if err := os.WriteFile("./.tzap-data/files.json", embeddingJSON, 0644); err != nil {
-		panic(err)
-	}
-	fmt.Println("Embeddings saved to ./.tzap-data/files.json")
 	return nil
 }
-
-func SaveBatchToFile(batch []types.Vector, batchNumber int) error {
-	embeddingJson := types.Embeddings{
-		Vectors: batch,
+func SaveEmbeddingToFile(e types.Embeddings) {
+	if err := BatchEmbeddings(e); err != nil {
+		panic(err)
 	}
-
-	embeddingJSON, err := json.Marshal(embeddingJson)
+	if err := SaveVectorsToFile(e, "./.tzap-data/files.json"); err != nil {
+		panic(err)
+	}
+}
+func SaveVectorsToFile(e types.Embeddings, filePath string) error {
+	embeddingJSON, err := json.Marshal(e)
 	if err != nil {
 		return err
 	}
 
-	if err := os.WriteFile(fmt.Sprintf("./.tzap-data/files-%d.json", batchNumber), embeddingJSON, 0644); err != nil {
+	if err := os.WriteFile(filePath, embeddingJSON, 0644); err != nil {
 		return err
 	}
-	fmt.Printf("Embeddings saved to ./.tzap-data/files-%d.json\n", batchNumber)
+	//fmt.Printf("Upserted files (count: %d): %s\n", len(e.Vectors), filePath)
 	return nil
 }
 
@@ -137,7 +128,11 @@ func BatchEmbeddings(e types.Embeddings) error {
 		batch = append(batch, vector)
 
 		if (i+1)%batchSize == 0 || i == len(e.Vectors)-1 {
-			err := SaveBatchToFile(batch, batchNumber)
+			filePath := fmt.Sprintf("./.tzap-data/files-%d.json", batchNumber)
+			batchEmbeddingJson := types.Embeddings{
+				Vectors: batch,
+			}
+			err := SaveVectorsToFile(batchEmbeddingJson, filePath)
 			if err != nil {
 				return err
 			}

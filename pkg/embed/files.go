@@ -12,20 +12,43 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-func OutputEmbeddingsToFile(t *tzap.Tzap, files []string) {
-	embeddings, totalTokens, totalLines := ProcessFiles(t, files)
-	idsToDelete, err := GetDrift(t, embeddings)
+func LazyPrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddings {
+	rawFileEmbeddings, totalTokens, totalLines := ProcessFiles(t, files)
+	idsToDelete, err := GetDrift(t, rawFileEmbeddings)
 	if err != nil {
 		panic(err)
 	}
 	if err := RemoveOldEmbeddings(t, idsToDelete); err != nil {
 		panic(err)
 	}
-	if err := ProcessEmbeddings(t, embeddings); err != nil {
+	uncachedEmbeddings := GetUncachedEmbeddings(rawFileEmbeddings)
+	if len(uncachedEmbeddings.Vectors) > 0 {
+		if err := FetchAndCacheNewEmbeddings(t, uncachedEmbeddings); err != nil {
+			panic(err)
+		}
+	}
+
+	cachedEmbeddings := GetCachedEmbeddings(rawFileEmbeddings)
+	SaveEmbeddingToFile(cachedEmbeddings)
+
+	fmt.Printf("Total Files: %d, Total Embeddings: %d, Total Tokens: %d, Total Lines: %d\n", len(files), len(rawFileEmbeddings.Vectors), totalTokens, totalLines)
+	return cachedEmbeddings
+}
+
+func PrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddings {
+	rawFileEmbeddings, _, _ := ProcessFiles(t, files)
+	idsToDelete, err := GetDrift(t, rawFileEmbeddings)
+	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Total Files: %d, Total Embeddings: %d, Total Tokens: %d, Total Lines: %d\n", len(files), len(embeddings.Vectors), totalTokens, totalLines)
+	if err := RemoveOldEmbeddings(t, idsToDelete); err != nil {
+		panic(err)
+	}
+
+	//fmt.Printf("Total Files: %d, Total Embeddings: %d, Total Tokens: %d, Total Lines: %d\n", len(files), len(rawFileEmbeddings.Vectors), totalTokens, totalLines)
+	return rawFileEmbeddings
 }
+
 func GetEmbeddingsFromFile() (types.Embeddings, error) {
 	filecontent, err := os.ReadFile("./.tzap-data/files.json")
 	if err != nil {
@@ -53,7 +76,7 @@ func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
 		totalLines += lines
 		totalTokens += fileTokens
 
-		fmt.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
+		//fmt.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
 
 		fileEmbeddings, err := ProcessFileOffsets(t, file, content, fileTokens)
 		if err != nil {
@@ -84,7 +107,7 @@ func GetDrift(t *tzap.Tzap, nowEmbeddings types.Embeddings) ([]string, error) {
 			tzap.Log(t, "Drift: ", storedVector)
 		}
 	}
-	println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
+	//println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
 	return missingIds, nil
 }
 
