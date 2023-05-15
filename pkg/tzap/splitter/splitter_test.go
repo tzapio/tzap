@@ -16,7 +16,7 @@ func Test_GenericSplitter_TransformedItems_ReturnsExpectedData(t *testing.T) {
 	}
 	callbackFn := func(i int, t *tzap.Tzap, s string) *tzap.Tzap {
 		tc := t.AddSystemMessage()
-		tc.Header = s
+		tc.InitialSystemContent = s
 		return tc
 	}
 
@@ -34,13 +34,13 @@ func Test_GenericSplitter_TransformedItems_ReturnsExpectedData(t *testing.T) {
 	if len(data) != 3 {
 		t.Errorf("should have 3 children, got %d", len(data))
 	}
-	if data[0].Header != "a" {
-		t.Errorf("First child should have header a, got %s", data[0].Header)
+	if data[0].InitialSystemContent != "a" {
+		t.Errorf("First child should have header a, got %s", data[0].InitialSystemContent)
 	}
-	if data[1].Header != "b" {
-		t.Errorf("Second child should have header b, got %s", data[1].Header)
+	if data[1].InitialSystemContent != "b" {
+		t.Errorf("Second child should have header b, got %s", data[1].InitialSystemContent)
 	}
-	if data[2].Header != "c" {
-		t.Errorf("Third child should have header c, got %s", data[2].Header)
+	if data[2].InitialSystemContent != "c" {
+		t.Errorf("Third child should have header c, got %s", data[2].InitialSystemContent)
 	}
 }

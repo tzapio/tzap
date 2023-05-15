@@ -32,14 +32,14 @@ func replaceNewLines(s string) string {
 
 func getMessagesGraphViz(t *Tzap) {
 	messages, count := rgetMessagesGraphViz(t.Parent)
-	if t.Header != "" {
+	if t.InitialSystemContent != "" {
 		c, err := t.TG.CountTokens(t.C, t.Message.Content)
 		if err != nil {
 			println("WARNING: could not count tokens", err.Error())
 		}
 		messages = append([]GraphVizLogMessage{{
 			Role:      "system",
-			Content:   t.Header,
+			Content:   t.InitialSystemContent,
 			TzapId:    t.Id,
 			Direction: "REQUEST",
 		}}, messages...)
