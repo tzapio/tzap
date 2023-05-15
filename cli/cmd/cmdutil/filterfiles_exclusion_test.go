@@ -1,9 +1,9 @@
-package util_test
+package cmdutil_test
 
 import (
 	"testing"
 
-	"github.com/tzapio/tzap/cli/cmd/util"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 )
 
 func TestFilterExcludePattern(t *testing.T) {
@@ -71,7 +71,7 @@ func TestFilterExcludePattern(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			outFiles := util.FilterWithExcludePattern(tc.inFiles, tc.excludePattern)
+			outFiles := cmdutil.FilterWithExcludePattern(tc.inFiles, tc.excludePattern)
 
 			if len(outFiles) != len(tc.expectedOutputs) {
 				t.Errorf("FilterExcludePattern returned incorrect output. Expected: %v, Got: %v", tc.expectedOutputs, outFiles)

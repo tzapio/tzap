@@ -1,9 +1,9 @@
-package util_test
+package cmdutil_test
 
 import (
 	"testing"
 
-	"github.com/tzapio/tzap/cli/cmd/util"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 )
 
 func TestFilterWithIncludePattern(t *testing.T) {
@@ -41,7 +41,7 @@ func TestFilterWithIncludePattern(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			outFiles := util.FilterWithIncludePattern(tc.inFiles, tc.includePattern)
+			outFiles := cmdutil.FilterWithIncludePattern(tc.inFiles, tc.includePattern)
 
 			if len(outFiles) != len(tc.expectedOutputs) {
 				t.Errorf("FilterWithIncludePattern returned incorrect output. Expected: %v, Got: %v", tc.expectedOutputs, outFiles)
