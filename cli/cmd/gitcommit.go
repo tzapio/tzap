@@ -5,9 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/tzapconnect"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
@@ -33,11 +31,10 @@ var gitcommitCmd = &cobra.Command{
 		}
 		fmt.Println(string(out))
 
-		t := tzap.
-			NewWithConnector(tzapconnect.WithConfig(config.Configuration{})).
-			SetHeader(`Write a git commit message maximum 30 words.
+		t := cmdutil.GetTzapFromContext(cmd.Context()).
+			AddSystemMessage(`Write a git commit message maximum 30 words.
 			
-Template:
+Workflow:
 {brief git commit message}`).
 			AddUserMessage(string(out))
 
@@ -50,7 +47,7 @@ Template:
 			fmt.Printf("WARNING: diff is too long. TRUNCATING TO 3900 of %d estimated tokens\n", c)
 		}
 		fmt.Printf("Summarizing %d estimated tokens\n", c)
-		if !stdin.ConfirmToContinue() {
+		if !stdin.ConfirmPrompt("Continue?") {
 			return
 		}
 
@@ -62,9 +59,9 @@ Template:
 			return
 		}
 
-		content := t.RequestChat().Data["content"].(string)
+		content := t.RequestChatCompletion().Data["content"].(string)
 		fmt.Println("\n", content)
-		if !stdin.ConfirmToContinue() {
+		if !stdin.ConfirmPrompt("Make the git commit?") {
 			return
 		}
 

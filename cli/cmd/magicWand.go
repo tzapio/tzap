@@ -7,10 +7,9 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/pkg/config"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/tzapconnect"
 )
 
 var magicWandCmd = &cobra.Command{
@@ -31,19 +30,14 @@ or you should provide the absolute path to the file. If the file is not found, a
 		}
 
 		content := strings.Join(args[1:], " ")
-		tzap.
-			NewWithConnector(tzapconnect.WithConfig(
-				config.Configuration{
-					MD5Rewrites: true,
-					OpenAIModel: modelMap[settings.Model],
-				})).
+		cmdutil.GetTzapFromContext(cmd.Context()).
 			AddSystemMessage(fmt.Sprintf("Task: %s", content)).
-			LoadTask(filename).
+			LoadCompletion(filename).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 				t.Message.Role = openai.ChatMessageRoleUser
 				return t
 			}).
-			LoadTaskOrRequestNewTaskMD5(filename)
+			LoadCompletionOrRequestCompletionMD5(filename)
 	},
 }
 
