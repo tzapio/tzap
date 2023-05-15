@@ -34,7 +34,7 @@ var gitcommitCmd = &cobra.Command{
 		t := cmdutil.GetTzapFromContext(cmd.Context()).
 			AddSystemMessage(`Write a git commit message maximum 30 words.
 			
-Workflow:
+Template:
 {brief git commit message}`).
 			AddUserMessage(string(out))
 
