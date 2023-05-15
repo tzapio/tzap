@@ -10,11 +10,9 @@
 # 
 vendor
 npm
+node_modules
 .tzap
 .devcontainer
 .vscode
 pkg/connectors/googlevoiceconnector
 pkg/connectors/redisembeddbconnector
-
-# sometimes, you want to ignore test files:
-## *_test.go
