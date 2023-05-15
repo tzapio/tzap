@@ -62,3 +62,15 @@ func ListFilesInDir(dir string) ([]string, error) {
 
 	return files, nil
 }
+
+// MkdirPAndWriteFile writes the edited content to the file
+func MkdirPAndWriteFile(filePath, content string) error {
+	dir := filepath.Dir(filePath)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		err = os.MkdirAll(dir, 0755)
+		if err != nil {
+			return err
+		}
+	}
+	return os.WriteFile(filePath, []byte(content), 0644)
+}

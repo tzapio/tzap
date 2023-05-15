@@ -4,57 +4,27 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
-// ApplyChanges writes the edited content to the file
-func ApplyChanges(filename, content string) error {
-	dir := filepath.Dir(filename)
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		err = os.MkdirAll(dir, 0755)
-		if err != nil {
-			return err
-		}
-	}
-	return os.WriteFile(filename, []byte(content), 0644)
-}
-func ConfirmToContinue() bool {
+func ConfirmPrompt(prompt string) bool {
 	reader := bufio.NewReader(os.Stdin)
-	var input string = ""
-	for input != "y" && input != "n" && input != "Y" && input != "N" {
-		fmt.Print("Continue? (y/n): ")
-		raw, _ := reader.ReadString('\n')
-		input = strings.TrimSpace(raw)
-	}
-	return input == "y" || input == "Y"
-}
-func ConfirmAndApplyChanges(filename string, editedContent string, cb func(filename string, content string) error) error {
-	reader := bufio.NewReader(os.Stdin)
-	var err error
 
 	for tries := 0; tries < 10; tries++ {
-
-		fmt.Print("Apply changes? (" + filename + ") (y/n): ")
+		fmt.Printf("%s (y/n):", prompt)
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimSpace(input)
 
 		if strings.EqualFold(input, "y") {
-			err = cb(filename, editedContent)
-			if err != nil {
-				panic(fmt.Errorf("error applying changes: %w", err))
-			} else {
-				fmt.Println("Changes applied.")
-				return nil
-			}
+			return true
 		} else if strings.EqualFold(input, "n") {
-			fmt.Println("Changes not applied.")
-			return fmt.Errorf("changes not applied")
+			return false
 		} else {
 			fmt.Println("Invalid input. Please enter 'y' or 'n'.")
 		}
 	}
-	panic("Crashing after 5 invalid inputs. Probably something wrong.")
+	fmt.Println("no valid input after 10 tries - assuming no")
+	return false
 }
 
 func GetStdinInput(prompt string) string {
