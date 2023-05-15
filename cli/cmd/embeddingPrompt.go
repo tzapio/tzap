@@ -25,8 +25,9 @@ func init() {
 }
 
 var embeddingPromptCmd = &cobra.Command{
-	Use:   "embeddingprompt <file> <prompt>",
-	Short: "Generate code or document content using code-search",
+	Aliases: []string{"p"},
+	Use:     "embeddingprompt <file> <prompt>",
+	Short:   "Generate code or document content using code-search",
 	Long: `The 'embeddingprompt' command generates content based on code-searching existing files. This enables GPT to be able to generate code with depth. To add breadth, the user can recommend needed Inspiration files like interfaces and types to enhance GPTs general understanding.
 The inspiration files should be a comma-separated list of file paths.`,
 	Args: cobra.MinimumNArgs(2),
@@ -55,7 +56,7 @@ The inspiration files should be a comma-separated list of file paths.`,
 				if !ok {
 					panic("Loading embeddings went wrong")
 				}
-				if len(uncachedEmbeddings.Vectors) > 0 {
+				if len(uncachedEmbeddings.Vectors) > 20 {
 					ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed?", len(uncachedEmbeddings.Vectors)))
 					if !ok {
 						panic("commit aborted by user")
