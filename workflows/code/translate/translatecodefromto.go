@@ -8,10 +8,10 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
+func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "translateCodeFromTo",
-		Template: func(t *tzap.Tzap) *tzap.Tzap {
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			filein := t.Data["filepath"].(string)
 			fileout := strings.TrimSuffix(t.Data["filepath"].(string), ".go") + ".ts"
 			fileout = strings.ReplaceAll(fileout, "/tzapio/tzap/", "/tzapio/tzap/ts/src/")
@@ -36,16 +36,16 @@ func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedTemp
 					"//file: "+filein+"\n",
 					t.Data["content"].(string),
 				).
-				LoadTaskOrRequestNewTaskMD5(fileout)
+				LoadCompletionOrRequestCompletionMD5(fileout)
 
 		}}
 
 }
 
-func MakeCodeTSMessage(mission, task, filein, fileout string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
+func MakeCodeTSMessage(mission, task, filein, fileout string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "makeCodeTSMessage",
-		Template: func(t *tzap.Tzap) *tzap.Tzap {
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.
 				AddSystemMessage("### The overall mission: \n"+mission).
 				AddUserMessage(
@@ -63,7 +63,7 @@ func MakeCodeTSMessage(mission, task, filein, fileout string) types.NamedTemplat
 					"//file: "+filein+"\n",
 					util.ReadFileP(filein),
 				).
-				LoadTaskOrRequestNewTask(fileout)
+				LoadCompletionOrRequestCompletion(fileout)
 		},
 	}
 }

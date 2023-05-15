@@ -31,7 +31,7 @@ func MakeCodeTS(mission, task string) func(t *tzap.Tzap) *tzap.Tzap {
 				"//file: "+filein+"\n",
 				t.Data["content"].(string),
 			).
-			LoadTaskOrRequestNewTaskMD5(fileout)
+			LoadCompletionOrRequestCompletionMD5(fileout)
 
 	}
 }

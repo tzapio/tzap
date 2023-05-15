@@ -8,13 +8,13 @@ import (
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
-func DisplayAndConfirm() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
+func DisplayAndConfirm() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "DisplayAndConfirm",
-		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
+		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			content := t.Data["content"].(string)
 			fmt.Println("\n", content)
-			ok := stdin.ConfirmToContinue()
+			ok := stdin.ConfirmPrompt("Continue with this commit?")
 
 			if !ok {
 				return t.ErrorTzap(fmt.Errorf("commit aborted by user"))

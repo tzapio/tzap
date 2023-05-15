@@ -8,8 +8,8 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func GitDiff() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
-	templateF := func(t *tzap.Tzap) *tzap.ErrorTzap {
+func GitDiff() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
+	workflowF := func(t *tzap.Tzap) *tzap.ErrorTzap {
 		diff := exec.Command("git", "diff",
 			"--staged",
 			"--patch-with-raw",
@@ -28,16 +28,16 @@ func GitDiff() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 		t.Data["git-diff"] = string(out)
 		return t.ErrorTzap(nil)
 	}
-	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name:     "GitDiff",
-		Template: templateF,
+		Workflow: workflowF,
 	}
 }
 
-func ValidateDiff() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
+func ValidateDiff() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "ValidateDiff",
-		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
+		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			diff := t.Data["git-diff"].(string)
 
 			if diff == "" {
@@ -48,10 +48,10 @@ func ValidateDiff() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 		}}
 }
 
-func GitCommit() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
+func GitCommit() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "GitCommit",
-		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
+		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			content := t.Data["content"].(string)
 
 			cmd := exec.Command("git", "commit", "-m", content)

@@ -7,10 +7,13 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func InspirationTemplate(inspirationFiles []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
-		Name: "inspirationTemplate",
-		Template: func(t *tzap.Tzap) *tzap.Tzap {
+func InspirationWorkflow(inspirationFiles []string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "inspirationWorkflow",
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
+			if len(inspirationFiles) == 0 {
+				return t
+			}
 			fmt.Printf("Including static inspiration files: %+v\n", inspirationFiles)
 			return t.
 				LoadFiles(inspirationFiles).

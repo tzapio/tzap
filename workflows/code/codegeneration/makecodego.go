@@ -31,7 +31,7 @@ func MakeCodeGO(mission, task string) func(t *tzap.Tzap) *tzap.Tzap {
 				"###file: "+filein+"\n",
 				t.Data["content"].(string),
 			).
-			LoadTaskOrRequestNewTaskMD5(fileout)
+			LoadCompletionOrRequestCompletionMD5(fileout)
 
 		/*"These are the current existing files:\n//existing file (content redacted)",
 		strings.Join(files, "\n//existing file (content redacted)"),*/

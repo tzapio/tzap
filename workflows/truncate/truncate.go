@@ -1,8 +1,7 @@
-package gocode
+package truncate
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/types"
@@ -14,18 +13,10 @@ const (
 	maxTokensForDefault = 4000
 )
 
-func DeserializedArguments(dataname string, args []string) types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
-		Name: "deserializedArguments",
-		Template: func(t *tzap.Tzap) *tzap.Tzap {
-			t.Data[dataname] = strings.Join(args, " ")
-			return t
-		}}
-}
-func SetContextSize() types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.Tzap]{
+func SetContextSize() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "setContextSize",
-		Template: func(t *tzap.Tzap) *tzap.Tzap {
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			settings := config.FromContext(t.C)
 			var contextSize int
 			if settings.OpenAIModel == "gpt4" {
@@ -39,12 +30,12 @@ func SetContextSize() types.NamedTemplate[*tzap.Tzap, *tzap.Tzap] {
 		}}
 }
 
-func CountTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
+func CountTokens() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "countTokens",
-		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
+		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			diff := t.Data["git-diff"].(string)
-			headerCount, err := t.CountTokens(t.Parent.Header)
+			headerCount, err := t.CountTokens(t.Parent.InitialSystemContent)
 			if err != nil {
 				return t.ErrorTzap(fmt.Errorf("could not count tokens: %v", err))
 			}
@@ -59,10 +50,10 @@ func CountTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
 		}}
 }
 
-func TruncateTokens() types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap] {
-	return types.NamedTemplate[*tzap.Tzap, *tzap.ErrorTzap]{
+func TruncateTokens() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "truncateTokens",
-		Template: func(t *tzap.Tzap) *tzap.ErrorTzap {
+		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			contextSize := t.Data["contextSize"].(int)
 			headerTokens := t.Data["headerTokens"].(int)
 			contentTokens := t.Data["contentTokens"].(int)
