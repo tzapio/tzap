@@ -9,11 +9,10 @@ import (
 type configKey struct{}
 
 type Configuration struct {
-	OpenAIModel   string
-	AutoMode      bool
-	TruncateLimit int
-	MD5Rewrites   bool
-	// Simple strings.Contains(file,include) matching. Default [""] = include all.
+	OpenAIModel    string
+	AutoMode       bool
+	TruncateLimit  int
+	MD5Rewrites    bool
 	MD5IncludeList []string
 	EnableLogs     bool
 	LoggerOutput   string

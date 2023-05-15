@@ -21,7 +21,7 @@ func CreateQueryJSON(t *tzap.Tzap, filename string, input string) error {
 }
 
 func GetQuery(t *tzap.Tzap, input string) (types.QueryRequest, error) {
-	println("Getting query for input: " + input)
+	println("\n\nGetting query for input: " + input + "\n\n")
 	embeddings, err := getEmbeddings(t, input)
 	if err != nil {
 		return types.QueryRequest{}, err

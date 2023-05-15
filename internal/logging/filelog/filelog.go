@@ -32,7 +32,7 @@ func LogData(ctx context.Context, data interface{}, logType LogType) {
 
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
 			writeJSONToFile(filename, data)
-			fmt.Printf("successfully written JSON to file: %s\n", filename)
+			fmt.Printf("Wrote log to file: %s\n", filename)
 			return
 		}
 	}

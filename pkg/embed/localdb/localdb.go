@@ -32,7 +32,6 @@ func NewFileDB(filePath string) (*FileDB, error) {
 
 func (db *FileDB) load() error {
 	file, err := os.Open(db.filePath)
-	println("Opening ", db.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			absPath, err := filepath.Abs(db.filePath)
