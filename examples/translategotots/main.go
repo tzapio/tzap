@@ -43,7 +43,7 @@ Tzap is a library for Prompts as Code. It provides a toolkit to build, customize
 ` + util.ReadFileP("/home/vscode/go/src/github.com/tzapio/tzap/pkg/tzap/message.go")
 
 func main() {
-	defer tzap.HandleShutdown()
+
 	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
 	if err != nil {
 		panic(err)

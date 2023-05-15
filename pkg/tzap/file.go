@@ -28,6 +28,10 @@ func (t *Tzap) LoadFileDir(dir string, match string) *Tzap {
 // LoadFiles exposes an array of Tzaps in with .Data["children"]. Each child is a .LoadTask(file)
 func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 	var ts []*Tzap
+	t = t.AddTzap(&Tzap{
+		Name: "LoadFiles",
+		Data: types.MappedInterface{},
+	})
 	for _, file := range filepaths {
 		println(file, len(file))
 		// Check if the file is a regular file and its name contains "test" if test is true.
@@ -38,11 +42,8 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 			panic(err)
 		}
 	}
-
-	return t.AddTzap(&Tzap{
-		Name: "LoadFiles",
-		Data: types.MappedInterface{"children": ts},
-	})
+	t.Data["children"] = ts
+	return t
 }
 
 // LoadCompletion loads a file and returns a Tzap with the file's content
@@ -59,7 +60,7 @@ func (t *Tzap) LoadCompletion(filePath string) *Tzap {
 	}
 	loadTaskFromFile := t.AddTzap(
 		&Tzap{
-			Name: "LoadTaskFromFile",
+			Name: "LoadCompletion",
 			Message: types.Message{
 				Role:    openai.ChatMessageRoleAssistant,
 				Content: originalContent,
@@ -74,7 +75,7 @@ func (t *Tzap) LoadCompletion(filePath string) *Tzap {
 func (t *Tzap) LoadCompletionOrRequestCompletion(filePath string) *Tzap {
 	Log(t, "Opening", filePath)
 	t = t.AddTzap(&Tzap{
-		Name: "LoadTaskOrRequestNewTask"})
+		Name: "LoadCompletionOrRequestCompletion"})
 
 	var out *Tzap
 	if _, err := os.Stat(filePath); err != nil {

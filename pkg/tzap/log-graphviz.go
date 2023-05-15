@@ -6,9 +6,8 @@ import (
 
 var GlobalTzaps []*Tzap
 
-func HandleShutdown() {
-
-	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
+func (t *Tzap) HandleShutdown() {
+	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	Flush()
 }
 

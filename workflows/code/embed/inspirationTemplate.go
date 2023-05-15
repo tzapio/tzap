@@ -17,10 +17,10 @@ func InspirationWorkflow(inspirationFiles []string) types.NamedWorkflow[*tzap.Tz
 			fmt.Printf("Including static inspiration files: %+v\n", inspirationFiles)
 			return t.
 				LoadFiles(inspirationFiles).
-				Accumulate(func(t *tzap.Tzap) *tzap.Tzap {
+				Reduce(func(t *tzap.Tzap, child *tzap.Tzap) *tzap.Tzap {
 					return t.AddSystemMessage(
-						"###file: "+t.Data["filepath"].(string),
-						t.Data["content"].(string))
+						"###file: "+child.Data["filepath"].(string),
+						child.Data["content"].(string))
 				})
 		},
 	}

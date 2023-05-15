@@ -16,6 +16,7 @@ const (
 	TzapLog     LogType = "tzap"
 	RequestLog  LogType = "request"
 	ResponseLog LogType = "response"
+	DotLog      LogType = "dotlog"
 )
 
 func LogData(ctx context.Context, data interface{}, logType LogType) {
@@ -29,9 +30,15 @@ func LogData(ctx context.Context, data interface{}, logType LogType) {
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
 			os.MkdirAll(dir, 0700)
 		}
-
+		if logType == DotLog {
+			filename = filename + ".dot"
+		}
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
-			writeJSONToFile(filename, data)
+			if logType == DotLog {
+				writeStringToFile(filename, data.(string))
+			} else {
+				writeJSONToFile(filename, data)
+			}
 			fmt.Printf("Wrote log to file: %s\n", filename)
 			return
 		}
@@ -52,13 +59,9 @@ func writeJSONToFile(filename string, data interface{}) {
 		panic(fmt.Errorf("could not encode: %w", err))
 	}
 
-	fileBytes, err := os.ReadFile(filename)
-	if err != nil {
-		panic(fmt.Errorf("error reading file: %w", err))
-	}
-
-	if err := os.WriteFile(filename, fileBytes, 0644); err != nil {
+}
+func writeStringToFile(filename string, data string) {
+	if err := os.WriteFile(filename, []byte(data), 0644); err != nil {
 		panic(fmt.Errorf("error writing file: %w", err))
 	}
-
 }

@@ -7,6 +7,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/tzapio/tzap/internal/logging/filelog"
 )
 
 type GraphVizNode struct {
@@ -62,9 +64,7 @@ func ConvertGraphvizToSVG(inputFile string, outputFile string) error {
 
 	return nil
 }
-func GenerateGraphvizDotFile(filename string, graph *GraphVizGraph) error {
-	return nil
-	println("Saving to ", filename)
+func GenerateGraphvizDotFile(t *Tzap, graph *GraphVizGraph) {
 	var dotBuilder strings.Builder
 
 	dotBuilder.WriteString("digraph G {\n")
@@ -85,10 +85,9 @@ func GenerateGraphvizDotFile(filename string, graph *GraphVizGraph) error {
 	for _, subgraph := range graph.SubGraphs {
 		writeSubgraph(&dotBuilder, subgraph)
 	}
-
 	dotBuilder.WriteString("}\n")
+	filelog.LogData(t.C, dotBuilder.String(), filelog.DotLog)
 
-	return os.WriteFile(filename, []byte(dotBuilder.String()), 0644)
 }
 func getLayout() string {
 	return `
