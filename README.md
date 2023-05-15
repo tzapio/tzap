@@ -1,4 +1,4 @@
-# Tzap: Think it and it's there. A toolset for GPT templating, prompt as Code and simple CLI automations
+# Tzap: Think it and it's there. A toolset for GPT workflows, Prompt as Code Functions and simple CLI automations
 
 ## What is Tzap?
 Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their GPT-based applications.
@@ -8,13 +8,11 @@ Tzap is a library that simplifies all things GPT and code. It provides both a CL
 npm install -g tzap
 export OPENAI_APIKEY=<apikey>
 
+tzap init
+
 # Do a git add <file> then do:
 tzap semantic:gitcommit
 
-touch .tzapignore
-touch .tzapinclude
-#Adapt to your programming language
-echo -e "*.tsx\n*.ts" > .tzapinclude
 # Adapt below to your project!
 tzap embeddingprompt outputfile.txt "can you add a tzap cli command that enables users \
 to generate code based on the users code without requiring them to manage prompts themselves? \
@@ -31,7 +29,7 @@ Using external APIs incurs small costs, read [Cost Estimation](#cost-estimation)
 
 - Simple CLI tool
 - Built-in local embedding vector database and cache.
-- Easily create prompts with domain specific contexts using Tzap functions, templates, loops and control flows.
+- Easily create prompts with domain specific contexts using Tzap functions, workflows, loops and control flows.
 - Build apps on top of Tzap and GPT
 - Automate GPT copy-pasting tasks
 - Integrate magic functions that evaluate GPT prompts instead of code
@@ -40,7 +38,7 @@ Using external APIs incurs small costs, read [Cost Estimation](#cost-estimation)
 
 ## How It Works
 
-Tzap allows you to create reusable instances and apply templates and functions to them, making it convenient to adapt to new use cases, such as automating GPT copy-pasting, creating magic functions that evaluate GPT prompts, and crafting magic CLI tools. In addition, Tzap makes it simple to apply templates and functions to existing Tzaps, enhancing the library's flexibility.
+Tzap allows you to create reusable instances and apply workflows and functions to them, making it convenient to adapt to new use cases, such as automating GPT copy-pasting, creating magic functions that evaluate GPT prompts, and crafting magic CLI tools. In addition, Tzap makes it simple to apply workflows and functions to existing Tzaps, enhancing the library's flexibility.
 
 By using Tzap, you can effortlessly manage file paths and directories, fetch chat responses, and generate content using OpenAI's GPT-4 model. Furthermore, the library provides chat message context in Golang, ensuring a smooth integration process.
 
