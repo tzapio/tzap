@@ -5,17 +5,21 @@ import (
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/templates/code/documents"
+	"github.com/tzapio/tzap/workflows/code/documents"
 )
 
 func main() {
-	tzap.NewWithConnector(tzapconnect.WithConfig(
-		config.Configuration{
-			AutoMode:    true,
-			OpenAIModel: openai.GPT4,
-			MD5Rewrites: true,
-		})).
-		ApplyTemplateFN(documents.ReadmeGithub(
+	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	if err != nil {
+		panic(err)
+	}
+	tzap.
+		NewWithConnector(
+			tzapconnect.WithConfig(openai_apikey, config.Configuration{
+				MD5Rewrites: true,
+				OpenAIModel: openai.GPT4,
+				EnableLogs:  true})).
+		ApplyWorkflowFN(documents.ReadmeGithub(
 			"Tzap is a library for Prompts as Code.",
 			[]string{
 				".tzap/usecases",

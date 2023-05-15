@@ -6,20 +6,24 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
 	"github.com/tzapio/tzap/pkg/util"
-	"github.com/tzapio/tzap/templates/code/codegeneration"
+	"github.com/tzapio/tzap/workflows/code/codegeneration"
 )
 
 func main() {
-	tzap.NewWithConnector(tzapconnect.WithConfig(
-		config.Configuration{
-			AutoMode:    true,
-			OpenAIModel: openai.GPT4,
-			MD5Rewrites: false,
-		})).
+	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	if err != nil {
+		panic(err)
+	}
+	tzap.
+		NewWithConnector(
+			tzapconnect.WithConfig(openai_apikey, config.Configuration{
+				MD5Rewrites: true,
+				OpenAIModel: openai.GPT4,
+				EnableLogs:  true})).
 		LoadFileDir("./pkg/embed", "*.go").
 		Map(func(t *tzap.Tzap) *tzap.Tzap {
 			return t.
-				ApplyTemplateFN(
+				ApplyWorkflowFN(
 					codegeneration.MakeCodeGO(`
 You are helping the user writing a library for chatgpt prompting. You primarely write Golang. Most files already exists. Do not create new data structures.
 

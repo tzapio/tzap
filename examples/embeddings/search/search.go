@@ -8,12 +8,13 @@ import (
 )
 
 func main() {
+	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	if err != nil {
+		panic(err)
+	}
 	tzap.
 		NewWithConnector(
-			tzapconnect.WithConfig(
-				config.Configuration{
-					MD5Rewrites: true,
-				})).
+			tzapconnect.WithConfig(openai_apikey, config.Configuration{MD5Rewrites: true})).
 		WorkTzap(func(t *tzap.Tzap) {
 			err := embed.CreateQueryJSON(t, "query.json", "Write a tzap to get embeddings from files in a directory")
 			if err != nil {

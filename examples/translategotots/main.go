@@ -6,7 +6,7 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
 	"github.com/tzapio/tzap/pkg/util"
-	"github.com/tzapio/tzap/templates/code/translate"
+	"github.com/tzapio/tzap/workflows/code/translate"
 )
 
 var mission1 string = `
@@ -44,17 +44,19 @@ Tzap is a library for Prompts as Code. It provides a toolkit to build, customize
 
 func main() {
 	defer tzap.HandleShutdown()
-
-	tzap.NewWithConnector(tzapconnect.WithConfig(
-		config.Configuration{
-			AutoMode:     true,
-			OpenAIModel:  openai.GPT4,
-			MD5Rewrites:  false,
-			LoggerOutput: "./out/",
-		})).
+	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	if err != nil {
+		panic(err)
+	}
+	tzap.
+		NewWithConnector(
+			tzapconnect.WithConfig(openai_apikey, config.Configuration{
+				MD5Rewrites: true,
+				OpenAIModel: openai.GPT4,
+				EnableLogs:  true})).
 		WorkTzap(func(t *tzap.Tzap) {
 			t.
-				ApplyTemplate(translate.MakeCodeTSMessage(
+				ApplyWorkflow(translate.MakeCodeTSMessage(
 					mission1,
 					"Generate a typescript interface for the Tzap library.",
 					"/home/vscode/go/src/github.com/tzapio/tzap/pkg/types/interfaces.go",
@@ -62,7 +64,7 @@ func main() {
 		}).
 		WorkTzap(func(t *tzap.Tzap) {
 			t.
-				ApplyTemplate(translate.MakeCodeTSMessage(
+				ApplyWorkflow(translate.MakeCodeTSMessage(
 					mission2,
 					"Translate Tzap.go into Tzap.ts.",
 					"/home/vscode/go/src/github.com/tzapio/tzap/pkg/tzap/tzap.go",
@@ -72,7 +74,7 @@ func main() {
 			t.LoadFileDir("/home/vscode/go/src/github.com/tzapio/tzap/pkg/util/", "*.go").
 				Map(func(t *tzap.Tzap) *tzap.Tzap {
 					return t.
-						ApplyTemplate(
+						ApplyWorkflow(
 							translate.TranslateCodeFromTo(
 								"go",
 								"ts",
