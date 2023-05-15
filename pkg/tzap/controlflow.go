@@ -47,6 +47,19 @@ func (t *Tzap) Map(fn func(*Tzap) *Tzap) *Tzap {
 	return tzmapped
 }
 
+func (t *Tzap) Reduce(fn func(*Tzap, *Tzap) *Tzap) *Tzap {
+	children := t.Data["children"].([]*Tzap)
+	Log(t, "START REDUCE", len(children))
+
+	reducedTzap := t.AddTzap(&Tzap{Name: "Reduce"})
+
+	for i, child := range children {
+		Log(t, "REDUCE child I", i)
+		reducedTzap = fn(reducedTzap, child)
+	}
+
+	return reducedTzap
+}
 func (t *Tzap) Accumulate(fn func(*Tzap) *Tzap) *Tzap {
 	children := t.Data["children"].([]*Tzap)
 	Log(t, "Accumulate start", len(children))
