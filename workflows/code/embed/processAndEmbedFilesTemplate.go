@@ -6,9 +6,9 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func PrepareEmbedFilesTzapWorkflow(files []string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func PrepareEmbedFilesWorkflow(files []string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
-		Name: "prepareEmbedFilesTzapWorkflow",
+		Name: "prepareEmbedFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			rawFileEmbeddings := embed.PrepareEmbeddingsFromFiles(t, files)
 			uncachedEmbeddings := embed.GetUncachedEmbeddings(rawFileEmbeddings)
@@ -18,9 +18,9 @@ func PrepareEmbedFilesTzapWorkflow(files []string) types.NamedWorkflow[*tzap.Tza
 	}
 }
 
-func FetchOrCachedEmbeddingForFilesTzapWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func FetchOrCachedEmbeddingForFilesWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
-		Name: "fetchOrCachedEmbeddingForFilesTzapWorkflow",
+		Name: "fetchOrCachedEmbeddingForFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
 			if !ok {
