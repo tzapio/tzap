@@ -43,7 +43,7 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		Temperature: 1,
 	}
 	filelog.LogData(ctx, request, filelog.RequestLog)
-	println("\nCompletion:\n")
+	println("\n--- Completion:\n")
 	var content string
 	if stream {
 		streamContent, err := ot.streamCompletion(ctx, request)
@@ -58,7 +58,7 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		}
 		content = responseContent
 	}
-
+	println("\n---\n")
 	return content, nil
 }
 

@@ -63,6 +63,7 @@ func ConvertGraphvizToSVG(inputFile string, outputFile string) error {
 	return nil
 }
 func GenerateGraphvizDotFile(filename string, graph *GraphVizGraph) error {
+	return nil
 	println("Saving to ", filename)
 	var dotBuilder strings.Builder
 
