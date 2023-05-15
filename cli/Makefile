@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
-PREVIOUS_VERSION=v0.7.12
-VERSION=v0.7.13
+PREVIOUS_VERSION=v0.7.13
+VERSION=v0.7.14
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)"
 
@@ -48,22 +48,22 @@ github-otherpkgs-release:
 
 
 remove-releases:
-	gh release delete pkg/tzapconnect/$(VERSION) --yes
-	gh release delete pkg/connectors/openaiconnector/$(VERSION) --yes
-	gh release delete pkg/connectors/googlevoiceconnector/$(VERSION) --yes
-	gh release delete pkg/connectors/redisembeddbconnector/$(VERSION) --yes
-	gh release delete $(VERSION) --yes
+	-gh release delete pkg/tzapconnect/$(VERSION) --yes
+	-gh release delete pkg/connectors/openaiconnector/$(VERSION) --yes
+	-gh release delete pkg/connectors/googlevoiceconnector/$(VERSION) --yes
+	-gh release delete pkg/connectors/redisembeddbconnector/$(VERSION) --yes
+	-gh release delete $(VERSION) --yes
 
-	git push --delete origin pkg/tzapconnect/$(VERSION)
-	git push --delete origin pkg/connectors/openaiconnector/$(VERSION)
-	git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
-	git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
-	git push --delete origin $(VERSION)
+	-git push --delete origin pkg/tzapconnect/$(VERSION)
+	-git push --delete origin pkg/connectors/openaiconnector/$(VERSION)
+	-git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
+	-git push --delete origin pkg/connectors/redisembeddbconnector/$(VERSION)
+	-git push --delete origin $(VERSION)
 
-	git tag -d pkg/tzapconnect/$(VERSION)
-	git tag -d pkg/connectors/openaiconnector/$(VERSION)
-	git tag -d pkg/connectors/googlevoiceconnector/$(VERSION)
-	git tag -d pkg/connectors/redisembeddbconnector/$(VERSION)
-	git tag -d $(VERSION)
+	-git tag -d pkg/tzapconnect/$(VERSION)
+	-git tag -d pkg/connectors/openaiconnector/$(VERSION)
+	-git tag -d pkg/connectors/googlevoiceconnector/$(VERSION)
+	-git tag -d pkg/connectors/redisembeddbconnector/$(VERSION)
+	-git tag -d $(VERSION)
 
 .PHONY:

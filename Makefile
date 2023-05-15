@@ -7,7 +7,6 @@ release:
 	make -C cli build
 	make -C cli tzapPrepareRelease
 	make -C cli tzapWriteRelease
-
 	make -C cli github-upload
 releaseOther:
 	make -C cli github-otherpkgs-release
