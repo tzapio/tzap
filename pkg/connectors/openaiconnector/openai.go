@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/sashabaranov/go-openai"
-	"github.com/tzapio/tzap/internal/filelog"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
 
@@ -28,7 +27,6 @@ func (ot OpenaiTgenerator) GenerateChat(ctx context.Context, messages []types.Me
 	config := config.FromContext(ctx)
 	content, err := ot.fetchChatResponse(ctx, config.OpenAIModel, stream, messages)
 	if err != nil {
-		filelog.LogData(ctx, err.Error(), filelog.ResponseLog)
 		return "", fmt.Errorf("error generating chat prompt result: %v", err)
 	}
 	return content, nil
@@ -43,7 +41,7 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		Messages:    output.GetOpenAICompletionMessage(messages),
 		Temperature: 1,
 	}
-	filelog.LogData(ctx, request, filelog.RequestLog)
+
 	var content string
 	if stream {
 		streamContent, err := ot.streamCompletion(request)
@@ -58,7 +56,7 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		}
 		content = responseContent
 	}
-	filelog.LogData(ctx, content, filelog.ResponseLog)
+
 	return content, nil
 }
 
@@ -72,17 +70,19 @@ func (ot OpenaiTgenerator) streamCompletion(request openai.ChatCompletionRequest
 	}
 	var resultBuilder strings.Builder
 	// Consume the stream completion
+
 	for {
 		// Read the next token from the stream
 		response, err := s.Recv()
 		if errors.Is(err, io.EOF) {
-			fmt.Println("\nStream finished")
-			fmt.Printf("%+v\n", response)
+			//	fmt.Println("\nStream finished")
+			//	fmt.Printf("%+v\n", response)
 			break
 		}
 		if err != nil {
-			return resultBuilder.String(), (fmt.Errorf("stream error: %v", err))
+			return resultBuilder.String(), fmt.Errorf("stream error: %v", err)
 		}
+
 		token := response.Choices[0].Delta.Content
 		print(token)
 		resultBuilder.WriteString(token)
