@@ -2,12 +2,10 @@ package tzap
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
-	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
 // AddUserMessage adds a user message to the Tzap
@@ -20,27 +18,6 @@ func (t *Tzap) AddUserMessage(contents ...string) *Tzap {
 			Content: content,
 		},
 	})
-}
-
-// LoadUserMessageFromFileOrStdinInput adds a user message from a file or standard input
-func (t *Tzap) LoadUserMessageFromFileOrStdinInput(filepath string, task string) *Tzap {
-	var content string
-	if _, err := os.Stat(filepath); err != nil {
-		content = stdin.GetStdinInput(task)
-		if err := os.WriteFile(filepath, []byte(content), 0666); err != nil {
-			panic(fmt.Errorf("could not write to from %s: %w", filepath, err))
-		}
-	} else {
-		byteContent, err := os.ReadFile(filepath)
-		if err != nil {
-			panic(fmt.Errorf("could not read from %s: %w", filepath, err))
-		}
-		content = string(byteContent)
-	}
-	return t.AddTzap(&Tzap{Name: "LoadTaskFromFileOrCreateTask", Message: types.Message{
-		Role:    openai.ChatMessageRoleUser,
-		Content: content,
-	}})
 }
 
 // AddSystemMessage adds a system message to the Tzap
@@ -107,7 +84,7 @@ func (t *Tzap) CombineMessage(nt1 func(*Tzap) *Tzap, nt2 func(*Tzap) *Tzap) *Tza
 	return t.AddTzap(&Tzap{Name: "CombineMessage", Message: types.Message{Role: types1.Role, Content: fmt.Sprintf("%s\n%s", types1.Content, types2.Content)}})
 }
 
-func (t *Tzap) SetHeader(header string) *Tzap {
-	t.Header = header
+func (t *Tzap) SetInitialSystemContent(content string) *Tzap {
+	t.InitialSystemContent = content
 	return t
 }

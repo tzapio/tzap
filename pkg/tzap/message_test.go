@@ -1,7 +1,6 @@
 package tzap_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -35,31 +34,6 @@ func Test_AddUserMessage_MultipleStrings_AddedContent(t *testing.T) {
 	}
 	if result.Message.Content != "Hello world!\nHow are you?" {
 		t.Errorf("Expected message content 'Hello world!\nHow are you?', but got %v", result.Message.Content)
-	}
-	if result.Message.Role != openai.ChatMessageRoleUser {
-		t.Errorf("Expected message role 'user', but got %v", result.Message.Role)
-	}
-}
-
-func Test_LoadUserMessageFromFileOrStdinInput_FileExists_LoadedContent(t *testing.T) {
-	filepath := "temp_testfile.txt"
-	testContent := "Example file content."
-
-	err := os.WriteFile(filepath, []byte(testContent), 0600)
-	if err != nil {
-		t.Fatalf("Failed to create test file: %v", err)
-	}
-	defer os.Remove(filepath)
-
-	original := tzap.InternalNew()
-	result := original.LoadUserMessageFromFileOrStdinInput(filepath, "Example file content task")
-
-	if result == nil {
-		t.Errorf("Expected a non-nil result, but got nil")
-		return
-	}
-	if result.Message.Content != testContent {
-		t.Errorf("Expected message content '%v', but got %v", testContent, result.Message.Content)
 	}
 	if result.Message.Role != openai.ChatMessageRoleUser {
 		t.Errorf("Expected message role 'user', but got %v", result.Message.Role)

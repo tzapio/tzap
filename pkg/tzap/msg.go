@@ -9,10 +9,10 @@ import (
 
 func GetMessages(t *Tzap) []types.Message {
 	messages := getMessages(t)
-	if t.Header != "" {
+	if t.InitialSystemContent != "" {
 		messages = append([]types.Message{{
 			Role:    "system",
-			Content: t.Header,
+			Content: t.InitialSystemContent,
 		}}, messages...)
 	}
 	return messages

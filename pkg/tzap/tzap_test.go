@@ -13,8 +13,8 @@ func Test_NewTzap_Defaults_RootTzapWithEmptyMessage(t *testing.T) {
 	if tt.Name != "ConnectionLess" {
 		t.Errorf("expected name to be ConnectionLess but got %s", tt.Name)
 	}
-	if tt.Header != "" {
-		t.Errorf("expected header to be empty but got %s", tt.Header)
+	if tt.InitialSystemContent != "" {
+		t.Errorf("expected header to be empty but got %s", tt.InitialSystemContent)
 	}
 	if tt.Message.Role != "" {
 		t.Errorf("expected message role to be empty but got %s", tt.Message.Role)
@@ -50,8 +50,8 @@ func Test_AddTzap_EmptyTzap_NewTzapAsChild(t *testing.T) {
 func Test_CloneTzap_Defaults_ClonedTzapWithInitialProperties(t *testing.T) {
 	parent := tzap.InternalNew()
 	child := &tzap.Tzap{
-		Name:   "ChildTzap",
-		Header: "ChildHeader",
+		Name:                 "ChildTzap",
+		InitialSystemContent: "ChildHeader",
 		Message: types.Message{
 			Role:    "ChildRole",
 			Content: "ChildContent",
@@ -66,8 +66,8 @@ func Test_CloneTzap_Defaults_ClonedTzapWithInitialProperties(t *testing.T) {
 	if clonedChild.Name != child.Name {
 		t.Errorf("expected cloned name to be %s but got %s", child.Name, clonedChild.Name)
 	}
-	if clonedChild.Header != child.Header {
-		t.Errorf("expected cloned header to be %s but got %s", child.Header, clonedChild.Header)
+	if clonedChild.InitialSystemContent != child.InitialSystemContent {
+		t.Errorf("expected cloned header to be %s but got %s", child.InitialSystemContent, clonedChild.InitialSystemContent)
 	}
 	if clonedChild.Message.Role != child.Message.Role {
 		t.Errorf("expected cloned message role to be %s but got %s", child.Message.Role, clonedChild.Message.Role)
@@ -86,8 +86,8 @@ func Test_CloneTzap_Defaults_ClonedTzapWithInitialProperties(t *testing.T) {
 func Test_HijackTzap_Defaults_HijackedTzapWithParentProperties(t *testing.T) {
 	parent := tzap.InternalNew().AddUserMessage("Skip me")
 	child := &tzap.Tzap{
-		Name:   "ChildTzap",
-		Header: "ChildHeader",
+		Name:                 "ChildTzap",
+		InitialSystemContent: "ChildHeader",
 		Message: types.Message{
 			Role:    "ChildRole",
 			Content: "ChildContent",

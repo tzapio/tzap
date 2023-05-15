@@ -22,18 +22,17 @@ func addId(t *Tzap) {
 
 // Tzap is a structure that holds data and methods related to Tzap objects.
 type Tzap struct {
-	Id      int
-	Name    string
-	Header  string
-	Message types.Message
-	Data    types.MappedInterface `json:"-"`
-	C       context.Context       `json:"-"`
+	Id                   int
+	Name                 string
+	InitialSystemContent string
+	Message              types.Message
+	Data                 types.MappedInterface `json:"-"`
+	C                    context.Context       `json:"-"`
+	TG                   types.TGenerator
 
 	types.ITzap[*Tzap, any] `json:"-"`
 
 	Parent *Tzap
-
-	TG types.TGenerator
 }
 
 // NewTzap creates a new Tzap with default values, and returns its pointer.
@@ -68,7 +67,7 @@ func (t *Tzap) New() *Tzap {
 		Name:    "NewConnection",
 		Message: types.Message{},
 		Data:    types.MappedInterface{},
-		C:       context.Background(),
+		C:       t.C,
 		TG:      t.TG,
 	}
 	addId(tc)
@@ -101,11 +100,11 @@ func (t *Tzap) AddTzap(tc *Tzap) *Tzap {
 func (t *Tzap) CloneTzap(tc *Tzap) *Tzap {
 	Logf(t, "Clone tzap (%s)", tc.Name)
 	tz := &Tzap{
-		Parent:  t,
-		Name:    t.Name,
-		Header:  t.Header,
-		Message: t.Message,
-		Data:    t.Data,
+		Parent:               t,
+		Name:                 t.Name,
+		InitialSystemContent: t.InitialSystemContent,
+		Message:              t.Message,
+		Data:                 t.Data,
 	}
 
 	if tc.Parent != nil {
@@ -114,8 +113,8 @@ func (t *Tzap) CloneTzap(tc *Tzap) *Tzap {
 	if tc.Name != "" {
 		tz.Name = tc.Name
 	}
-	if tc.Header != "" {
-		tz.Header = tc.Header
+	if tc.InitialSystemContent != "" {
+		tz.InitialSystemContent = tc.InitialSystemContent
 	}
 	if tc.Message.Role != "" {
 		tz.Message.Role = tc.Message.Role
