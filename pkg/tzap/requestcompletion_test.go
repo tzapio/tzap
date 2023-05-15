@@ -15,20 +15,20 @@ func Test_RequestChat_ValidFetch_OpenAIChatRequested(t *testing.T) {
 	tzapObj := tzap.InternalNew()
 	tzapObj.TG = &mockTG{}
 	tzapObj = tzapObj.AddTzap(&tzap.Tzap{
-		Header:  "validHeader",
-		Name:    "Mock",
-		Message: types.Message{Role: "mocked", Content: "Hello!"},
+		InitialSystemContent: "validHeader",
+		Name:                 "Mock",
+		Message:              types.Message{Role: "mocked", Content: "Hello!"},
 		Data: types.MappedInterface{
 			"filepath": "validFilePath",
 		},
 	})
 
 	// When
-	responseTzap := tzapObj.RequestChat()
+	responseTzap := tzapObj.RequestChatCompletion()
 
 	// Expect
-	if responseTzap.Parent.Parent.Header == "validHeader" {
-		t.Errorf("Expected header to be 'validHeader', but got '%s'", responseTzap.Parent.Parent.Header)
+	if responseTzap.Parent.Parent.InitialSystemContent == "validHeader" {
+		t.Errorf("Expected header to be 'validHeader', but got '%s'", responseTzap.Parent.Parent.InitialSystemContent)
 	}
 	if responseTzap.Data["content"] != "r=system;c=validHeader|r=mocked;c=Hello!" {
 		t.Errorf("Expected content to be 'r=system;c=validHeader|r=mocked;c=Hello!', but got '%s'", responseTzap.Data["content"])
@@ -50,20 +50,22 @@ func Test_FetchTask_ValidFetch_ChangesApplied(t *testing.T) {
 
 	tzapObj.TG = &mockTG{}
 	tzapObj = tzapObj.AddTzap(&tzap.Tzap{
-		Header:  "validHeader",
-		Name:    "Mock",
-		Message: types.Message{Role: "mocked", Content: "Hello!"},
+		InitialSystemContent: "validHeader",
+		Name:                 "Mock",
+		Message:              types.Message{Role: "mocked", Content: "Hello!"},
 		Data: types.MappedInterface{
 			"content": "someOldFile",
 		},
 	})
 
 	// When
-	responseTzap := tzapObj.FetchTask(filename)
+	responseTzap := tzapObj.
+		RequestChatCompletion().
+		StoreCompletion(filename)
 
 	// Expect
-	if responseTzap.Header != "" {
-		t.Errorf("Expected header to be '', but got '%s'", responseTzap.Header)
+	if responseTzap.InitialSystemContent != "" {
+		t.Errorf("Expected header to be '', but got '%s'", responseTzap.InitialSystemContent)
 	}
 	if responseTzap.Message.Content == "" {
 		t.Errorf("Expected content to not be empty string")

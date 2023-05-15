@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tzapio/tzap/internal/filelog"
+	"github.com/tzapio/tzap/internal/logging/filelog"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/util"
@@ -17,36 +17,38 @@ func (t *Tzap) ChangeFilepath(filepath string) *Tzap {
 	return t
 }
 
-// LoadTaskOrRequestNewTaskMD5 loads a task file if it exists and its MD5 checksum matches,
+// LoadCompletionOrRequestCompletionMD5 loads a task file if it exists and its MD5 checksum matches,
 // otherwise requests a new task content from OpenAI and applies the changes to the original file
-func (t *Tzap) LoadTaskOrRequestNewTaskMD5(filepath string) *Tzap {
+func (t *Tzap) LoadCompletionOrRequestCompletionMD5(filePath string) *Tzap {
 	config := config.FromContext(t.C)
 	md5memory := getMessageMD5(t)
-	md5file, _ := util.ReadFile(filepath + ".md5")
+	md5file, _ := util.ReadFile(filePath + ".md5")
 
-	if _, err := os.Stat(filepath); err != nil {
-		Log(t, "LoadTaskMD5 new file", filepath)
+	if _, err := os.Stat(filePath); err != nil {
+		Log(t, "LoadTaskMD5 new file", filePath)
 		return t.
-			FetchTask(filepath)
+			RequestChatCompletion().
+			StoreCompletion(filePath)
 	}
 	if config.MD5Rewrites {
 		if md5memory != md5file {
 			include := false
 			for _, rule := range config.MD5IncludeList {
-				if strings.Contains(filepath, rule) {
+				if strings.Contains(filePath, rule) {
 					include = true
 				}
 			}
 			if include {
 				filelog.LogData(t.C, t, filelog.TzapLog)
-				Log(t, "LoadTaskMD5 not matching", filepath)
+				Log(t, "LoadTaskMD5 not matching", filePath)
 				return t.
-					FetchTask(filepath)
+					RequestChatCompletion().
+					StoreCompletion(filePath)
 			}
 		}
 	}
-	Log(t, "LoadTaskMD5 Matching", filepath, "enabled", config.MD5Rewrites)
-	return t.LoadTask(filepath)
+	Log(t, "LoadTaskMD5 Matching", filePath, "enabled", config.MD5Rewrites)
+	return t.LoadCompletion(filePath)
 
 }
 

@@ -38,6 +38,7 @@ func (t *Tzap) Map(fn func(*Tzap) *Tzap) *Tzap {
 	children := t.Data["children"].([]*Tzap)
 	Log(t, "START MAP", len(children))
 	mappedChildren := make([]*Tzap, len(children))
+
 	for i, child := range children {
 		Log(t, "MAP child I", i)
 		mappedChildren[i] = fn(child)
@@ -52,7 +53,7 @@ func (t *Tzap) Accumulate(fn func(*Tzap) *Tzap) *Tzap {
 	tzmapped := t.AddTzap(&Tzap{Name: "Accumulate"})
 	for _, child := range children {
 		child.Parent = tzmapped
-		tzmapped = tzmapped.ApplyTemplateP(fn(child))
+		tzmapped = tzmapped.ApplyWorkflowP(fn(child))
 	}
 	return tzmapped
 }
@@ -75,8 +76,8 @@ func (t *Tzap) Recursive(tf func(tzapThatCreatesNewChildren *Tzap) *Tzap) *Tzap 
 	}
 
 	Log(t, "Recursive Function called")
-	return t.ApplyTemplateFN(tf). // should error check
+	return t.ApplyWorkflowFN(tf). // should error check
 					Map(func(t *Tzap) *Tzap {
-			return t.ApplyTemplateFN(recursive)
+			return t.ApplyWorkflowFN(recursive)
 		})
 }

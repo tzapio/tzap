@@ -3,41 +3,52 @@ package tzap
 import (
 	"fmt"
 
-	"github.com/tzapio/tzap/internal/filelog"
+	"github.com/tzapio/tzap/internal/logging/filelog"
 	"github.com/tzapio/tzap/pkg/config"
+	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
 	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/types/openai"
+	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
-// FetchTask initializes the chat completion request, fetches the edited content, and sets up the environment.
-func (t *Tzap) FetchTask(filePath string) *Tzap {
+func (t *Tzap) StoreCompletion(filePath string) *Tzap {
 	config := config.FromContext(t.C)
-	// force print all recent logs.
-	Flush()
+	editedContent := t.Data["content"].(string)
 
-	filepathValue := filePath
-	fmt.Println("requesting edit file for (" + filepathValue + ")")
-	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
-	editedContent, err := fetchChatResponse(t, true)
-	if err != nil {
-		panic(err)
+	autoMode := config.AutoMode
+	makeChange := autoMode
+	if !autoMode {
+		if ok := stdin.ConfirmPrompt("Overwrite file: " + filePath); ok {
+			makeChange = true
+		}
+	}
+	if makeChange {
+		err := util.MkdirPAndWriteFile(filePath, editedContent)
+		if err != nil {
+			panic(fmt.Errorf("error applying changes: %w", err))
+		}
+		writeMessageMD5(filePath, t)
+		data := types.MappedInterface{
+			"filepath": filePath,
+			"content":  editedContent,
+		}
+		withEditFile := t.CloneTzap(&Tzap{Name: "storeCompletion", Message: types.Message{
+			Role:    openai.ChatMessageRoleAssistant,
+			Content: editedContent,
+		}, Data: data})
+		return withEditFile
 	}
 
-	fmt.Println(editedContent)
-
-	t = applyChanges(t, filepathValue, editedContent)
-	getMessagesGraphViz(t)
-	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
-
-	if config.AutoMode || stdin.ConfirmToContinue() {
+	if config.AutoMode || stdin.ConfirmPrompt("Continue on?") {
 		return t
 	}
 	panic("Do not continue selected")
 }
 
-// RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
-func (t *Tzap) RequestChat() *Tzap {
-	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
+// RequestChatCompletion initializes the openai chat completion request and creates a new Tzap with the edited content.
+func (t *Tzap) RequestChatCompletion() *Tzap {
+
 	output, err := fetchChatResponse(t, true)
 	if err != nil {
 		panic(err)
@@ -46,8 +57,6 @@ func (t *Tzap) RequestChat() *Tzap {
 		"content": output,
 	}
 	requestChat := t.AddTzap(&Tzap{Name: "requestChat", Data: data})
-	getMessagesGraphViz(requestChat)
-	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
 
 	return requestChat
 }
@@ -68,12 +77,14 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 
 	messages := TruncateToMaxWords(GetMessages(t), config.TruncateLimit)
 	filelog.LogData(t.C, t, filelog.TzapLog)
+	filelog.LogData(t.C, output.GetOpenAICompletionMessage(messages), filelog.RequestLog)
+	println("\nCompletion:\n")
 	result, err := t.TG.GenerateChat(t.C, messages, stream)
-
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)
 		return "", err
 	}
+	println("\n")
 	filelog.LogData(t.C, result, filelog.ResponseLog)
 
 	return result, nil

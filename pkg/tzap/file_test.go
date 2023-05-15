@@ -23,7 +23,7 @@ func Test_LoadTask_given_existing_file_path_expect_tzap_with_file_contents(t *te
 	// Load the file with Tzap
 	tt := tzap.InternalNew()
 	tt.TG = &mockTG{}
-	loadedTzap := tt.LoadTask(tempFile.Name())
+	loadedTzap := tt.LoadCompletion(tempFile.Name())
 
 	// Check if the loadedTzap contains the correct content
 	if loadedTzap.Message.Content != content {
@@ -106,7 +106,7 @@ func Test_LoadTaskOrRequestNewTask_given_existing_file_path_expect_tzap_with_fil
 	tt := tzap.InternalNew()
 
 	tt.TG = &mockTG{}
-	loadedTzap := tt.LoadTaskOrRequestNewTask(tempFile.Name())
+	loadedTzap := tt.LoadCompletionOrRequestCompletion(tempFile.Name())
 
 	// Check if the loadedTzap contains the correct content
 	if loadedTzap.Message.Content != content {

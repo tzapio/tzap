@@ -15,9 +15,9 @@ func Test_ErrorTzap_ErrorNotHandled_ReturnsError(t *testing.T) {
 	err := tzap.HandlePanic(func() {
 		tzapObj = tzapObj.
 			AddTzap(&tzap.Tzap{
-				Header:  "validHeader",
-				Name:    "Mock",
-				Message: types.Message{Role: "mocked", Content: "Hello!"},
+				InitialSystemContent: "validHeader",
+				Name:                 "Mock",
+				Message:              types.Message{Role: "mocked", Content: "Hello!"},
 				Data: types.MappedInterface{
 					"filepath": "validFilePath",
 				},

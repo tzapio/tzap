@@ -33,7 +33,7 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 		// Check if the file is a regular file and its name contains "test" if test is true.
 		if info, err := os.Stat(file); err == nil && !info.IsDir() {
 			// Load the file content and create a Tzap with the file content as the message content.
-			ts = append(ts, t.LoadTask(file))
+			ts = append(ts, t.LoadCompletion(file))
 		} else if err != nil {
 			panic(err)
 		}
@@ -45,16 +45,16 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 	})
 }
 
-// LoadTask loads a file and returns a Tzap with the file's content
-func (t *Tzap) LoadTask(filepath string) *Tzap {
-	Log(t, "Adding file", filepath)
-	originalContent, err := util.ReadFile(filepath)
+// LoadCompletion loads a file and returns a Tzap with the file's content
+func (t *Tzap) LoadCompletion(filePath string) *Tzap {
+	Log(t, "Adding file", filePath)
+	originalContent, err := util.ReadFile(filePath)
 	if err != nil {
 		panic(fmt.Errorf("cannot add file: %w", err))
 	}
 
 	data := types.MappedInterface{
-		"filepath": filepath,
+		"filepath": filePath,
 		"content":  originalContent,
 	}
 	loadTaskFromFile := t.AddTzap(
@@ -66,13 +66,12 @@ func (t *Tzap) LoadTask(filepath string) *Tzap {
 			},
 			Data: data,
 		})
-	getMessagesGraphViz(loadTaskFromFile)
-	GenerateGraphvizDotFile("out/tzap2.dot", FillGraphVizGraph())
+
 	return loadTaskFromFile
 }
 
 // LoadTaskOrRequestNewTask loads a file if it exists, otherwise requests a new file content from OpenAI and applies the changes to the original file
-func (t *Tzap) LoadTaskOrRequestNewTask(filePath string) *Tzap {
+func (t *Tzap) LoadCompletionOrRequestCompletion(filePath string) *Tzap {
 	Log(t, "Opening", filePath)
 	t = t.AddTzap(&Tzap{
 		Name: "LoadTaskOrRequestNewTask"})
@@ -80,9 +79,10 @@ func (t *Tzap) LoadTaskOrRequestNewTask(filePath string) *Tzap {
 	var out *Tzap
 	if _, err := os.Stat(filePath); err != nil {
 		out = t.
-			FetchTask(filePath)
+			RequestChatCompletion().
+			StoreCompletion(filePath)
 	} else {
-		out = t.LoadTask(filePath)
+		out = t.LoadCompletion(filePath)
 	}
 
 	return out
