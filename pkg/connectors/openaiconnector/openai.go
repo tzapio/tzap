@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/sashabaranov/go-openai"
+	"github.com/tzapio/tzap/internal/logging/filelog"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
 
@@ -41,16 +42,17 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 		Messages:    output.GetOpenAICompletionMessage(messages),
 		Temperature: 1,
 	}
-
+	filelog.LogData(ctx, request, filelog.RequestLog)
+	println("\nCompletion:\n")
 	var content string
 	if stream {
-		streamContent, err := ot.streamCompletion(request)
+		streamContent, err := ot.streamCompletion(ctx, request)
 		if err != nil {
 			return "", fmt.Errorf("chatcompletion error: %v", err)
 		}
 		content = streamContent
 	} else {
-		responseContent, err := ot.createChatCompletion(request)
+		responseContent, err := ot.createChatCompletion(ctx, request)
 		if err != nil {
 			return "", fmt.Errorf("chatcompletion error: %v", err)
 		}
@@ -60,8 +62,8 @@ func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel strin
 	return content, nil
 }
 
-func (ot OpenaiTgenerator) streamCompletion(request openai.ChatCompletionRequest) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+func (ot OpenaiTgenerator) streamCompletion(ctx context.Context, request openai.ChatCompletionRequest) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Minute)
 	defer cancel()
 	// Create a stream completion
 	s, err := ot.client.CreateChatCompletionStream(ctx, request)
@@ -91,8 +93,8 @@ func (ot OpenaiTgenerator) streamCompletion(request openai.ChatCompletionRequest
 	return response, nil
 }
 
-func (ot OpenaiTgenerator) createChatCompletion(request openai.ChatCompletionRequest) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Minute)
+func (ot OpenaiTgenerator) createChatCompletion(ctx context.Context, request openai.ChatCompletionRequest) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Minute)
 	defer cancel()
 	response, err := ot.client.CreateChatCompletion(ctx, request)
 	if err != nil {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/tzapio/tzap/internal/logging/filelog"
 	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/util"
@@ -77,14 +76,11 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 
 	messages := TruncateToMaxWords(GetMessages(t), config.TruncateLimit)
 	filelog.LogData(t.C, t, filelog.TzapLog)
-	filelog.LogData(t.C, output.GetOpenAICompletionMessage(messages), filelog.RequestLog)
-	println("\nCompletion:\n")
 	result, err := t.TG.GenerateChat(t.C, messages, stream)
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)
 		return "", err
 	}
-	println("\n")
 	filelog.LogData(t.C, result, filelog.ResponseLog)
 
 	return result, nil
