@@ -11,8 +11,8 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func WithConfig(conf config.Configuration) types.TzapConnector {
-	tg, err := newBaseconnector()
+func WithConfig(openai_apikey string, conf config.Configuration) types.TzapConnector {
+	tg, err := newBaseconnector(openai_apikey)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -22,12 +22,8 @@ func WithConfig(conf config.Configuration) types.TzapConnector {
 	}
 }
 
-func newBaseconnector() (types.TGenerator, error) {
-	apiKey, err := getOpenAIAPIKeyFromEnv()
-	if err != nil {
-		return nil, err
-	}
-	openaiC := openaiconnector.InitiateOpenaiClient(apiKey)
+func newBaseconnector(openai_apikey string) (types.TGenerator, error) {
+	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey)
 	embeddingC, err := localdbconnector.InitiateLocalDB("./.tzap-data/fileembeddings.db")
 	if err != nil {
 		return nil, err
@@ -73,12 +69,4 @@ func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, docID st
 }
 func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
 	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx)
-}
-func getOpenAIAPIKeyFromEnv() (string, error) {
-	apiKey := os.Getenv("OPENAI_APIKEY")
-	if apiKey == "" {
-		return "", fmt.Errorf("OPENAI_APIKEY environment variable not set\n\n\t\texport OPENAI_APIKEY=<apikey>")
-	}
-
-	return apiKey, nil
 }
