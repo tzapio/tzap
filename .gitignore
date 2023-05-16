@@ -2,6 +2,7 @@ out/
 *.md5
 node_modules
 release
+.env
 npm/README.md
 npm/bin
 npm/release
