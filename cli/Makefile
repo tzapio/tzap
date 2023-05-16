@@ -26,7 +26,7 @@ tzapPrepareRelease:
 	git fetch;
 	
 tzapWriteRelease:
-	go run ./main.go ghrelease $(PREVIOUS_VERSION) $(VERSION)
+	cd ../ && go run ./cli/main.go ghrelease $(PREVIOUS_VERSION) $(VERSION)
 
 github-upload:
 	gh release upload $(VERSION) ../release/tzap*
