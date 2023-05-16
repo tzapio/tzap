@@ -3,7 +3,7 @@
 ## What is Tzap?
 Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their GPT-based applications.
 
-!(prompt demo)[/public/promptdemo.gif]
+![prompt demo](/public/promptdemo.gif)
 
 
 ### Quick install (NPM):
