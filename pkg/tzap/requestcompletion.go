@@ -79,7 +79,7 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 	filelog.LogData(t.C, t, filelog.TzapLog)
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, messages, filelog.RequestLog)
-	println("--- Completion:")
+	println("\n--- Completion:")
 	result, err := t.TG.GenerateChat(t.C, messages, stream)
 
 	if err != nil {

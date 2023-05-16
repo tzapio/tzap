@@ -8,19 +8,9 @@ import (
 	"strings"
 )
 
-// ReadFile reads the contents of a file given its path and returns the contents as a string.
-// If the file cannot be read, the function returns an error.
-func ReadFile(filepath string) (string, error) {
-	b, err := os.ReadFile(filepath)
-	if err != nil {
-		return "", fmt.Errorf("cannot read file %s", filepath)
-	}
-	return string(b), err
-}
-
 // ReadFileP is a convenience function that calls ReadFile and panics if an error occurs.
 func ReadFileP(filepath string) string {
-	b, err := ReadFile(filepath)
+	b, err := os.ReadFile(filepath)
 	if err != nil {
 		panic(err)
 	}

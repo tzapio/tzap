@@ -28,7 +28,7 @@ USER vscode
 RUN mkdir -p /home/vscode/go/src/github.com/tzapio/tzap
 WORKDIR /home/vscode/go/src/github.com/tzapio/tzap
 RUN echo set enable-bracketed-paste off > ~/.inputrc
-RUN echo "export PATH=/home/vscode/go/bin:\$PATH" >> /home/vscode/.bashrc
+RUN echo "export PATH=/home/vscode/go/bin:/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:\$PATH" >> /home/vscode/.bashrc
 
 # Install Go tools
 RUN go install -v golang.org/x/tools/gopls@latest

@@ -1,8 +1,6 @@
 package embed
 
 import (
-	"fmt"
-
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
@@ -14,7 +12,6 @@ func InspirationWorkflow(inspirationFiles []string) types.NamedWorkflow[*tzap.Tz
 			if len(inspirationFiles) == 0 {
 				return t
 			}
-			fmt.Printf("Including static inspiration files: %+v\n", inspirationFiles)
 			return t.
 				LoadFiles(inspirationFiles).
 				Reduce(func(t *tzap.Tzap, child *tzap.Tzap) *tzap.Tzap {

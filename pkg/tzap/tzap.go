@@ -28,7 +28,7 @@ type Tzap struct {
 	Message              types.Message
 	Data                 types.MappedInterface `json:"-"`
 	C                    context.Context       `json:"-"`
-	TG                   types.TGenerator
+	TG                   types.TGenerator      `json:"-"`
 
 	types.ITzap[*Tzap, any] `json:"-"`
 

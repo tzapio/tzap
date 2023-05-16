@@ -13,7 +13,6 @@ func EmbeddingInspirationWorkflow(input string, inspirationFiles []string, k int
 			return t.
 				ApplyWorkflow(InspirationWorkflow(inspirationFiles)).
 				ApplyWorkflow(SearchFilesWorkflow(input, inspirationFiles, k, n))
-
 		},
 	}
 }
@@ -42,17 +41,11 @@ func SearchFilesWorkflow(input string, excludeFiles []string, k int, n int) type
 			}
 			filteredResults := filterSearchResults(searchResults, excludeFiles, k)
 
-			t = t.AddSystemMessage(
-				"The following file contents are embeddings for the user input:",
-			)
-			println("Search result embeddings:")
-			for _, result := range filteredResults.Results {
-				t = t.AddSystemMessage(result.Metadata["splitPart"])
-				println("\t", result.ID)
+			data := types.MappedInterface{
+				"searchResults": filteredResults,
 			}
-			println()
 
-			return t
+			return t.AddTzap(&tzap.Tzap{Name: "searchResults", Data: data})
 		},
 	}
 }
