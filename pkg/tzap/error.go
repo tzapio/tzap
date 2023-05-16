@@ -1,7 +1,5 @@
 package tzap
 
-import "runtime/debug"
-
 type ErrorTzap struct {
 	Tzap *Tzap
 	Err  error
@@ -31,7 +29,6 @@ func (t *ErrorTzap) HandleError(cb func(*ErrorTzap) error) *Tzap {
 func tzapHandlePanic(err *error) {
 	if r := recover(); r != nil {
 		*err = r.(error)
-		debug.PrintStack()
 	}
 }
 func HandlePanic(fn func()) (err error) {
