@@ -87,6 +87,7 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 		return "", err
 	}
 	println("\n---")
+	getMessagesGraphViz(t)
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, result, filelog.ResponseLog)
 
