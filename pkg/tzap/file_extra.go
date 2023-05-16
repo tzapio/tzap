@@ -22,7 +22,7 @@ func (t *Tzap) ChangeFilepath(filepath string) *Tzap {
 func (t *Tzap) LoadCompletionOrRequestCompletionMD5(filePath string) *Tzap {
 	config := config.FromContext(t.C)
 	md5memory := getMessageMD5(t)
-	md5file, _ := util.ReadFile(filePath + ".md5")
+	md5file := util.ReadFileP(filePath + ".md5")
 
 	if _, err := os.Stat(filePath); err != nil {
 		Log(t, "LoadTaskMD5 new file", filePath)

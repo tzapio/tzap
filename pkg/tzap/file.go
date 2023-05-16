@@ -7,7 +7,6 @@ import (
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
-	"github.com/tzapio/tzap/pkg/util"
 )
 
 // LoadFileDir exposes an array of Tzaps in the previous elements .Data["children"]. Each child is a .LoadTask(file)
@@ -33,7 +32,6 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 		Data: types.MappedInterface{},
 	})
 	for _, file := range filepaths {
-		println(file, len(file))
 		// Check if the file is a regular file and its name contains "test" if test is true.
 		if info, err := os.Stat(file); err == nil && !info.IsDir() {
 			// Load the file content and create a Tzap with the file content as the message content.
@@ -49,21 +47,21 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 // LoadCompletion loads a file and returns a Tzap with the file's content
 func (t *Tzap) LoadCompletion(filePath string) *Tzap {
 	Log(t, "Adding file", filePath)
-	originalContent, err := util.ReadFile(filePath)
+	originalContent, err := os.ReadFile(filePath)
 	if err != nil {
 		panic(fmt.Errorf("cannot add file: %w", err))
 	}
 
 	data := types.MappedInterface{
 		"filepath": filePath,
-		"content":  originalContent,
+		"content":  string(originalContent),
 	}
 	loadTaskFromFile := t.AddTzap(
 		&Tzap{
 			Name: "LoadCompletion",
 			Message: types.Message{
 				Role:    openai.ChatMessageRoleAssistant,
-				Content: originalContent,
+				Content: string(originalContent),
 			},
 			Data: data,
 		})

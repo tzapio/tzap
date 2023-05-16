@@ -23,6 +23,7 @@ var settings struct {
 	EnableLogs    bool
 	LoggerOutput  string
 	Stub          bool
+	File          string
 }
 
 var rootCmd = &cobra.Command{
@@ -73,4 +74,5 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&settings.EnableLogs, "enablelogs", false, "Whether to enable logging.")
 	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./out", "Path and name of the log file.")
 	rootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
+	rootCmd.PersistentFlags().StringVarP(&settings.File, "file", "f", "", "Read from file instead of prompt")
 }

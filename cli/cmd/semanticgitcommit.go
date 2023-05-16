@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"time"
+
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/pkg/types"
@@ -10,6 +12,7 @@ import (
 	"github.com/tzapio/tzap/workflows/truncate"
 )
 
+var showDiff bool
 var semanticGitcommitCmd = &cobra.Command{
 	Aliases: []string{"c"},
 	Use:     "semantic:gitcommit [clarifying prompt]",
@@ -23,6 +26,21 @@ var semanticGitcommitCmd = &cobra.Command{
 				ApplyWorkflow(gocode.DeserializedArguments("extraPrompt", args)).
 				ApplyErrorWorkflow(git.GitDiff(), func(et *tzap.ErrorTzap) error {
 					return et.Err
+				}).
+				WorkTzap(func(t *tzap.Tzap) {
+					diff := t.Data["git-diff"].(string)
+					print("Reading staged git commit diffs")
+					if !showDiff {
+						println(" (Use --show-diff to show the git diff)\n\n")
+					} else {
+						println(":")
+					}
+					time.Sleep(500 * time.Millisecond)
+					if showDiff {
+						println()
+						println(diff)
+						println("\n\n")
+					}
 				}).
 				ApplyErrorWorkflow(git.ValidateDiff(), func(et *tzap.ErrorTzap) error {
 					return et.Err
@@ -69,4 +87,6 @@ func RequestChat() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 
 func init() {
 	rootCmd.AddCommand(semanticGitcommitCmd)
+	// add flag to show git diff
+	semanticGitcommitCmd.Flags().BoolVarP(&showDiff, "show-diff", "d", false, "Show git diff")
 }

@@ -15,7 +15,7 @@ import (
 var magicWandCmd = &cobra.Command{
 	Use:   "magicwand <file> <prompt>",
 	Short: "Use magicwand to quickly edit code or documents",
-	Long: `The 'magicwand' command allows you to use a magicwand to make quick edits to existing code or documents, 
+	Long: `The 'magicwand' command allows you to use a magicwand to make quick edits to existing code or document,
 including adding functions, comments, and clarifying error messages. 
 
 This command takes two arguments: the file name and your prompt. The file must be relative to the current directory, 
