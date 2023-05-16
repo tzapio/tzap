@@ -32,6 +32,11 @@ var rootCmd = &cobra.Command{
 	Long:    `tbd`,
 	Version: "v0.7.14-alpha",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		//check subcommand if init or help
+		if cmd.Name() == "init" || cmd.Name() == "help" {
+			return nil
+		}
+
 		config := config.Configuration{
 			OpenAIModel:   modelMap[settings.Model],
 			AutoMode:      settings.AutoMode,

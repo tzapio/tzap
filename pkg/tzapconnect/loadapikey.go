@@ -18,15 +18,6 @@ func loadAPIKey(key string) (string, error) {
 		return apiKey, nil
 	}
 
-	// Try to get API key from flag.
-	if len(os.Args) > 1 && os.Args[1] == "--api-key" {
-		if len(os.Args) > 2 {
-			return os.Args[2], nil
-		} else {
-			return "", errors.New("missing API key in flag")
-		}
-	}
-
 	// Try to get API key from .env file.
 	envData, err := os.ReadFile(".env")
 	if err == nil {
@@ -34,10 +25,10 @@ func loadAPIKey(key string) (string, error) {
 		for scanner.Scan() {
 			line := scanner.Text()
 			splits := strings.SplitN(line, "=", 2)
-			if len(splits) == 2 && splits[0] == "API_KEY" {
+			if len(splits) == 2 && splits[0] == key {
 				return strings.TrimSpace(splits[1]), nil
 			}
 		}
 	}
-	return "", errors.New("API key not found")
+	return "", errors.New("API key not found. Add " + key + "=<key> to environment variable or .env file")
 }
