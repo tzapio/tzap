@@ -3,6 +3,9 @@
 ## What is Tzap?
 Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their GPT-based applications.
 
+!(prompt demo)[/public/promptdemo.gif]
+
+
 ### Quick install (NPM):
 ```bash
 npm install -g tzap
@@ -11,10 +14,10 @@ export OPENAI_APIKEY=<apikey>
 tzap init
 
 # Do a git add <file> then do:
-tzap semantic:gitcommit
+tzap commit
 
 # Adapt below to your project!
-tzap embeddingprompt outputfile.txt "can you add a tzap cli command that enables users \
+tzap prompt outputfile.txt "can you add a tzap cli command that enables users \
 to generate code based on the users code without requiring them to manage prompts themselves? \
 Utilize Tzap embedding search."
 ```
