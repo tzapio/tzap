@@ -16,6 +16,7 @@ type Configuration struct {
 	MD5IncludeList []string
 	EnableLogs     bool
 	LoggerOutput   string
+	Temperature    float32
 }
 
 var defaultConfig = Configuration{
@@ -26,6 +27,7 @@ var defaultConfig = Configuration{
 	MD5IncludeList: []string{""},
 	EnableLogs:     false,
 	LoggerOutput:   "",
+	Temperature:    1.0,
 }
 
 func NewContext(ctx context.Context, config Configuration) context.Context {

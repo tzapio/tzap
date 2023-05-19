@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
@@ -23,18 +24,41 @@ var settings struct {
 	EnableLogs    bool
 	LoggerOutput  string
 	Stub          bool
-	File          string
+	Temperature   float32
 }
 
 var rootCmd = &cobra.Command{
 	Use:     "tzap",
 	Short:   "Tzap Cli!",
 	Long:    `tbd`,
-	Version: "v0.7.14-alpha",
+	Version: "v0.7.17",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		//check subcommand if init or help
 		if cmd.Name() == "init" || cmd.Name() == "help" {
 			return nil
+		}
+		cur, err := os.Getwd()
+		if err != nil {
+			return err
+		}
+
+		for {
+			includePath := filepath.Join(cur, ".tzapinclude")
+			_, err := os.Stat(includePath)
+			if err == nil || !os.IsNotExist(err) {
+				break
+			}
+
+			if cur == filepath.Dir(cur) {
+				break
+			}
+			cur = filepath.Dir(cur)
+		}
+		if cur != "" {
+			err := os.Chdir(cur)
+			if err != nil {
+				return err
+			}
 		}
 
 		config := config.Configuration{
@@ -44,6 +68,7 @@ var rootCmd = &cobra.Command{
 			MD5Rewrites:   settings.MD5Rewrites,
 			EnableLogs:    settings.EnableLogs,
 			LoggerOutput:  settings.LoggerOutput,
+			Temperature:   settings.Temperature,
 		}
 		var connector types.TzapConnector
 		if settings.Stub {
@@ -79,5 +104,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&settings.EnableLogs, "enablelogs", false, "Whether to enable logging.")
 	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./out", "Path and name of the log file.")
 	rootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
-	rootCmd.PersistentFlags().StringVarP(&settings.File, "file", "f", "", "Read from file instead of prompt")
+	rootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
+
 }

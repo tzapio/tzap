@@ -35,11 +35,11 @@ func (ot OpenaiTgenerator) GenerateChat(ctx context.Context, messages []types.Me
 // fetchChatResponse requests openai-chat completion for the given Tzap and returns the modified content.
 func (ot OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel string, stream bool, messages []types.Message) (string, error) {
 	// Create a context with a timeout
-
+	config := config.FromContext(ctx)
 	request := openai.ChatCompletionRequest{
 		Model:       gptmodel,
 		Messages:    output.GetOpenAICompletionMessage(messages),
-		Temperature: 1,
+		Temperature: config.Temperature,
 	}
 	var content string
 	if stream {
