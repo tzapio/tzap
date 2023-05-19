@@ -261,9 +261,9 @@
            
         </div>
         <ul class="menu-expanded">
-            <li><a href="#gettingstarted">Getting Started</a></li>
-            <li><a href="#howitworks">How It Works</a></li>
-            <li><a href="#costestimation">Cost Estimation</a></li>
+            <li><a href="#gettingstarted" onclick="toggleMenu()">Getting Started</a></li>
+            <li><a href="#howitworks" onclick="toggleMenu()">How It Works</a></li>
+            <li><a href="#costestimation" onclick="toggleMenu()">Cost Estimation</a></li>
         </ul>
      
     </div>
@@ -421,6 +421,10 @@ export OPENAI_APIKEY=&lt;apikey&gt;
         </footer>
     </div>
     <script>
+        function toggleMenu() {
+            const menuToggle = document.querySelector('.toggle');
+            menuToggle.classList.toggle('active');
+        }
         // Toggle mobile menu
         const hamburgerMenu = document.querySelector('.hamburger-menu');
         const menuExpanded = document.querySelector('.menu-expanded');
