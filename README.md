@@ -6,13 +6,13 @@ Tzap is an easy to use CLI tool designed to streamline GPT-based code generation
 When you run the `tzap prompt` command, Tzap combines your prompt with the extracted context and generates a suitable prompt for the GPT model. This allows GPT to generate both very complex and highly specific code.
 
 # Demo (prompt: How would you expose tzap through a golang echo backend?)
-![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/public/promptdemo.gif)
+![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/docs/promptdemo.gif)
 # Comparing generation to existing code:
-![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/public/comparison.png)
+![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/docs/comparison.png)
 ### Quick install (NPM)
 ```bash
 # Choose how to install. install.sh, npm, npx
-curl https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash
+curl https://tzap.io/install.sh | bash
 # npm install -g tzap
 # npx tzap
 
@@ -21,13 +21,18 @@ export OPENAI_APIKEY=<apikey>
 # echo "OPENAI_APIKEY=<apikey>" > .env
 
 tzap init
-
 # Adapt below to your project!
 tzap prompt outputfile.txt "can you add a tzap cli command that enables users \
 to generate code based on the users code without requiring them to manage prompts themselves? \
 Utilize Tzap embedding search."
 ```
 
+## Resources
+
+- Join our [Discord community](https://discord.gg/88xDVYbPVB) to get help, discuss features, and share your projects.
+- Visit our official page at [https://tzap.io](https://tzap.io).
+- Check out our NPM package: [tzap](https://npmjs.org/package/tzap).
+- Follow us on Twitter: [@tzap_io](https://twitter.com/tzap_io)
 
 ## Notes:
 Tzap is in a beta phase.
@@ -131,3 +136,4 @@ The maximum cost per file for GPT-4 is $0.1 (8,000 "word/token" limit).
 The maximum cost per file for GPT-3.5 is $0.008 (4,000 "word/token" limit).
 
 It is important to understand and manage these costs while using Tzap.
+
