@@ -9,3 +9,4 @@ npm/release
 .tzap-data/
 .redis-data/
 *.gox
+.DS_Store

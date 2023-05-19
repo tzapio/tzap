@@ -1,7 +1,7 @@
 {
   "name": "tzap",
-  "version": "0.7.16",
-  "description": "Tzap is a library designed to run GPT prompts in the terminal and seamlessly integrate GPT prompts into your code. ",
+  "version": "0.7.16-b",
+  "description": "Tzap Dev Tools: Code generation style transfer with GPT.",
   "bin": { "tzap": "./run.js" },
   "scripts": {
     "start": "node run.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/tzapio/tzap"
+    "url": "https://github.com/tzapio/tzap"
   },
   "keywords": [
     "gpt",
