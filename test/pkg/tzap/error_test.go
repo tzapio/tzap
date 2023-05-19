@@ -2,6 +2,7 @@ package tzap_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/tzapio/tzap/pkg/types"
@@ -35,7 +36,7 @@ func Test_ErrorTzap_ErrorNotHandled_ReturnsError(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expected err to be not nil, but got nil")
 	}
-	if err != nil && err.Error() != "MOCK ERROR" {
+	if err != nil && !strings.HasSuffix(err.Error(), "MOCK ERROR") {
 		t.Errorf("Expected err to be 'MOCK ERROR', but got '%s'", err.Error())
 	}
 }

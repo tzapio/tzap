@@ -1,5 +1,7 @@
 package tzap
 
+import "fmt"
+
 type ErrorTzap struct {
 	Tzap *Tzap
 	Err  error
@@ -8,6 +10,7 @@ type ErrorTzap struct {
 func (t *Tzap) ErrorTzap(err error) *ErrorTzap {
 	if err != nil {
 		Logf(t, "Error tzap (%s)", err.Error())
+		err = fmt.Errorf("error tzap %s (%d): %v", t.Name, t.Id, err)
 	}
 
 	return &ErrorTzap{
