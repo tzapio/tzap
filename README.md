@@ -1,20 +1,26 @@
-# Tzap: Think it and it's there. A toolset for GPT workflows, Prompt as Code Functions and simple CLI automations
+# Tzap Dev Tools: Code generation style transfer with GPT. 
 
 ## What is Tzap?
-Tzap is a library that simplifies all things GPT and code. It provides both a CLI tool with pre-selected workflows and a toolkit to build, customize, and extend chatbot prompts in a streamlined and extensible manner. The library is designed to make it easy for developers to create reusable Tzap instances and combinations of Tzaps to quickly and effectively implement desired outcomes in their GPT-based applications.
+Tzap is an easy to use CLI tool designed to streamline GPT-based code generation tasks. It works by indexing your project (using embeddings) and extracting relevant contextual information, such as interfaces, types, database models, and more. 
 
-![prompt demo](/public/promptdemo.gif)
+When you run the `tzap prompt` command, Tzap combines your prompt with the extracted context and generates a suitable prompt for the GPT model. This allows GPT to generate both very complex and highly specific code.
 
-
-### Quick install (NPM):
+# Demo (prompt: How would you expose tzap through a golang echo backend?)
+![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/public/promptdemo.gif)
+# Comparing generation to existing code:
+![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/public/comparison.png)
+### Quick install (NPM)
 ```bash
-npm install -g tzap
+# Choose how to install. install.sh, npm, npx
+curl https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash
+# npm install -g tzap
+# npx tzap
+
+# Provide the apikey. env variable or .env file
 export OPENAI_APIKEY=<apikey>
+# echo "OPENAI_APIKEY=<apikey>" > .env
 
 tzap init
-
-# Do a git add <file> then do:
-tzap commit
 
 # Adapt below to your project!
 tzap prompt outputfile.txt "can you add a tzap cli command that enables users \
@@ -22,30 +28,45 @@ to generate code based on the users code without requiring them to manage prompt
 Utilize Tzap embedding search."
 ```
 
+
 ## Notes:
 Tzap is in a beta phase.
 Tzap has the power to overwrite existing files, so commit local changes first. 
 Using embeddings will upload most files to OpenAIs servers. (Alternative solutions are being looked into)
 Using external APIs incurs small costs, read [Cost Estimation](#cost-estimation).
 
+# Tzap provides a few commands:
+
+- `tzap init`: Initializes Tzap in your project directory, creating necessary configuration files and folders.
+- `tzap prompt`: Generates code suggestions based on the provided prompt and your project's context.
+- other fun commands 
+    - `tzap commit`: Makes a git commit suggestion based on diff. It does not use wide context.
+    - `tzap ghrelease`: A bit hardcoded and undocumented, makes release notes for github. 
+
 ## Key Features
 
 - Simple CLI tool
-- Built-in local embedding vector database and cache.
-- Easily create prompts with domain specific contexts using Tzap functions, workflows, loops and control flows.
-- Build apps on top of Tzap and GPT
 - Automate GPT copy-pasting tasks
-- Integrate magic functions that evaluate GPT prompts instead of code
-- Effortlessly manipulate file paths and directories
-- Generate multi-modal content 
+- Effortlessly build context and pull in files
+- Local vector database
 
 ## How It Works
 
-Tzap allows you to create reusable instances and apply workflows and functions to them, making it convenient to adapt to new use cases, such as automating GPT copy-pasting, creating magic functions that evaluate GPT prompts, and crafting magic CLI tools. In addition, Tzap makes it simple to apply workflows and functions to existing Tzaps, enhancing the library's flexibility.
+**Tzap works in the following steps:**
+- Init: Initializing a project is done with `tzap init`. In order to limit costs, Tzap requires a specification of both what to ignore and is allowed to include. `.gitignore` and `.tzapignore` is FIRST applied and removes all file matches. THEN `.tzapinclude` further filters out all NON-MATCHES.
+- Indexing: When you run `tzap prompt`, Tzap builds a cache, indexes your project directory and builds a vector database of your code files. This allows Tzap to efficiently search for relevant code snippets during the code generation process. Note: This process uploads all file matches to OpenAI.
+- Prompt Generation: Tzap takes the prompt string that describes the code you want to generate. Tzap combines your prompt with the extracted context information, such as interfaces, types, ORM, and libraries, to build a specific prompt for the GPT model.
+- Code Generation: Tzap sends the generated prompt to the GPT model, which produces code suggestions based on the provided context and the prompt. These suggestions are then presented to you for further evaluation and integration into your codebase.
 
-By using Tzap, you can effortlessly manage file paths and directories, fetch chat responses, and generate content using OpenAI's GPT-4 model. Furthermore, the library provides chat message context in Golang, ensuring a smooth integration process.
+By automating code generation tasks and leveraging GPT's language capabilities, Tzap simplifies the process of writing code and helps you push features  consistent code styles within your project.
 
-With Tzap's intuitive design and powerful capabilities, you can quickly and efficiently implement desired outcomes in your GPT-based applications. So go ahead and give it a try, and let Tzap work its magic for you!
+## Tips
+The typical use case for `tzap prompt` is when:
+1. there is some existing code (does not have to be related code to the prompt, like existing datamodels or endpoints)
+2. there is some idea of a starting point (How do I create an endpoint)
+3. there is some idea of the goal (that enables customers to change subscription)
+4. run `tzap prompt out.file "How do I create an endpoint that enables customers to change subscription"`
+5. based on the prompt, GPT might provide a general non-code answer. In such case, instruct it with feedback.
 
 ## Getting Started
 
@@ -80,9 +101,10 @@ The `tzap embeddingprompt` command allows you to generate code or content based 
  tzap embeddingprompt <output_file> "<prompt>" [--inspiration=filepath1,filepath2,...]
  ```
 
- - `<output_file>`: The name of the file you want to store the generated content.
+ - `<output_file>`: The name of the file you want to store the generated content. Currently automatic file writing is in beta under the alias `tzap pv2`
  - `<prompt>`: The text prompt you want to provide to GPT. Make your prompt as clear as possible and enclose it in double quotes.
  - `--inspiration`: (Optional) A flag followed by a comma-separated list of file paths, which are used as inspiration files to enhance GPT's general understanding.
+ - `--temperature`: fine tune the temperature.
 
 For example, this text was generated using:
 
@@ -91,19 +113,6 @@ npx tzap embeddingprompt -m gpt4 README.md2 "Add to the README.md an explanation
 ``` 
 
 Feel free to customize the `<output_file>` and `<prompt>` according to your desired outcomes.
-
-You can also use the `--inspiration` flag to specify relevant inspiration files to provide GPT with better context:
-
-### Tzap Semantic Git Commit CLI
-
-Never write a git commit message again with Tzap! To try this feature, simply run:
-
-```bash
-export OPENAI_APIKEY=<openai_key>
-tzap semantic:gitcommit
-```
-
-This command will automatically generate a meaningful git commit message based on your recent code changes.
 
 ## Cost Estimation
 
@@ -122,9 +131,3 @@ The maximum cost per file for GPT-4 is $0.1 (8,000 "word/token" limit).
 The maximum cost per file for GPT-3.5 is $0.008 (4,000 "word/token" limit).
 
 It is important to understand and manage these costs while using Tzap.
-
-## Example Code
-
-To start coding with Tzap, you can refer to the provided examples in the `examples` directory of the Tzap repository. These examples demonstrate various use cases and will help you understand how to utilize Tzap effectively.
-
-Feel free to explore the Tzap library, experiment with its features, and create powerful GPT-based applications tailored to your requirements. Enjoy the convenience and efficiency that Tzap brings to your projects!
