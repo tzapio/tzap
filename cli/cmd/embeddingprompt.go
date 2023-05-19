@@ -18,6 +18,7 @@ import (
 var inspirationFilesFlag string
 var embedsCountFlag int
 var nCountFlag int
+var promptFile string
 
 func init() {
 	rootCmd.AddCommand(embeddingPromptCmd)
@@ -41,8 +42,8 @@ The inspiration files should be a comma-separated list of file paths.`,
 			nCount = embedsCountFlag + 5
 		}
 		var content string
-		if settings.File != "" {
-			content = util.ReadFileP(settings.File)
+		if promptFile != "" {
+			content = util.ReadFileP(promptFile)
 		} else {
 			content = strings.Join(args[1:], " ")
 		}

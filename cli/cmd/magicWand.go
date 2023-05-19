@@ -32,7 +32,7 @@ or you should provide the absolute path to the file. If the file is not found, a
 		content := strings.Join(args[1:], " ")
 		cmdutil.GetTzapFromContext(cmd.Context()).
 			AddSystemMessage(fmt.Sprintf("Task: %s", content)).
-			LoadCompletion(filename).
+			LoadFileAsCompletion(filename).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 				t.Message.Role = openai.ChatMessageRoleUser
 				return t
