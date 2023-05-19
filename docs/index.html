@@ -47,12 +47,11 @@
             margin: auto;
             padding: 1rem;
         }
-
+      
         .logo {
             display: flex;
             align-items: center;
             font-size: 2rem;
-            margin-bottom: 1rem;
         }
 
         .logo i {
@@ -140,16 +139,136 @@
         background-color: #777777;
     }
     </style>
+    <style>
+        .topbar {
+            background-color: #292c33;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .menu li {
+            margin-left: 20px;
+        }
+
+        .menu li a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .hamburger-menu {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .menu-expanded {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: #292c33;
+                padding: 10px;
+        }
+        .logo {
+                margin-right: 10rem;
+            }
+        /* Media query for mobile devices */
+        @media (max-width: 768px) {
+            .topbar-content {
+                justify-content: start;
+            }
+          
+            .menu {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: block;
+                margin-right:45px;
+            }
+
+            .menu-expanded.active {
+                display: block;
+            }
+
+            .menu-expanded li {
+                margin-bottom: 10px;
+            }
+
+            .menu-expanded li:last-child {
+                margin-bottom: 0;
+            }
+
+            .menu-expanded li a {
+                color: #ffffff;
+                text-decoration: none;
+            }
+        }
+        .containermenu {
+            max-width: 900px;
+            margin: auto;
+        }
+    </style>
+    <style>
+        h2[id]::before {
+            content: "";
+            display: block;
+            height: 80px; /* Adjust this value to match the height of your sticky title */
+            margin-top: -80px; /* Negative value to offset the content */
+        }
+    </style>
 </head>
 
 <body>
-    <a href="https://github.com/tzapio/tzap" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-  
-  
-    <div id="container"> 
-        <div class="logo">
-            <i class="fas fa-file-code"></i> Tzap
+    <div id="top"></div>
+    <div class="topbar" class="containermenu">
+        <a href="https://github.com/tzapio/tzap" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+    
+        <div class="topbar-content">
+            <div class="hamburger-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <div class="logo">
+                <a href="#top"><i class="fas fa-file-code"></i> Tzap</a>
+            </div>
+          
+            <ul class="menu">
+                <li><a href="#gettingstarted">Getting Started</a></li>
+                <li><a href="#howitworks">How It Works</a></li>
+                <li><a href="#costestimation">Cost Estimation</a></li>
+            </ul>
+           
         </div>
+        <ul class="menu-expanded">
+            <li><a href="#gettingstarted">Getting Started</a></li>
+            <li><a href="#howitworks">How It Works</a></li>
+            <li><a href="#costestimation">Cost Estimation</a></li>
+        </ul>
+     
+    </div>
+
+    <div id="container"> 
         <header style="min-height:70vh; display:flex; flex-direction: column; justify-content: center; align-items: center;">
                 <h1 style="max-width:500px">Enable GPT to solve complex and specific problems</h1>
                 <p style="max-width:500px">An easy-to-use CLI tool that extracts relevant context from your repository and handles prompting for you.</p>
@@ -188,17 +307,14 @@ tzap prompt out.txt "your prompt"</code>
         <section class="separator"></section>
 
         <section>
-            <h2>Quick Install (NPM)</h2>
+            <h2>Quick Install (Node - NPX)</h2>
             <pre>
-<code class="language-bash"># Install using curl. Also available # or use "npm install -g tzap" and "npx tzap"
-curl https://tzap.io/install.sh | bash
-
-# Add env variable or .env file with your OpenAI API key
+<code class="language-bash"># Add env variable or .env file with your OpenAI API key
 # .env file can be added with: echo "OPENAI_APIKEY=&lt;apikey&gt;" &gt; .env
 export OPENAI_APIKEY=&lt;apikey&gt;
 
-tzap init
-tzap prompt outputfile.txt "your prompt"</code>
+npx tzap init
+npx tzap prompt outfile.txt "your prompt"</code>
 </pre>
         </section>
 
@@ -217,7 +333,7 @@ tzap prompt outputfile.txt "your prompt"</code>
         <section class="separator"></section>
 
         <section>
-            <h2>How It Works</h2>
+            <h2 id="howitworks">How It Works</h2>
             <p><strong>Tzap works in the following steps:</strong></p>
             <ol>
                 <li><strong>Init:</strong> Initializing a project is done with <code>tzap init</code>. In order to limit costs, Tzap requires a specification of both what to ignore and include. <code>.gitignore</code> and <code>.tzapignore</code> is FIRST applied and removes all file matches. THEN <code>.tzapinclude</code> further filters out all NON-MATCHES.</li>
@@ -243,14 +359,14 @@ tzap prompt outputfile.txt "your prompt"</code>
 
         <section class="separator"></section>
 
-        <section id="getting-started">
-            <h2>Getting Started</h2>
+        <section>
+            <h2 id="gettingstarted">Getting Started</h2>
             <p>To install and run Tzap, simply use one of the following commands:</p>
             <pre>
 <code># Choose one:
 npm install -g tzap
 npx tzap 
-curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash
+curl -sSL https://tzap.io/install.sh | bash
 # Download binaries from: https://github.com/tzapio/tzap/releases/latest
 
 # set env variable or .env file
@@ -276,16 +392,17 @@ export OPENAI_APIKEY=&lt;apikey&gt;
         <section class="separator"></section>
 
         <section>
-            <h2>Cost Estimation</h2>
+            <h2  id="costestimation">Cost Estimation</h2>
+            <p>Tzap is open source and does not charge anything. However, Tzap requires access to OpenAIs api which incurs costs.</p>
             <p>Using embeddings and external APIs comes with certain costs. Here's a breakdown of those costs:</p>
             <h3>Embeddings</h3>
             <ul>
-                <li>Initialization of embeddings for this project cost: $0.04 (Run once). (200 files, 6,500 lines of code)</li>
+                <li>Initialization of embeddings: $0.04 (Run once). (200 files, 6,500 lines of code)</li>
                 <li>Re-fetch when generating with new code changes: $0.0004 per 1,000 "words/tokens"</li>
             </ul>
             <h3>GPT Model</h3>
             <ul>
-                <li>You can choose to use GPT-4 or GPT-3.5 (default usually).</li>
+                <li>You can choose to use GPT-4 or GPT-3.5 (GPT-3.5 is default usually).</li>
                 <li>The maximum cost per file for GPT-4 is $0.1 (8,000 "word/token" limit).</li>
                 <li>The maximum cost per file for GPT-3.5 is $0.008 (4,000 "word/token" limit).</li>
             </ul>
@@ -303,6 +420,15 @@ export OPENAI_APIKEY=&lt;apikey&gt;
             </p>
         </footer>
     </div>
+    <script>
+        // Toggle mobile menu
+        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        const menuExpanded = document.querySelector('.menu-expanded');
+
+        hamburgerMenu.addEventListener('click', function () {
+            menuExpanded.classList.toggle('active');
+        });
+    </script>
     <script>
         const form = document.getElementById('newsletter-form');
       
