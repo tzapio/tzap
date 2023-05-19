@@ -116,8 +116,29 @@
         strong {
             color: white;
         }
-       
+    </style>
+    <style>
+            input[type="email"] {
+        background-color: #303030;
+        color: #ffffff;
+        border: 1px solid #555555;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
 
+    button[type="submit"] {
+        background-color: #555555;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #777777;
+    }
     </style>
 </head>
 
@@ -130,14 +151,21 @@
             <i class="fas fa-file-code"></i> Tzap
         </div>
         <header style="min-height:70vh; display:flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h1 style="max-width:500px">Code generation style transfer with GPT</h1>
-                <p style="max-width:500px">An easy-to-use CLI tool that extracts relevant context from your repository and generates suitable prompts for GPT models.</p>
+                <h1 style="max-width:500px">Enable GPT to solve complex and specific problems</h1>
+                <p style="max-width:500px">An easy-to-use CLI tool that extracts relevant context from your repository and handles prompting for you.</p>
                 <pre style="margin-top: 3rem; min-width:70%" class="language-bash">
-<code>npx tzap init
+<code>curl https://tzap.io/install.sh | bash
+tzap init
 export OPENAI_APIKEY="apikey"
 tzap prompt out.txt "your prompt"</code>
                 </pre>
+                <h3>Join our newsletter:</h3>
+                <form id="newsletter-form"> 
+                    <input type="email" name="entry.1260517333" placeholder="Email" required><br>
+                    <button type="submit">Sign up</button>
+                </form>
         </header>
+       
         <section>
             <h2>What is Tzap?</h2> 
 
@@ -163,7 +191,7 @@ tzap prompt out.txt "your prompt"</code>
             <h2>Quick Install (NPM)</h2>
             <pre>
 <code class="language-bash"># Install using curl. Also available # or use "npm install -g tzap" and "npx tzap"
-curl https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash
+curl https://tzap.io/install.sh | bash
 
 # Add env variable or .env file with your OpenAI API key
 # .env file can be added with: echo "OPENAI_APIKEY=&lt;apikey&gt;" &gt; .env
@@ -275,6 +303,27 @@ export OPENAI_APIKEY=&lt;apikey&gt;
             </p>
         </footer>
     </div>
-
+    <script>
+        const form = document.getElementById('newsletter-form');
+      
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+      
+          const formData = new FormData(form);
+          const formURL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSf4gCbmwIO6NQBhczO6tTK4H-wDn2Bi1jlrdXSlcOiRT2F0AA/formResponse';
+      
+          try {
+            const response = await fetch(formURL, {
+              method: 'POST',
+              body: formData,
+                mode: 'no-cors',
+            });
+            alert('Thank you for signing up!');
+          } catch (error) {
+            console.error(error);
+            alert('Oops! Something went wrong. Please try again.');
+          }
+        });
+      </script>
 </body>
 </html>
