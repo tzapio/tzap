@@ -35,7 +35,7 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 		// Check if the file is a regular file and its name contains "test" if test is true.
 		if info, err := os.Stat(file); err == nil && !info.IsDir() {
 			// Load the file content and create a Tzap with the file content as the message content.
-			ts = append(ts, t.LoadCompletion(file))
+			ts = append(ts, t.LoadFileAsCompletion(file))
 		} else if err != nil {
 			panic(err)
 		}
@@ -44,8 +44,8 @@ func (t *Tzap) LoadFiles(filepaths []string) *Tzap {
 	return t
 }
 
-// LoadCompletion loads a file and returns a Tzap with the file's content
-func (t *Tzap) LoadCompletion(filePath string) *Tzap {
+// LoadFileAsCompletion loads a file and returns a Tzap with the file's content
+func (t *Tzap) LoadFileAsCompletion(filePath string) *Tzap {
 	Log(t, "Adding file", filePath)
 	originalContent, err := os.ReadFile(filePath)
 	if err != nil {
@@ -81,7 +81,7 @@ func (t *Tzap) LoadCompletionOrRequestCompletion(filePath string) *Tzap {
 			RequestChatCompletion().
 			StoreCompletion(filePath)
 	} else {
-		out = t.LoadCompletion(filePath)
+		out = t.LoadFileAsCompletion(filePath)
 	}
 
 	return out

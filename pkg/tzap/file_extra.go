@@ -48,14 +48,14 @@ func (t *Tzap) LoadCompletionOrRequestCompletionMD5(filePath string) *Tzap {
 		}
 	}
 	Log(t, "LoadTaskMD5 Matching", filePath, "enabled", config.MD5Rewrites)
-	return t.LoadCompletion(filePath)
+	return t.LoadFileAsCompletion(filePath)
 
 }
 
 // getMessageMD5 generates an MD5 checksum of the messages content in a Tzap
 func getMessageMD5(t *Tzap) string {
 	tmpStr := ""
-	for _, message := range GetMessages(t) {
+	for _, message := range GetThread(t) {
 		tmpStr += message.Content
 	}
 	return util.MD5Hash(tmpStr)
