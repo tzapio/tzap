@@ -45,6 +45,10 @@ The inspiration files should be a comma-separated list of file paths.`,
 		if promptFile != "" {
 			content = util.ReadFileP(promptFile)
 		} else {
+			if len(args) < 2 {
+				panic("Missing file, please provide a file.\n\nUsage: tzap embeddingprompt <file> <prompt>")
+			}
+
 			content = strings.Join(args[1:], " ")
 		}
 
