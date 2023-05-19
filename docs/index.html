@@ -202,7 +202,9 @@
             .menu {
                 display: none;
             }
-
+            .logo {
+                margin-right: 0;
+            }
             .hamburger-menu {
                 display: block;
                 margin-right:45px;
@@ -250,7 +252,7 @@
                 <i class="fas fa-bars"></i>
             </div>
             <div class="logo">
-                <a href="#top"><i class="fas fa-file-code"></i> Tzap</a>
+                <a href="#top" onclick="toggleMenu()"><i class="fas fa-file-code"></i> Tzap</a>
             </div>
           
             <ul class="menu">
@@ -272,19 +274,37 @@
         <header style="min-height:70vh; display:flex; flex-direction: column; justify-content: center; align-items: center;">
                 <h1 style="max-width:500px">Enable GPT to solve complex and specific problems</h1>
                 <p style="max-width:500px">An easy-to-use CLI tool that extracts relevant context from your repository and handles prompting for you.</p>
-                <pre style="margin-top: 3rem; min-width:70%" class="language-bash">
-<code>curl https://tzap.io/install.sh | bash
+                <div style="margin-top: 3rem; min-width:70%; overflow-x:auto"><pre  class="language-bash">
+                    <code>curl -sSL https://tzap.io/sh | bash
 tzap init
 export OPENAI_APIKEY="apikey"
 tzap prompt out.txt "your prompt"</code>
-                </pre>
-                <h3>Join our newsletter:</h3>
-                <form id="newsletter-form"> 
-                    <input type="email" name="entry.1260517333" placeholder="Email" required><br>
-                    <button type="submit">Sign up</button>
-                </form>
-        </header>
-       
+</pre>
+</div>
+<h3>Get feature updates:</h3>
+<form id="newsletter-form"> 
+    <input type="email" name="entry.1260517333" placeholder="Email" required><br>
+    <button type="submit">Sign up</button>
+</form>
+<style>
+    .discord-button {
+      background-color: #7289DA;
+      color: #FFFFFF;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  
+    .discord-button:hover {
+      background-color: #5B6EAC;
+    }
+  </style>
+            </header>
+
+                              
         <section>
             <h2>What is Tzap?</h2> 
 
@@ -301,7 +321,44 @@ tzap prompt out.txt "your prompt"</code>
             <h1>Comparison of completion and existing code</h1>
             <a href="comparison.png"><img src="comparison.png"></a>
         </section>
+        <section class="separator"></section>
+        <section>
+            <h2>Community</h2>
+            <p>Join our Discord community to get help, discuss features, and share your projects.</p>
+            <a href="https://discord.gg/your-discord-invite-link" target="_blank" rel="noopener noreferrer">
+                <button class="discord-button">Join Discord</button>
+            </a>
+            <style>
+                .buttonF {
+                  display: inline-block;
+                  padding: 10px 20px;
+                  background-color: #000;
+                  color: #fff;
+                  border: none;
+                  border-radius: 5px;
+                  text-decoration: none;
+                  font-size: 16px;
+                  cursor: pointer;
+                }
+              
+                .buttonF:hover {
+                  background-color: #414551;
+                }
+              
+                .buttonF i {
+                  vertical-align: middle;
+                  margin-right: 5px;
+                }
+              </style>
+              <p style="margin-top:15px">
+                Contributions are welcome! Check out our github repo:
+              </p>
+              
+                <a class="buttonF" href="https://github.com/tzapio/tzap" target="_blank">
+                  <i class="fa-brands fa-github fa-2xl" style="color: #ffffff;"></i> GitHub
+                </a>
 
+        </section>
  
 
         <section class="separator"></section>
@@ -361,19 +418,17 @@ npx tzap prompt outfile.txt "your prompt"</code>
 
         <section>
             <h2 id="gettingstarted">Getting Started</h2>
-            <p>To install and run Tzap, simply use one of the following commands:</p>
-            <pre>
-<code># Choose one:
-npm install -g tzap
-npx tzap 
-curl -sSL https://tzap.io/install.sh | bash
-# Download binaries from: https://github.com/tzapio/tzap/releases/latest
+            To get started with Tzap, you can choose one of the following installation methods:
+            <ul style="">
+            <li>Global installation via npm: <strong><code>`npm install -g tzap`</code></strong></li>
+            <li>Use npx: <strong><code>`npx tzap`</code></strong></li>
+            <li>Run the installation script: <strong><code>`curl -sSL https://tzap.io/install.sh | bash</code></strong></li>
+            <li>Download binaries from the <a href="https://github.com/tzapio/tzap/releases/latest">latest release</a></li>
+            </ul>
+            Once Tzap is installed, set your OpenAI API key as an environment variable or use a .env file with the following content: OPENAI_APIKEY=<apikey>.
+            <br>
+            With Tzap up and running, you can begin using it by simply typing <strong><code>`tzap`</code></strong> in your terminal.
 
-# set env variable or .env file
-export OPENAI_APIKEY=&lt;apikey&gt;
-</code>
-</pre>
-        <p>Once you have installed Tzap, you can start using it immediately by typing <code>tzap</code> in your terminal.</p>
         </section>
 
         <section class="separator"></section>
@@ -422,8 +477,8 @@ export OPENAI_APIKEY=&lt;apikey&gt;
     </div>
     <script>
         function toggleMenu() {
-            const menuToggle = document.querySelector('.toggle');
-            menuToggle.classList.toggle('active');
+            const menuToggle = document.querySelector('.menu-expanded');
+            menuToggle.classList.remove('active');
         }
         // Toggle mobile menu
         const hamburgerMenu = document.querySelector('.hamburger-menu');
