@@ -47,7 +47,6 @@ func (t *Tzap) StoreCompletion(filePath string) *Tzap {
 
 // RequestChatCompletion initializes the openai chat completion request and creates a new Tzap with the edited content.
 func (t *Tzap) RequestChatCompletion() *Tzap {
-
 	output, err := fetchChatResponse(t, true)
 	if err != nil {
 		panic(err)
@@ -74,13 +73,13 @@ func (t *Tzap) OffsetTokens(content string, from int, to int) (string, error) {
 func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 	config := config.FromContext(t.C)
 
-	messages := TruncateToMaxWords(GetMessages(t), config.TruncateLimit)
+	thread := TruncateToMaxWords(GetThread(t), config.TruncateLimit)
 
 	filelog.LogData(t.C, t, filelog.TzapLog)
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
-	filelog.LogData(t.C, messages, filelog.RequestLog)
+	filelog.LogData(t.C, thread, filelog.RequestLog)
 	println("\n--- Completion:")
-	result, err := t.TG.GenerateChat(t.C, messages, stream)
+	result, err := t.TG.GenerateChat(t.C, thread, stream)
 
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)
