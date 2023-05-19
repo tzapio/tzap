@@ -41,7 +41,7 @@
             margin-bottom: 0.5rem;
             color:white;
         }
-
+     
         #container {
             max-width: 900px;
             margin: auto;
@@ -89,7 +89,11 @@
         header h1 {
             font-size: 2.5rem;
         }
-
+        @media (max-width: 767px) {
+            header h1 {
+                font-size: 2rem; /* Adjusted font size for mobile */
+            }
+        }
         header p {
             font-size: 1.1rem;
             margin-top: 0.5rem;
@@ -119,20 +123,20 @@
 
 <body>
     <a href="https://github.com/tzapio/tzap" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
-    <div id="container">
+  
+  
+    <div id="container"> 
         <div class="logo">
             <i class="fas fa-file-code"></i> Tzap
         </div>
-        <header style="height:80vh; display:flex; justify-content: center; align-items: center;">
-            <div>
-                <h1>Code generation style transfer with GPT</h1>
-                <p>Streamline GPT-based code generation tasks with Tzap - an easy-to-use CLI tool that extracts relevant context from your project and generates suitable prompts for GPT models.</p>
-                <pre style="margin-top: 3rem;">
+        <header style="min-height:70vh; display:flex; flex-direction: column; justify-content: center; align-items: center;">
+                <h1 style="max-width:500px">Code generation style transfer with GPT</h1>
+                <p style="max-width:500px">An easy-to-use CLI tool that extracts relevant context from your repository and generates suitable prompts for GPT models.</p>
+                <pre style="margin-top: 3rem; min-width:70%" class="language-bash">
 <code>npx tzap init
 export OPENAI_APIKEY="apikey"
-npx tzap prompt outfile.txt "your prompt"</code>
+tzap prompt out.txt "your prompt"</code>
                 </pre>
-            </div>
         </header>
         <section>
             <h2>What is Tzap?</h2> 
@@ -142,13 +146,13 @@ npx tzap prompt outfile.txt "your prompt"</code>
         </section>
         <section>
             <h1>Demo</h1>
-            <img src="promptdemo.gif">
+            <a href="promptdemo.gif"><img src="promptdemo.gif"></a>
             <center>   <i>(prompt: How would you expose tzap through a golang echo backend?)</i>
             </center>
             <br/>
             <br/>
             <h1>Comparison of completion and existing code</h1>
-            <img src="comparison.png">
+            <a href="comparison.png"><img src="comparison.png"></a>
         </section>
 
  
@@ -202,11 +206,11 @@ tzap prompt outputfile.txt "your prompt"</code>
             <h2>Tips for Using Tzap</h2>
             <p>The typical use case for <code>tzap prompt</code> is when:</p>
             <ol>
-                <li>There is some existing code (does not have to be related code to the prompt, like existing datamodels or endpoints)</li>
-                <li>There is some idea of a starting point (How do I create an endpoint)</li>
-                <li>There is some idea of the goal (that enables customers to change subscription)</li>
+                <li>There is some <strong>existing code</strong> (does not have to be related code to the prompt, like existing datamodels or endpoints)</li>
+                <li>There is some idea of a <strong>starting point</strong> (How do I create an endpoint)</li>
+                <li>There is some idea of the <strong>goal</strong> (that enables customers to change subscription)</li>
             </ol>
-            <p>Run <code>tzap prompt out.file "How do I create an endpoint that enables customers to change subscription"</code> based on the prompt. GPT might provide a general non-code answer. In such case, instruct it with feedback.</p>
+            <p>Example: Run <strong>tzap prompt out.file "How do I create an endpoint that enables customers to change subscription"</strong> based on the prompt. GPT might provide a general non-code answer. In such case, instruct it with feedback.</p>
         </section>
 
         <section class="separator"></section>
@@ -217,9 +221,12 @@ tzap prompt outputfile.txt "your prompt"</code>
             <pre>
 <code># Choose one:
 npm install -g tzap
-npx tzap
+npx tzap 
 curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash
 # Download binaries from: https://github.com/tzapio/tzap/releases/latest
+
+# set env variable or .env file
+export OPENAI_APIKEY=&lt;apikey&gt;
 </code>
 </pre>
         <p>Once you have installed Tzap, you can start using it immediately by typing <code>tzap</code> in your terminal.</p>
@@ -233,7 +240,9 @@ curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | ba
             <br>
             <p>Use the <code>tzap prompt</code> command with the following syntax:</p>
             <pre><code>tzap prompt &lt;output_file&gt; "&lt;prompt&gt;" [--inspiration=filepath1,filepath2,...]</code></pre>
+            
             <p>Customize the <code>&lt;output_file&gt;</code> and <code>&lt;prompt&gt;</code> according to your desired outcomes.</p>
+            <br>
         </section>
 
         <section class="separator"></section>
@@ -257,10 +266,10 @@ curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | ba
         <footer class="footer" style="margin-top:150px; margin-bottom:50px">
             <p>&copy; 2023 Tzap.io - Beyond Cloud Holding AB. All rights reserved.</p>
             <p style="margin-top: 15px">
-                <a style="margin:5px" href="https://www.npmjs.com/package/your-npm-package" target="_blank">
+                <a style="margin:5px" href="https://www.npmjs.com/package/tzap" target="_blank">
                     <i class="fa-brands fa-npm fa-2xl" style="color: #b51a00;"></i>
                 </a>
-                <a   style="margin:5px" href="https://github.com/your-username/your-repository" target="_blank">
+                <a   style="margin:5px" href="https://github.com/tzapio/tzap" target="_blank">
                     <i class="fa-brands fa-github fa-2xl" style="color: #ffffff;"></i>
                 </a>
             </p>
