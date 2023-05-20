@@ -344,8 +344,9 @@
 
     <div id="container"> 
         <header style="min-height:70vh; display:flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h1 style="max-width:500px">Enable GPT to solve complex and specific problems</h1>
-                <p style="max-width:500px">An easy-to-use CLI tool that extracts relevant context from your repository and handles prompting for you.</p>
+                <h1 style="max-width:500px">Tzap - supercharged Github Copilot X</h1>
+                <p style="max-width:500px">Include your whole code repository for <br>refactoring, analysis and feature building.<br><small style="font-size:8px;">*Powered by GPT3.5 and GPT4</small></p>
+              
                 <div style="margin-top: 3rem; min-width:70%; overflow-x:auto">
 <pre  class="language-bash"><code>curl -sSL https://tzap.io/sh | bash
 tzap init
@@ -443,6 +444,7 @@ export OPENAI_APIKEY=&lt;apikey&gt;
 npx tzap init
 npx tzap prompt outfile.txt "your prompt"</code>
 </pre>
+            Note: Windows users might have to run add: `--ExecutionPolicy Bypass` to the tzap command.
         </section>
 
         <section class="separator"></section>
@@ -489,7 +491,7 @@ npx tzap prompt outfile.txt "your prompt"</code>
         <section>
             <h2 id="gettingstarted">Getting Started</h2>
             To get started with Tzap, you can choose one of the following installation methods:
-            <ul style="">
+            <ul>
             <li>Global installation via npm: <strong><code>`npm install -g tzap`</code></strong></li>
             <li>Use npx: <strong><code>`npx tzap`</code></strong></li>
             <li>Run the installation script: <strong><code>`curl -sSL https://tzap.io/install.sh | bash</code></strong></li>
