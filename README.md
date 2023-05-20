@@ -1,5 +1,8 @@
 # Tzap Dev Tools: Code generation style transfer with GPT. 
-
+[![Discord](https://img.shields.io/badge/Discord-Join%20Our%20Community-blue?logo=discord&logoColor=white)](https://discord.gg/your_discord_invite_link)
+[![Official Page](https://img.shields.io/badge/Official%20Page-Visit%20Our%20Site-blue?logo=internet-explorer)](https://tzap.io)
+[![NPM](https://img.shields.io/badge/NPM-tzap-blue?logo=npm)](https://npmjs.com/package/tzap)
+[![Twitter Follow](https://img.shields.io/twitter/follow/tzap_io?style=social)](https://twitter.com/tzap_io)
 ## What is Tzap?
 Tzap is an easy to use CLI tool designed to streamline GPT-based code generation tasks. It works by indexing your project (using embeddings) and extracting relevant contextual information, such as interfaces, types, database models, and more. 
 
@@ -28,7 +31,6 @@ Utilize Tzap embedding search."
 ```
 
 ## Resources
-
 - Join our [Discord community](https://discord.gg/88xDVYbPVB) to get help, discuss features, and share your projects.
 - Visit our official page at [https://tzap.io](https://tzap.io).
 - Check out our NPM package: [tzap](https://npmjs.org/package/tzap).
