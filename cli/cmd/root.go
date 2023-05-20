@@ -31,7 +31,7 @@ var rootCmd = &cobra.Command{
 	Use:     "tzap",
 	Short:   "Tzap Cli!",
 	Long:    `tbd`,
-	Version: "v0.7.16",
+	Version: "v0.7.17",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		//check subcommand if init or help
 		if cmd.Name() == "init" || cmd.Name() == "help" {
