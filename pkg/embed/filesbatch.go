@@ -68,33 +68,45 @@ func GetUncachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
 
 func FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embeddings) error {
 	if len(uncachedEmbeddings.Vectors) > 0 {
-		var inputStrings []string
-		for _, vector := range uncachedEmbeddings.Vectors {
-			inputStrings = append(inputStrings, vector.Metadata["splitPart"])
-		}
+		batchSize := 100
 
-		embeddingsResult, err := t.TG.FetchEmbedding(t.C, inputStrings...)
-		if err != nil {
-			panic(err)
-		}
 		db, err := localdb.NewFileDB("./.tzap-data/embeddingsCache.db")
 		if err != nil {
 			panic(err)
 		}
 
-		cacheKeyVal := []types.KeyValue{}
-		for i, embedding := range embeddingsResult {
-			embeddingByte, err := json.Marshal(embedding)
-			if err != nil {
-				panic(err)
+		for i := 0; i < len(uncachedEmbeddings.Vectors); i += batchSize {
+			end := i + batchSize
+			if end > len(uncachedEmbeddings.Vectors) {
+				end = len(uncachedEmbeddings.Vectors)
 			}
-			cacheKeyVal = append(cacheKeyVal, types.KeyValue{Key: inputStrings[i], Value: string(embeddingByte)})
+
+			batch := uncachedEmbeddings.Vectors[i:end]
+			var inputStrings []string
+			for _, vector := range batch {
+				inputStrings = append(inputStrings, vector.Metadata["splitPart"])
+			}
+
+			embeddingsResult, err := t.TG.FetchEmbedding(t.C, inputStrings...)
+			if err != nil {
+				return err
+			}
+
+			cacheKeyVal := []types.KeyValue{}
+			for i, embedding := range embeddingsResult {
+				embeddingByte, err := json.Marshal(embedding)
+				if err != nil {
+					return err
+				}
+				cacheKeyVal = append(cacheKeyVal, types.KeyValue{Key: inputStrings[i], Value: string(embeddingByte)})
+			}
+
+			added, err := db.BatchSet(cacheKeyVal)
+			if err != nil {
+				return err
+			}
+			fmt.Println("Added", added, "embeddings to cache")
 		}
-		added, err := db.BatchSet(cacheKeyVal)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("Added", added, "embeddings to cache")
 	}
 	return nil
 }
@@ -126,7 +138,7 @@ func BatchEmbeddings(e types.Embeddings) error {
 
 	for i, vector := range e.Vectors {
 		batch = append(batch, vector)
-
+		deletePreviousBatch()
 		if (i+1)%batchSize == 0 || i == len(e.Vectors)-1 {
 			filePath := fmt.Sprintf("./.tzap-data/files-%d.json", batchNumber)
 			batchEmbeddingJson := types.Embeddings{
@@ -138,6 +150,19 @@ func BatchEmbeddings(e types.Embeddings) error {
 			}
 			batch = nil
 			batchNumber++
+		}
+	}
+	return nil
+}
+func deletePreviousBatch() error {
+	// Remove previous embedding files
+	for i := 1; ; i++ {
+		filePath := fmt.Sprintf("./.tzap-data/files-%d.json", i)
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			break
+		}
+		if err := os.Remove(filePath); err != nil {
+			return err
 		}
 	}
 	return nil
