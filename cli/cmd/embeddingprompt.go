@@ -75,7 +75,8 @@ The inspiration files should be a comma-separated list of file paths.`,
 						panic("Loading embeddings went wrong")
 					}
 					if len(uncachedEmbeddings.Vectors) > 19 {
-						ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed?", len(uncachedEmbeddings.Vectors)))
+						price := float64(len(uncachedEmbeddings.Vectors)*400) * 0.0004 / 1000
+						ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD", len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
 						if !ok {
 							panic("commit aborted by user")
 						}
