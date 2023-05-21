@@ -12,6 +12,7 @@
     "type": "git",
     "url": "https://github.com/tzapio/tzap"
   },
+  "homepage": "https://tzap.io",
   "keywords": [
     "gpt",
     "cli",
