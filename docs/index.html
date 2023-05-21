@@ -93,7 +93,7 @@
                 <i class="fas fa-bars"></i>
             </div>
             <div class="logo">
-                <a href="#top" onclick="toggleMenu()">
+                <a href="#top" onclick="removeMenu()">
                     <div style="display:flex; justify-content: center; align-items: center; text-align: center; vertical-align: auto;">
                     <img alt="circular tzap logo" width="40px" height="40px" style="padding:4px; margin-right:2px" src="logo_whiteonblack_180.png">
                     <span>Tzap</span>
@@ -103,16 +103,18 @@
             </div>
           
             <ul class="menu">
+                <li><a href="#keyfeatures">Features</a></li>
                 <li><a href="#gettingstarted">Getting Started</a></li>
                 <li><a href="#howitworks">How It Works</a></li>
-                <li><a href="#costestimation">Cost Estimation</a></li>
+                <li><a href="#costestimation">Pricing</a></li>
             </ul>
            
         </nav>
         <ul class="menu-expanded">
-            <li><a href="#gettingstarted" onclick="toggleMenu()">Getting Started</a></li>
-            <li><a href="#howitworks" onclick="toggleMenu()">How It Works</a></li>
-            <li><a href="#costestimation" onclick="toggleMenu()">Cost Estimation</a></li>
+            <li><a href="#keyfeatures" onclick="removeMenu()">Key features</a></li>
+            <li><a href="#gettingstarted" onclick="removeMenu()">Getting Started</a></li>
+            <li><a href="#howitworks" onclick="removeMenu()">How It Works</a></li>
+            <li><a href="#costestimation" onclick="removeMenu()">Cost Estimation</a></li>
         </ul>
      
     </div>
@@ -158,6 +160,36 @@ tzap prompt out.txt "your prompt"</code></pre>
             <p>Tzap is an easy-to-use CLI tool designed to streamline GPT-based code generation tasks. It works by indexing your project (using embeddings and built-in vector database) and extracting relevant contextual information, such as interfaces, types, database models, and more.</p>
             <p>When you run the <code>tzap prompt</code> command, Tzap combines your prompt with the extracted context and generates a suitable prompt for the GPT model. This allows GPT to generate both very <strong>complex</strong> and highly <strong>specific code</strong>.</p>
         </section>
+        <section class="separator"></section>
+
+       
+        <section>
+            <h2 id="keyfeatures">Key Features</h2> 
+            <p style="margin-bottom:10px"><strong>Tzap</strong> is designed to be a tool that <strong>significantly improves outcomes</strong>, <strong>reduce copy pasting</strong>, and <strong>time spent prompting</strong> and can be used in a variety of ways.
+                Here are some of the key features:</p>
+            <ul>
+                <li>
+                    <strong style="font-size:20px">Targeted refactor</strong>
+                    <br><strong>Scenario</strong>: There is a function Update() that is over 200 lines that calls on many other functions. There are many code smells and there is no encapsulation.</br>
+                    <strong>Prompt</strong>: "In Update() there is a model_ELS flag that is depended on by on a.js and b.js, refactor to remove this dependency"
+                </li>
+                <li><strong style="font-size:20px">Feature building</strong>
+                <br><strong>Scenario</strong>: Some ideas exists on new functionality but solutions have not yet been explored</br>
+                <strong>Prompt</strong>: "How would we implement a new paid subscription using stripe in our graphql backend?"
+           
+            </li>
+                <li><strong style="font-size:20px">Analysis & Documentation</strong>
+                    <br><strong>Scenario</strong>: When there are many abstractions, files and a lack of documentation</br>
+                    <strong>Solution</strong>: "How does our backend handle signups using oauth and specifically what happens when the user has several emails?"
+                </li>
+            </ul>
+<p>
+         
+        </p>
+        </section>
+        <section class="separator"></section>
+
+       
         <section>
             <h1>Demo</h1>
             <a href="promptdemo.gif"><img style="width:100%" src="promptdemo.gif" aria-label="Image of comparison of GPT completion and existing code"></a>
@@ -212,27 +244,19 @@ tzap prompt out.txt "your prompt"</code></pre>
 
         <section>
             <h2>Quick Install (Node - NPX)</h2>
-            <pre><code class="language-bash"># Add env variable or .env file with your OpenAI API key
-# .env file can be added with: echo "OPENAI_APIKEY=&lt;apikey&gt;" &gt; .env
+            <pre ><code style="margin-bottom: 0px;" class="language-bash" ># Add env variable or .env file with your OpenAI API key
+# .env file can be added with containing only: OPENAI_APIKEY=&lt;apikey&gt;
 export OPENAI_APIKEY=&lt;apikey&gt;
 
 npx tzap init
-npx tzap prompt outfile.txt "your prompt"</code>
-</pre>
-            Note: Windows users might have to run add: `--ExecutionPolicy Bypass` to the tzap command.
+npx tzap prompt outfile.txt "your prompt"</code></pre>
+           <small style="font-size:10px;">Notes: 
+            1) Note: Make sure NPM/NPX exists in path environment variable.
+            2) Windows users might have to run add: `--ExecutionPolicy Bypass` to the tzap command.
+        </small>
         </section>
 
-        <section class="separator"></section>
 
-        <section>
-            <h2>Key Features</h2>
-            <ul>
-                <li>Simple CLI tool</li>
-                <li>Automate GPT copy-pasting tasks</li>
-                <li>Effortlessly build context and pull in files</li>
-                <li>Local vector database</li>
-            </ul>
-        </section>
 
         <section class="separator"></section>
 
@@ -294,7 +318,7 @@ npx tzap prompt outfile.txt "your prompt"</code>
         <section class="separator"></section>
 
         <section>
-            <h2  id="costestimation">Cost Estimation</h2>
+            <h2 id="costestimation">Pricing</h2>
             <p>Tzap is open source and does not charge anything. However, Tzap requires access to OpenAIs api which incurs costs.</p>
             <p>Using embeddings and external APIs comes with certain costs. Here's a breakdown of those costs:</p>
             <h3>Embeddings</h3>
@@ -329,7 +353,7 @@ npx tzap prompt outfile.txt "your prompt"</code>
         </footer>
     </div>
     <script>
-        function toggleMenu() {
+        function removeMenu() {
             const menuToggle = document.querySelector('.menu-expanded');
             menuToggle.classList.remove('active');
         }
