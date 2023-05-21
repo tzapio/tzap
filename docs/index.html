@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tzap - Code generation style transfer with GP</title>
+    <title>Tzap - supercharged Github Copilot</title>
     <link rel="icon" type="image/x-icon" href="/favicons/favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
@@ -61,8 +61,8 @@
     <link rel="yandex-tableau-widget" href="/favicons/yandex-browser-manifest.json">
     <meta name="description" content="Tzap is an easy-to-use CLI tool designed to streamline GPT-based code generation tasks by extracting relevant contextual information from your project and generating suitable prompts for GPT models.">
     
-    <meta property="og:title" content="Tzap - Code generation style transfer with GPT">
-    <meta property="og:description" content="Tzap is an easy-to-use CLI tool designed to streamline GPT-based code generation tasks by extracting relevant contextual information from your project and generating suitable prompts for GPT models.">
+    <meta property="og:title" content="Tzap - supercharged Github Copilot">
+    <meta property="og:description" content="Include your whole code repository for refactoring, analysis and feature building. *Powered by GPT3.5 and GPT4">
     <meta property="og:image" content="https://tzap.io/comparison.png">
     <meta property="og:url" content="https://tzap.io">
     <meta property="og:type" content="website">
@@ -71,8 +71,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Tzap - Code generation style transfer with GPT">
-    <meta name="twitter:description" content="Tzap is an easy-to-use CLI tool designed to streamline GPT-based code generation tasks by extracting relevant contextual information from your project and generating suitable prompts for GPT models.">
+    <meta name="twitter:title" content="Tzap - supercharged Github Copilot">
+    <meta name="twitter:description" content="Include your whole code repository for refactoring, analysis and feature building. *Powered by GPT3.5 and GPT4">
     <meta name="twitter:image" content="https://tzap.io/comparison.png">
     <meta name="twitter:site" content="@tzap_io">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous">
@@ -80,232 +80,7 @@
     href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>  
     <script>hljs.highlightAll();</script>
-<style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            line-height: 1.6;
-            color: #bbb;
-            background-color: #292c33;
-        }
-
-        a {
-            text-decoration: none;
-            color: white;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h6 {
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            color:white;
-        }
-     
-        #container {
-            max-width: 900px;
-            margin: auto;
-            padding: 1rem;
-        }
-      
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 2rem;
-        }
-
-        .logo i {
-            margin-right: 0.5rem;
-        }
-
-        ul {
-            
-            padding-left: 2rem;
-        }
-
-        ul li {
-            padding: 0.5rem 0;
-        }
-        ol {
-            margin-top: 0.2rem;
-            margin-bottom: 0.2rem;
-            padding-left: 2rem;
-        }
-        ol li {
-            padding: 0.5rem 0;
-        }
-        pre {
-            margin-top: 0.6rem;
-            margin-bottom: 0.6rem;
-        }
-
-        header {
-            padding: 1rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        header h1 {
-            font-size: 2.5rem;
-        }
-        @media (max-width: 767px) {
-            header h1 {
-                font-size: 2rem; /* Adjusted font size for mobile */
-            }
-        }
-        header p {
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-        }
-        p {
-            margin-top: 0.2rem;
-            margin-bottom: 0.2rem;
-        }
-        .separator {
-            border-top: 2px solid #444;
-            margin: 2rem 0;
-        }
-
-        .footer {
-            text-align: center;
-        }
-     
-        strong {
-            color: white;
-        }
-    </style>
-    <style>
-            input[type="email"] {
-        background-color: #303030;
-        color: #ffffff;
-        border: 1px solid #555555;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 10px;
-    }
-
-    button[type="submit"] {
-        background-color: #555555;
-        color: #ffffff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    button[type="submit"]:hover {
-        background-color: #777777;
-    }
-    </style>
-    <style>
-        .topbar {
-            background-color: #292c33;
-            color: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .topbar-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 20px;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .menu {
-            display: flex;
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .menu li {
-            margin-left: 20px;
-        }
-
-        .menu li a {
-            color: #ffffff;
-            text-decoration: none;
-        }
-
-        .hamburger-menu {
-            display: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .menu-expanded {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background-color: #292c33;
-                padding: 10px;
-        }
-        .logo {
-                margin-right: 10rem;
-            }
-        /* Media query for mobile devices */
-        @media (max-width: 768px) {
-            .topbar-content {
-                justify-content: start;
-            }
-          
-            .menu {
-                display: none;
-            }
-            .logo {
-                margin-right: 0;
-            }
-            .hamburger-menu {
-                display: block;
-                margin-right:45px;
-            }
-
-            .menu-expanded.active {
-                display: block;
-            }
-
-            .menu-expanded li {
-                margin-bottom: 10px;
-            }
-
-            .menu-expanded li:last-child {
-                margin-bottom: 0;
-            }
-
-            .menu-expanded li a {
-                color: #ffffff;
-                text-decoration: none;
-            }
-        }
-        .containermenu {
-            max-width: 900px;
-            margin: auto;
-        }
-    </style>
-    <style>
-        h2[id]::before {
-            content: "";
-            display: block;
-            height: 80px; /* Adjust this value to match the height of your sticky title */
-            margin-top: -80px; /* Negative value to offset the content */
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -344,7 +119,7 @@
 
     <div id="container"> 
         <header style="min-height:70vh; display:flex; flex-direction: column; justify-content: center; align-items: center;">
-                <h1 style="max-width:500px">Tzap - supercharged Github Copilot X</h1>
+                <h1 style="max-width:500px">Tzap: supercharged Github Copilot</h1>
                 <p style="max-width:500px">Include your whole code repository for <br>refactoring, analysis and feature building.<br><small style="font-size:8px;">*Powered by GPT3.5 and GPT4</small></p>
               
                 <div style="margin-top: 3rem; min-width:70%; overflow-x:auto">

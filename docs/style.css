@@ -1,0 +1,232 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.6;
+    color: #bbb;
+    background-color: #292c33;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+}
+
+h1,
+h2,
+h3,
+h4,
+h6 {
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    color:white;
+}
+
+#container {
+    max-width: 900px;
+    margin: auto;
+    padding: 1rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.logo i {
+    margin-right: 0.5rem;
+}
+
+ul {
+    
+    padding-left: 2rem;
+}
+
+ul li {
+    padding: 0.5rem 0;
+}
+ol {
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    padding-left: 2rem;
+}
+ol li {
+    padding: 0.5rem 0;
+}
+pre {
+    margin-top: 0.6rem;
+    margin-bottom: 0.6rem;
+}
+
+header {
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 2.5rem;
+}
+@media (max-width: 767px) {
+    header h1 {
+        font-size: 2rem; /* Adjusted font size for mobile */
+    }
+}
+header p {
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+p {
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+}
+.separator {
+    border-top: 2px solid #444;
+    margin: 2rem 0;
+}
+
+.footer {
+    text-align: center;
+}
+
+strong {
+    color: white;
+}
+
+
+
+
+
+
+    input[type="email"] {
+background-color: #303030;
+color: #ffffff;
+border: 1px solid #555555;
+padding: 10px;
+border-radius: 5px;
+margin-bottom: 10px;
+}
+
+button[type="submit"] {
+background-color: #555555;
+color: #ffffff;
+border: none;
+padding: 10px 20px;
+border-radius: 5px;
+cursor: pointer;
+}
+
+button[type="submit"]:hover {
+background-color: #777777;
+}
+
+
+
+.topbar {
+    background-color: #292c33;
+    color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.topbar-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menu li {
+    margin-left: 20px;
+}
+
+.menu li a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.hamburger-menu {
+    display: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+.menu-expanded {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #292c33;
+        padding: 10px;
+}
+.logo {
+        margin-right: 10rem;
+    }
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .topbar-content {
+        justify-content: start;
+    }
+  
+    .menu {
+        display: none;
+    }
+    .logo {
+        margin-right: 0;
+    }
+    .hamburger-menu {
+        display: block;
+        margin-right:45px;
+    }
+
+    .menu-expanded.active {
+        display: block;
+    }
+
+    .menu-expanded li {
+        margin-bottom: 10px;
+    }
+
+    .menu-expanded li:last-child {
+        margin-bottom: 0;
+    }
+
+    .menu-expanded li a {
+        color: #ffffff;
+        text-decoration: none;
+    }
+}
+.containermenu {
+    max-width: 900px;
+    margin: auto;
+}
+
+
+
+
+
+h2[id]::before {
+    content: "";
+    display: block;
+    height: 80px; /* Adjust this value to match the height of your sticky title */
+    margin-top: -80px; /* Negative value to offset the content */
+}
