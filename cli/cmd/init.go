@@ -73,9 +73,11 @@ node_modules
 \n\n	
 # copied from .gitignore
 ` + gitignoreContent
+
 	if err := os.WriteFile(".tzapignore", []byte(tzapIgnoreContent), 0644); err != nil {
 		fmt.Println("Error:", err)
 	}
+	println("Created file .tzapignore")
 	time.Sleep(time.Millisecond * 500)
 }
 func touchTzapinclude() {
