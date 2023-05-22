@@ -19,12 +19,15 @@ var inspirationFilesFlag string
 var embedsCountFlag int
 var nCountFlag int
 var promptFile string
+var disableindex bool
 
 func init() {
 	rootCmd.AddCommand(embeddingPromptCmd)
 	embeddingPromptCmd.Flags().StringVarP(&inspirationFilesFlag, "inspiration", "i", "", "Comma-separated list of inspiration files")
 	embeddingPromptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the prompt generation")
 	embeddingPromptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15, "Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
+	embeddingPromptCmd.Flags().BoolVarP(&disableindex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
+
 }
 
 var embeddingPromptCmd = &cobra.Command{
@@ -35,7 +38,6 @@ var embeddingPromptCmd = &cobra.Command{
 The inspiration files should be a comma-separated list of file paths.`,
 	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		filePath := args[0]
 		embedsCount := embedsCountFlag
 		nCount := nCountFlag
 		if embedsCountFlag > nCountFlag {
@@ -67,23 +69,29 @@ The inspiration files should be a comma-separated list of file paths.`,
 			defer t.HandleShutdown()
 			t.
 				// Process and create embeddings for all files in the current directory
-				ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
-				WorkTzap(func(t *tzap.Tzap) {
-					uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
-					if !ok {
+				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+					if disableindex {
+						return t
+					}
+					println("Checking for file changes. (use -d to disable this check)...\n")
+					return t.ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
+						WorkTzap(func(t *tzap.Tzap) {
+							uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
+							if !ok {
 
-						panic("Loading embeddings went wrong")
-					}
-					if len(uncachedEmbeddings.Vectors) > 19 {
-						price := float64(len(uncachedEmbeddings.Vectors)*400) * 0.0004 / 1000
-						ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD", len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
-						if !ok {
-							panic("commit aborted by user")
-						}
-					}
+								panic("Loading embeddings went wrong")
+							}
+							if len(uncachedEmbeddings.Vectors) > 19 {
+								price := float64(len(uncachedEmbeddings.Vectors)*400) * 0.0004 / 1000
+								ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD", len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
+								if !ok {
+									panic("commit aborted by user")
+								}
+							}
+						}).
+						ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
+						ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB())
 				}).
-				ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
-				ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB()).
 				WorkTzap(func(t *tzap.Tzap) {
 					if len(inspirationFiles) == 0 {
 						println(bold("Inspiration files: None (use --inspiration to add more)"))
@@ -122,14 +130,20 @@ The inspiration files should be a comma-separated list of file paths.`,
 					}
 					time.Sleep(1 * time.Second)
 					println()
+
 					return t
 				}).
 				AddUserMessage(content).
-				RequestChatCompletion().
-				StoreCompletion(filePath)
+				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+					for {
+						t = t.RequestChatCompletion()
+						input := stdin.GetStdinInput("\n\n(We are slowly deprecating out.file, it's still required as an argument for compatability, but nothing will be written to file. Instead you can now follow up chat with code).\n\n Ask follow up question (or use ctrl+c to exit): ")
+						t = t.AddUserMessage(input)
+					}
+					return t.RequestChatCompletion()
+				})
 		})
 		if err != nil {
-			println(err.Error())
 			panic(err)
 		}
 
