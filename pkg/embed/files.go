@@ -123,18 +123,23 @@ func RemoveOldEmbeddings(t *tzap.Tzap, deleteIds []string) error {
 
 func ProcessFileOffsets(t *tzap.Tzap, file, content string, fileTokens int) (types.Embeddings, error) {
 	vectors := []types.Vector{}
+	step := 200
 	start := 0
-	end := 250
+	offset := 50
+	end := step + offset
 
+	lineStart := 1
 	for start < fileTokens {
-		splitPart, err := ProcessOffset(t, file, content, start, end, fileTokens)
+		partialVector, err := ProcessOffset(t, file, content, start, end, step, lineStart, fileTokens)
 		if err != nil {
 			return types.Embeddings{}, err
 		}
-		vectors = append(vectors, splitPart)
+		vectors = append(vectors, partialVector)
 
-		start += 200
-		end += 200
+		start += step
+		end += step
+		lines := strings.Count(partialVector.Metadata["realSplitPart"], "\n")
+		lineStart += lines
 	}
 
 	return types.Embeddings{Vectors: vectors}, nil
@@ -156,7 +161,7 @@ func ProcessFile(filename string, t *tzap.Tzap) (int, int, string, error) {
 	return fileTokens, lines, content, nil
 }
 
-func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, fileTokens int) (types.Vector, error) {
+func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, step int, lineStart int, fileTokens int) (types.Vector, error) {
 	truncatedEnd := end
 	if end > fileTokens {
 		truncatedEnd = fileTokens
@@ -166,21 +171,34 @@ func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, f
 	if err != nil {
 		return types.Vector{}, err
 	}
+	truncatedRealEnd := start + step
+	if truncatedRealEnd > fileTokens {
+		truncatedRealEnd = fileTokens
+	}
+	realSplitPart, err := t.TG.OffsetTokens(t.C, content, start, truncatedRealEnd)
+	if err != nil {
+		return types.Vector{}, err
+	}
+
 	splitPart = "###embedding from file: " + filename + "\n" + splitPart
 	metadataStart := fmt.Sprintf("%d", start)
 	metadataEnd := fmt.Sprintf("%d", end)
+	metadataLineStart := fmt.Sprintf("%d", lineStart)
 	metadataTruncatedEnd := fmt.Sprintf("%d", truncatedEnd)
 	metadataSplitMd5 := util.MD5Hash(splitPart)
+
 	id := filename + "-" + metadataStart + "-" + metadataEnd
 
 	metadata := map[string]string{
-		"id":           id,
-		"filename":     filename,
-		"start":        metadataStart,
-		"end":          metadataEnd,
-		"truncatedEnd": metadataTruncatedEnd,
-		"splitPart":    splitPart,
-		"splitMd5":     metadataSplitMd5,
+		"id":            id,
+		"filename":      filename,
+		"start":         metadataStart,
+		"end":           metadataEnd,
+		"lineStart":     metadataLineStart,
+		"truncatedEnd":  metadataTruncatedEnd,
+		"splitPart":     splitPart,
+		"realSplitPart": realSplitPart,
+		"splitMd5":      metadataSplitMd5,
 	}
 	return types.Vector{ID: id, Metadata: metadata}, nil
 }

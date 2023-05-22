@@ -78,7 +78,6 @@ The inspiration files should be a comma-separated list of file paths.`,
 						WorkTzap(func(t *tzap.Tzap) {
 							uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
 							if !ok {
-
 								panic("Loading embeddings went wrong")
 							}
 							if len(uncachedEmbeddings.Vectors) > 19 {
@@ -126,7 +125,7 @@ The inspiration files should be a comma-separated list of file paths.`,
 						if err != nil {
 							panic(err)
 						}
-						println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(result.ID)))
+						println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(cmdutil.FormatVectorToClickable(result))))
 					}
 					time.Sleep(1 * time.Second)
 					println()
