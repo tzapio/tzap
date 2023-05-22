@@ -32,6 +32,7 @@ func (t *ErrorTzap) HandleError(cb func(*ErrorTzap) error) *Tzap {
 func tzapHandlePanic(err *error) {
 	if r := recover(); r != nil {
 		*err = r.(error)
+		println(fmt.Sprintf("Panic: %s", r.(error).Error()))
 	}
 }
 func HandlePanic(fn func()) (err error) {
