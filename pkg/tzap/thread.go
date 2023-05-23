@@ -57,16 +57,16 @@ func (t *Tzap) StoreThread(filePath string) *ErrorTzap {
 
 	return t.ErrorTzap(nil)
 }
-func (t *Tzap) LoadThread(filePath string) *ErrorTzap {
+func (t *Tzap) LoadThreadFile(filePath string) *ErrorTzap {
 	var messages []types.Message
 	err := json.Unmarshal([]byte(util.ReadFileP(filePath)), &messages)
 	if err != nil {
 		t.ErrorTzap(fmt.Errorf("error loading thread: %w", err))
 	}
-	return t.loadThread(messages).ErrorTzap(nil)
+	return t.LoadThread(messages).ErrorTzap(nil)
 }
 
-func (t *Tzap) loadThread(messages []types.Message) *Tzap {
+func (t *Tzap) LoadThread(messages []types.Message) *Tzap {
 	for _, message := range messages {
 		if message.Role == openai.ChatMessageRoleSystem {
 			t = t.AddSystemMessage(message.Content)
