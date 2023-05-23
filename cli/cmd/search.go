@@ -33,7 +33,7 @@ var searchCmd = &cobra.Command{
 			searchResults := t.ApplyWorkflow(embed.SearchFilesWorkflow(query, nil, embedsCountFlag, nCountFlag)).
 				Data["searchResults"].(types.SearchResults)
 
-			println("\nSearch result embeddings:")
+			cmd.Println("\nSearch result embeddings:")
 			for _, result := range searchResults.Results {
 				tokens, err := t.CountTokens(result.Metadata["splitPart"])
 				if err != nil {
@@ -43,10 +43,10 @@ var searchCmd = &cobra.Command{
 				if printEmbedding {
 					fmt.Printf("\n\n\t%s", result.Metadata["splitPart"])
 				}
-				println()
+				cmd.Println()
 
 			}
-			println()
+			cmd.Println()
 		})
 
 		if err != nil {

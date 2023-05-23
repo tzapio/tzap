@@ -22,7 +22,7 @@ var initCmd = &cobra.Command{
 		fmt.Println("Initializing Tzap...")
 		time.Sleep(time.Millisecond * 500)
 		if _, err := os.Stat(".git"); os.IsNotExist(err) {
-			if !surveyConfirm("Warning: This command should be run from the root of a project") {
+			if !surveyConfirm("Warning: Trying to find .git in the folder. This command should be run from the root of a project. ") {
 				return
 			}
 		}

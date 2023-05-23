@@ -37,9 +37,13 @@ func (tg *mockTG) CountTokens(ctx context.Context, content string) (int, error) 
 	// Return pre-defined value for testing purposes
 	return 50, nil
 }
-func (tg *mockTG) OffsetTokens(ctx context.Context, content string, from int, to int) (string, error) {
+func (tg *mockTG) OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error) {
 	// Return pre-defined value for testing purposes
-	return "Hello world!", nil
+	return "Hello world!", 0, nil
+}
+func (tg *mockTG) RawTokens(ctx context.Context, content string) ([]string, error) {
+	// Return pre-defined value for testing purposes
+	return []string{}, nil
 }
 func (tg *mockTG) FetchEmbedding(ctx context.Context, content ...string) ([][]float32, error) {
 	return [][]float32{}, nil
