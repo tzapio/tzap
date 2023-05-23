@@ -3,7 +3,7 @@ services:
   app:
     build: .
     volumes:
-      - ..:/home/vscode/go/src/github.com/tzapio/tzap
+      - ../../:/home/vscode/go/src/github.com/tzapio
     working_dir: /home/vscode/go/src/github.com/tzapio/tzap
     command: sleep infinity
   #  depends_on:

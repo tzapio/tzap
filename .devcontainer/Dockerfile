@@ -9,7 +9,8 @@ RUN apt-get update && \
         curl \
         htop \
         tar \
-        gcc
+        gcc \
+        ffmpeg
 
 RUN sudo rm -rf /usr/local/go && curl -sfL https://go.dev/dl/go1.20.3.linux-amd64.tar.gz | sudo tar -C /usr/local -xzf -
 RUN sudo ln -s /usr/local/go/bin/go /usr/bin/go
