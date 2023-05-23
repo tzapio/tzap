@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/pkg/config"
+	"github.com/tzapio/tzap/pkg/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -25,6 +25,7 @@ var settings struct {
 	LoggerOutput  string
 	Stub          bool
 	Temperature   float32
+	Verbose       bool
 }
 
 var rootCmd = &cobra.Command{
@@ -33,34 +34,24 @@ var rootCmd = &cobra.Command{
 	Long:    `tbd`,
 	Version: "v0.7.18",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if settings.Verbose {
+			tl.EnableLogger()
+		}
 		//check subcommand if init or help
 		if cmd.Name() == "init" || cmd.Name() == "help" {
 			return nil
 		}
-		cur, err := os.Getwd()
+
+		err := cmdutil.SearchForTzapincludeAndChangeDir()
 		if err != nil {
 			return err
 		}
-
-		for {
-			includePath := filepath.Join(cur, ".tzapinclude")
-			_, err := os.Stat(includePath)
-			if err == nil || !os.IsNotExist(err) {
-				break
-			}
-
-			if cur == filepath.Dir(cur) {
-				break
-			}
-			cur = filepath.Dir(cur)
+		// print cwd
+		cwd, err := os.Getwd()
+		if err != nil {
+			return err
 		}
-		if cur != "" {
-			err := os.Chdir(cur)
-			if err != nil {
-				return err
-			}
-		}
-
+		tl.Logger.Println("Current working directory:", cwd)
 		config := config.Configuration{
 			OpenAIModel:   modelMap[settings.Model],
 			AutoMode:      settings.AutoMode,
@@ -105,5 +96,5 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./out", "Path and name of the log file.")
 	rootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
 	rootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
-
+	rootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
 }
