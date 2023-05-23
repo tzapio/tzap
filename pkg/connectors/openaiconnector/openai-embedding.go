@@ -27,6 +27,10 @@ func (ot OpenaiTgenerator) CountTokens(content string) (int, error) {
 	return tokenizer.CountTokens(content)
 }
 
-func (ot OpenaiTgenerator) OffsetTokens(content string, from int, to int) (string, error) {
+func (ot OpenaiTgenerator) OffsetTokens(content string, from int, to int) (string, int, error) {
 	return tokenizer.OffsetTokens(content, from, to)
+}
+
+func (ot OpenaiTgenerator) RawTokens(content string) ([]string, error) {
+	return tokenizer.RawTokens(content)
 }

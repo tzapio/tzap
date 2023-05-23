@@ -2,8 +2,10 @@ package tokenizer
 
 import (
 	"errors"
+	"strings"
 
 	tiktokenizer "github.com/tiktoken-go/tokenizer"
+	"github.com/tzapio/tzap/pkg/tl"
 )
 
 var _tokenizer tiktokenizer.Codec
@@ -24,20 +26,23 @@ func CountTokens(content string) (int, error) {
 	return len(ids), err
 }
 
-func OffsetTokens(content string, from int, to int) (string, error) {
-	ids, _, err := _tokenizer.Encode(content)
+func OffsetTokens(content string, from int, to int) (string, int, error) {
+	ids, strs, err := _tokenizer.Encode(content)
 	if err != nil {
-		return "", errors.New("error couting tokens while encoding")
+		return "", 0, errors.New("error couting tokens while encoding")
 	}
 
 	start := from
 	end := to
 	if to > len(ids) {
 		end = len(ids)
-		println("warning offset out of bounds, truncating to: ", end, "/", to)
+		tl.Logger.Println("warning offset out of bounds, truncating to: ", end, "/", to)
 	}
+	offsetStrs := strs[start:end]
+	s := strings.Join(offsetStrs, "")
+	return s, len(offsetStrs), err
+}
 
-	offsetIds := ids[start:end]
-	s, _ := _tokenizer.Decode(offsetIds)
-	return s, err
+func RawTokens(content string) ([]string, error) {
+	return []string{}, nil
 }

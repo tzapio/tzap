@@ -6,11 +6,13 @@ import (
 	"os"
 
 	"github.com/tzapio/tzap/pkg/embed/localdb"
+	"github.com/tzapio/tzap/pkg/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
 func GetCachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
+	tl.Logger.Println("Getting cached embeddings", len(embeddings.Vectors))
 	var cachedEmbeddings []types.Vector
 	db, err := localdb.NewFileDB("./.tzap-data/embeddingsCache.db")
 	if err != nil {

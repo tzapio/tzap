@@ -17,6 +17,7 @@ type TGenerator interface {
 	ListAllEmbeddingsIds(ctx context.Context) (SearchResults, error)
 	GenerateChat(ctx context.Context, messages []Message, stream bool) (string, error)
 	CountTokens(ctx context.Context, content string) (int, error)
-	OffsetTokens(ctx context.Context, content string, from int, to int) (string, error)
+	OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error)
+	RawTokens(ctx context.Context, content string) ([]string, error)
 }
 type TzapConnector func() (TGenerator, config.Configuration)

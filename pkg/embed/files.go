@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/tzapio/tzap/pkg/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
@@ -36,20 +37,21 @@ func LazyPrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddin
 }
 
 func PrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddings {
+	tl.Logger.Println("Preparing embeddings from files", len(files))
 	rawFileEmbeddings, _, _ := ProcessFiles(t, files)
 	idsToDelete, err := GetDrift(t, rawFileEmbeddings)
 	if err != nil {
 		panic(err)
 	}
+	tl.Logger.Println("Removing old embeddings", len(idsToDelete))
 	if err := RemoveOldEmbeddings(t, idsToDelete); err != nil {
 		panic(err)
 	}
-
-	//fmt.Printf("Total Files: %d, Total Embeddings: %d, Total Tokens: %d, Total Lines: %d\n", len(files), len(rawFileEmbeddings.Vectors), totalTokens, totalLines)
 	return rawFileEmbeddings
 }
 
 func GetEmbeddingsFromFile() (types.Embeddings, error) {
+	tl.Logger.Println("Getting embeddings from file", "./.tzap-data/files.json")
 	filecontent, err := os.ReadFile("./.tzap-data/files.json")
 	if err != nil {
 		return types.Embeddings{}, err
@@ -63,6 +65,7 @@ func GetEmbeddingsFromFile() (types.Embeddings, error) {
 }
 
 func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
+	tl.Logger.Println("Processing files", len(files))
 	totalTokens := 0
 	totalLines := 0
 
@@ -85,7 +88,7 @@ func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
 
 		embeddings.Vectors = append(embeddings.Vectors, fileEmbeddings.Vectors...)
 	}
-
+	tl.Logger.Println("Processed files", len(files), "Total Embeddings", len(embeddings.Vectors), "Total Tokens", totalTokens, "Total Lines", totalLines)
 	return embeddings, totalTokens, totalLines
 }
 
@@ -120,26 +123,40 @@ func RemoveOldEmbeddings(t *tzap.Tzap, deleteIds []string) error {
 	}
 	return nil
 }
-
-func ProcessFileOffsets(t *tzap.Tzap, file, content string, fileTokens int) (types.Embeddings, error) {
+func ProcessFileOffsets(t *tzap.Tzap, file string, content string, fileTokens int) (types.Embeddings, error) {
 	vectors := []types.Vector{}
-	step := 200
-	start := 0
-	offset := 50
-	end := step + offset
+	baseStep := 200
+	step := 4000
+	chunkStart := 0
+	chunkEnd := step
 
 	lineStart := 1
-	for start < fileTokens {
-		partialVector, err := ProcessOffset(t, file, content, start, end, step, lineStart, fileTokens)
+	for chunkStart < fileTokens {
+		// Process file in chunks of 32k tokens to avoid loading whole file
+		tl.Logger.Println("Processing file", file, "chunk", chunkStart, "to", chunkEnd, "tokens", fileTokens)
+		chunkContent, c, err := t.TG.OffsetTokens(t.C, content, chunkStart, chunkEnd)
 		if err != nil {
 			return types.Embeddings{}, err
 		}
-		vectors = append(vectors, partialVector)
 
-		start += step
-		end += step
-		lines := strings.Count(partialVector.Metadata["realSplitPart"], "\n")
-		lineStart += lines
+		start := 0
+		end := baseStep
+		for start < c {
+			partialVector, err := ProcessOffset(t, file, chunkContent, start, end, baseStep, chunkStart, lineStart, c)
+			if err != nil {
+				return types.Embeddings{}, err
+			}
+			vectors = append(vectors, partialVector)
+
+			start += baseStep
+			end += baseStep
+
+			lines := strings.Count(partialVector.Metadata["realSplitPart"], "\n")
+			lineStart += lines
+		}
+
+		chunkStart += step
+		chunkEnd += step
 	}
 
 	return types.Embeddings{Vectors: vectors}, nil
@@ -161,13 +178,13 @@ func ProcessFile(filename string, t *tzap.Tzap) (int, int, string, error) {
 	return fileTokens, lines, content, nil
 }
 
-func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, step int, lineStart int, fileTokens int) (types.Vector, error) {
+func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, step int, chunkStart int, lineStart int, fileTokens int) (types.Vector, error) {
 	truncatedEnd := end
 	if end > fileTokens {
 		truncatedEnd = fileTokens
 	}
-
-	splitPart, err := t.TG.OffsetTokens(t.C, content, start, truncatedEnd)
+	tl.Logger.Println("Filename", filename, "Processing offset", start, truncatedEnd, "of", fileTokens, "tokens")
+	splitPart, _, err := t.TG.OffsetTokens(t.C, content, start, truncatedEnd)
 	if err != nil {
 		return types.Vector{}, err
 	}
@@ -175,14 +192,14 @@ func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, s
 	if truncatedRealEnd > fileTokens {
 		truncatedRealEnd = fileTokens
 	}
-	realSplitPart, err := t.TG.OffsetTokens(t.C, content, start, truncatedRealEnd)
+	realSplitPart, _, err := t.TG.OffsetTokens(t.C, content, start, truncatedRealEnd)
 	if err != nil {
 		return types.Vector{}, err
 	}
 
 	splitPart = "###embedding from file: " + filename + "\n" + splitPart
-	metadataStart := fmt.Sprintf("%d", start)
-	metadataEnd := fmt.Sprintf("%d", end)
+	metadataStart := fmt.Sprintf("%d", chunkStart+start)
+	metadataEnd := fmt.Sprintf("%d", chunkStart+end)
 	metadataLineStart := fmt.Sprintf("%d", lineStart)
 	metadataTruncatedEnd := fmt.Sprintf("%d", truncatedEnd)
 	metadataSplitMd5 := util.MD5Hash(splitPart)
