@@ -2,6 +2,8 @@ package tzap
 
 import (
 	"strings"
+
+	"github.com/tzapio/tzap/pkg/tl"
 )
 
 var GlobalTzaps []*Tzap
@@ -34,7 +36,7 @@ func getMessagesGraphViz(t *Tzap) {
 	if t.InitialSystemContent != "" {
 		c, err := t.TG.CountTokens(t.C, t.Message.Content)
 		if err != nil {
-			println("WARNING: could not count tokens", err.Error())
+			tl.Logger.Println("WARNING: could not count tokens", err.Error())
 		}
 		messages = append([]GraphVizLogMessage{{
 			Role:      "system",
