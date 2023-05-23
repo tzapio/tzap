@@ -3,23 +3,23 @@ package tzap
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
+	"github.com/tzapio/tzap/pkg/util"
 )
 
 // LoadFileDir exposes an array of Tzaps in the previous elements .Data["children"]. Each child is a .LoadTask(file)
-func (t *Tzap) LoadFileDir(dir string, match string) *Tzap {
+func (t *Tzap) LoadFileDir(dir string) *Tzap {
 	_, err := os.ReadDir(dir)
 	if err != nil {
 		fmt.Printf("Error reading directory: %v\n", err)
 		panic(err)
 	}
-	pattern := filepath.Join(dir, match)
-	files, err := filepath.Glob(pattern)
+	files, err := util.ListFilesInDir(dir)
 	if err != nil {
-		panic(fmt.Errorf("error reading directory: %w", err))
+		fmt.Printf("Error listing files in directory: %v\n", err)
+		panic(err)
 	}
 	return t.LoadFiles(files)
 }

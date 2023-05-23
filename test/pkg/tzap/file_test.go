@@ -56,10 +56,9 @@ func Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents(t *te
 
 	// Load the files with Tzap
 	path := os.TempDir()
-	match := "Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents_*"
 	tt := tzap.InternalNew()
 	tt.TG = &mockTG{}
-	loadedTzap := tt.LoadFileDir(path, match)
+	loadedTzap := tt.LoadFileDir(path)
 
 	// Check if the loadedTzap contains two tzaps with the correct content
 	children, ok := loadedTzap.Data["children"].([]*tzap.Tzap)
