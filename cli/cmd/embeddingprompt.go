@@ -20,6 +20,7 @@ var embedsCountFlag int
 var nCountFlag int
 var promptFile string
 var disableindex bool
+var searchQuery string
 
 func init() {
 	rootCmd.AddCommand(embeddingPromptCmd)
@@ -27,16 +28,15 @@ func init() {
 	embeddingPromptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the prompt generation")
 	embeddingPromptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15, "Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
 	embeddingPromptCmd.Flags().BoolVarP(&disableindex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
-
+	embeddingPromptCmd.Flags().StringVarP(&searchQuery, "search", "s", "", "The search query to start the embedding prompt with. Default (<prompt>)")
 }
 
 var embeddingPromptCmd = &cobra.Command{
 	Aliases: []string{"p", "prompt"},
-	Use:     "embeddingprompt <file> <prompt>",
+	Use:     "embeddingprompt <prompt>",
 	Short:   "Generate code or document content using code-search",
 	Long: `The 'embeddingprompt' command generates content based on code-searching existing files. This enables GPT to be able to generate code with depth. To add breadth, the user can recommend needed Inspiration files like interfaces and types to enhance GPTs general understanding.
 The inspiration files should be a comma-separated list of file paths.`,
-	Args: cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		embedsCount := embedsCountFlag
 		nCount := nCountFlag
@@ -47,21 +47,21 @@ The inspiration files should be a comma-separated list of file paths.`,
 		if promptFile != "" {
 			content = util.ReadFileP(promptFile)
 		} else {
-			if len(args) < 2 {
-				panic("Missing file, please provide a file.\n\nUsage: tzap embeddingprompt <file> <prompt>")
+			if len(args) > 0 {
+				content = strings.Join(args[0:], " ")
 			}
-
-			content = strings.Join(args[1:], " ")
 		}
 
 		var inspirationFiles []string
 		if inspirationFilesFlag != "" {
 			inspirationFiles = strings.Split(inspirationFilesFlag, ",")
 		}
+
 		files, err := util.ListFilesInDir("./")
 		if err != nil {
 			panic(err)
 		}
+
 		files = cmdutil.GetNonExcludedFiles(files)
 
 		err = tzap.HandlePanic(func() {
@@ -73,7 +73,7 @@ The inspiration files should be a comma-separated list of file paths.`,
 					if disableindex {
 						return t
 					}
-					println("Checking for file changes. (use -d to disable this check)...\n")
+					cmd.Println("Checking for file changes. (use -d to disable this check)...\n")
 					return t.ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
 						WorkTzap(func(t *tzap.Tzap) {
 							uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
@@ -93,31 +93,38 @@ The inspiration files should be a comma-separated list of file paths.`,
 				}).
 				WorkTzap(func(t *tzap.Tzap) {
 					if len(inspirationFiles) == 0 {
-						println(bold("Inspiration files: None (use --inspiration to add more)"))
+						cmd.Println(bold("Inspiration files: None (use --inspiration to add more)"))
 						return
 					}
-					println(bold("\nInspiration files:"))
+					cmd.Println(bold("\nInspiration files:"))
 					for _, inspirationFile := range inspirationFiles {
 						inspirationFile = strings.TrimSpace(inspirationFile)
 						tokens, err := t.CountTokens(util.ReadFileP(inspirationFile))
 						if err != nil {
 							panic(err)
 						}
-						println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(inspirationFile)))
+						cmd.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(inspirationFile)))
 
 					}
 				}).
-				WorkTzap(func(t *tzap.Tzap) {
-					println(bold("\nSearch query: "), yellow(content))
+				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+					if searchQuery == "" {
+						if content == "" {
+							searchQuery = stdin.GetStdinInput("Enter your task/embedding search? (also available as -s <query>): ")
+						} else {
+							searchQuery = content
+						}
+					}
+					cmd.Println(bold("\nSearch query: "), yellow(searchQuery))
+					return t.ApplyWorkflow(embed.EmbeddingInspirationWorkflow(searchQuery, inspirationFiles, embedsCount, nCount))
 				}).
-				ApplyWorkflow(embed.EmbeddingInspirationWorkflow(content, inspirationFiles, embedsCount, nCount)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					searchResults := t.Data["searchResults"].(types.SearchResults)
 
 					t = t.AddSystemMessage(
 						"The following file contents are embeddings for the user input:",
 					)
-					println(bold("\nSearch result embeddings:"))
+					cmd.Println(bold("\nSearch result embeddings:"))
 
 					for _, result := range searchResults.Results {
 						t = t.AddSystemMessage(result.Metadata["splitPart"])
@@ -125,21 +132,22 @@ The inspiration files should be a comma-separated list of file paths.`,
 						if err != nil {
 							panic(err)
 						}
-						println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(cmdutil.FormatVectorToClickable(result))))
+						cmd.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(cmdutil.FormatVectorToClickable(result))))
 					}
 					time.Sleep(1 * time.Second)
-					println()
+					cmd.Println()
 
 					return t
 				}).
-				AddUserMessage(content).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+					if content != "" {
+						t = t.AddUserMessage(content).RequestChatCompletion().AsAssistantMessage()
+					}
 					for {
-						t = t.RequestChatCompletion()
 						input := stdin.GetStdinInput("\n\n(We are slowly deprecating out.file, it's still required as an argument for compatability, but nothing will be written to file. Instead you can now follow up chat with code).\n\n Ask follow up question (or use ctrl+c to exit): ")
 						t = t.AddUserMessage(input)
+						t = t.RequestChatCompletion().AsAssistantMessage()
 					}
-					return t.RequestChatCompletion()
 				})
 		})
 		if err != nil {
