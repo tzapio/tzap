@@ -1,6 +1,9 @@
 package tzap
 
-import "fmt"
+import (
+	"fmt"
+	"runtime"
+)
 
 type ErrorTzap struct {
 	Tzap *Tzap
@@ -32,7 +35,14 @@ func (t *ErrorTzap) HandleError(cb func(*ErrorTzap) error) *Tzap {
 func tzapHandlePanic(err *error) {
 	if r := recover(); r != nil {
 		*err = r.(error)
-		panic(err)
+		stack := make([]byte, 4096)
+		length := runtime.Stack(stack, true)
+
+		// Print the error message
+		println(err)
+
+		// Print the stack trace
+		println("%s\n", stack[:length])
 	}
 }
 func HandlePanic(fn func()) (err error) {
