@@ -25,7 +25,7 @@ export OPENAI_APIKEY=<apikey>
 
 tzap init
 # Adapt below to your project!
-tzap prompt outputfile.txt "can you add a tzap cli command that enables users \
+tzap prompt "can you add a tzap cli command that enables users \
 to generate code based on the users code without requiring them to manage prompts themselves? \
 Utilize Tzap embedding search."
 ```
@@ -72,7 +72,7 @@ The typical use case for `tzap prompt` is when:
 1. there is some existing code (does not have to be related code to the prompt, like existing datamodels or endpoints)
 2. there is some idea of a starting point (How do I create an endpoint)
 3. there is some idea of the goal (that enables customers to change subscription)
-4. run `tzap prompt out.file "How do I create an endpoint that enables customers to change subscription"`
+4. run `tzap prompt "How do I create an endpoint that enables customers to change subscription"`
 5. based on the prompt, GPT might provide a general non-code answer. In such case, instruct it with feedback.
 
 ## Getting Started
@@ -105,13 +105,14 @@ The `tzap embeddingprompt` command allows you to generate code or content based 
 
 1. Use the `tzap embeddingprompt` command with the following syntax:
  ```
- tzap embeddingprompt <output_file> "<prompt>" [--inspiration=filepath1,filepath2,...]
+ tzap embeddingprompt "<prompt>" [--inspiration=filepath1,filepath2,...]
  ```
 
- - `<output_file>`: The name of the file you want to store the generated content. Currently automatic file writing is in beta under the alias `tzap pv2`
  - `<prompt>`: The text prompt you want to provide to GPT. Make your prompt as clear as possible and enclose it in double quotes.
  - `--inspiration`: (Optional) A flag followed by a comma-separated list of file paths, which are used as inspiration files to enhance GPT's general understanding.
  - `--temperature`: fine tune the temperature.
+ - `-s searchQuery`: split the search and the prompt
+ - `-f promptFile`: use file as prompt
 
 For example, this text was generated using:
 
@@ -119,7 +120,7 @@ For example, this text was generated using:
 npx tzap embeddingprompt -m gpt4 README.md2 "Add to the README.md an explanation on how to use the cli command tzap embeddingprompt" -i README.md 
 ``` 
 
-Feel free to customize the `<output_file>` and `<prompt>` according to your desired outcomes.
+Feel free to customize `<prompt>` according to your desired outcomes.
 
 ## Cost Estimation
 
