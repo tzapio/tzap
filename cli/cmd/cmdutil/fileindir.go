@@ -17,7 +17,7 @@ func GetNonExcludedFiles(files []string) []string {
 	files = FilterWithIncludePattern(files, includePatterns)
 
 	var kilobyte = 1024
-	files = FilterFileSize(files, 100*kilobyte)
+	files = FilterFileSize(files, 10000*kilobyte)
 
 	return files
 }
