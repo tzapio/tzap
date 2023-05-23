@@ -1,8 +1,14 @@
 package cmdutil
 
+import "os"
+
 func GetNonExcludedFiles(files []string) []string {
 	baseIgnore := []string{".git/", ".DS_Store", "desktop.ini"}
-	excludePatterns, err := ReadFilterPatternFiles(".tzapignore", ".gitignore")
+	ignoreFiles := []string{".tzapignore"}
+	if _, err := os.Stat(".gitignore"); os.IsNotExist(err) {
+		ignoreFiles = append(ignoreFiles, ".gitignore")
+	}
+	excludePatterns, err := ReadFilterPatternFiles(ignoreFiles...)
 	if err != nil {
 		panic(err)
 	}

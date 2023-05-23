@@ -22,8 +22,7 @@ func SearchForTzapincludeAndChangeDir() error {
 		}
 
 		if cur == filepath.Dir(cur) {
-			fmt.Println("Reached the top of the directory tree.")
-			break
+			panic("Reached the top of the directory tree. Did not find .tzapinclude in any parent directory. Did you run 'tzap init'?")
 		}
 		fmt.Printf("Did not find .tzapinclude in: %s\n", cur)
 		cur = filepath.Dir(cur)
