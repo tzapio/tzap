@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -29,17 +30,17 @@ var semanticGitcommitCmd = &cobra.Command{
 				}).
 				WorkTzap(func(t *tzap.Tzap) {
 					diff := t.Data["git-diff"].(string)
-					cmd.Print("Reading staged git commit diffs")
+					fmt.Print("Reading staged git commit diffs")
 					if !showDiff {
-						cmd.Println(" (Use --show-diff to show the git diff)\n\n")
+						fmt.Println(" (Use --show-diff to show the git diff)\n\n")
 					} else {
-						cmd.Println(":")
+						fmt.Println(":")
 					}
 					time.Sleep(500 * time.Millisecond)
 					if showDiff {
-						cmd.Println()
-						cmd.Println(diff)
-						cmd.Println("\n\n")
+						fmt.Println()
+						fmt.Println(diff)
+						fmt.Println("\n\n")
 					}
 				}).
 				ApplyErrorWorkflow(git.ValidateDiff(), func(et *tzap.ErrorTzap) error {

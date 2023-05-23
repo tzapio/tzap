@@ -73,7 +73,7 @@ The inspiration files should be a comma-separated list of file paths.`,
 					if disableindex {
 						return t
 					}
-					cmd.Println("Checking for file changes. (use -d to disable this check)...\n")
+					fmt.Println("Checking for file changes. (use -d to disable this check)...\n")
 					return t.ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
 						WorkTzap(func(t *tzap.Tzap) {
 							uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
@@ -93,17 +93,17 @@ The inspiration files should be a comma-separated list of file paths.`,
 				}).
 				WorkTzap(func(t *tzap.Tzap) {
 					if len(inspirationFiles) == 0 {
-						cmd.Println(bold("Inspiration files: None (use --inspiration to add more)"))
+						fmt.Println(bold("Inspiration files: None (use --inspiration to add more)"))
 						return
 					}
-					cmd.Println(bold("\nInspiration files:"))
+					fmt.Println(bold("\nInspiration files:"))
 					for _, inspirationFile := range inspirationFiles {
 						inspirationFile = strings.TrimSpace(inspirationFile)
 						tokens, err := t.CountTokens(util.ReadFileP(inspirationFile))
 						if err != nil {
 							panic(err)
 						}
-						cmd.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(inspirationFile)))
+						fmt.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(inspirationFile)))
 
 					}
 				}).
@@ -115,7 +115,7 @@ The inspiration files should be a comma-separated list of file paths.`,
 							searchQuery = content
 						}
 					}
-					cmd.Println(bold("\nSearch query: "), yellow(searchQuery))
+					fmt.Println(bold("\nSearch query: "), yellow(searchQuery))
 					return t.ApplyWorkflow(embed.EmbeddingInspirationWorkflow(searchQuery, inspirationFiles, embedsCount, nCount))
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
@@ -124,7 +124,7 @@ The inspiration files should be a comma-separated list of file paths.`,
 					t = t.AddSystemMessage(
 						"The following file contents are embeddings for the user input:",
 					)
-					cmd.Println(bold("\nSearch result embeddings:"))
+					fmt.Println(bold("\nSearch result embeddings:"))
 
 					for _, result := range searchResults.Results {
 						t = t.AddSystemMessage(result.Metadata["splitPart"])
@@ -132,10 +132,10 @@ The inspiration files should be a comma-separated list of file paths.`,
 						if err != nil {
 							panic(err)
 						}
-						cmd.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(cmdutil.FormatVectorToClickable(result))))
+						fmt.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(cmdutil.FormatVectorToClickable(result))))
 					}
 					time.Sleep(1 * time.Second)
-					cmd.Println()
+					fmt.Println()
 
 					return t
 				}).
