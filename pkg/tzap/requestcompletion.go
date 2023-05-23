@@ -58,6 +58,17 @@ func (t *Tzap) RequestChatCompletion() *Tzap {
 
 	return requestChat
 }
+func (t *Tzap) AsAssistantMessage() *Tzap {
+	content := t.Data["content"].(string)
+	return t.AddAssistantMessage(content)
+}
+func (t *Tzap) AsAssistantMessage2(s string, tp ...*Tzap) *Tzap {
+	if len(tp) > 0 {
+		t = tp[0]
+	}
+
+	return t.AddAssistantMessage(s)
+}
 
 // RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
 func (t *Tzap) CountTokens(content string) (int, error) {
@@ -65,7 +76,7 @@ func (t *Tzap) CountTokens(content string) (int, error) {
 }
 
 // RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
-func (t *Tzap) OffsetTokens(content string, from int, to int) (string, error) {
+func (t *Tzap) OffsetTokens(content string, from int, to int) (string, int, error) {
 	return t.TG.OffsetTokens(t.C, content, from, to)
 }
 

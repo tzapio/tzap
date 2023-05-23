@@ -63,7 +63,7 @@ func TruncateTokens() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 				offsetStart := 0
 				offsetEnd := 0 + max
 				diff := t.Data["git-diff"].(string)
-				truncatedDiff, err := t.OffsetTokens(diff, offsetStart, offsetEnd)
+				truncatedDiff, _, err := t.OffsetTokens(diff, offsetStart, offsetEnd)
 				if err != nil {
 					return t.ErrorTzap(fmt.Errorf("could not offset tokens: %v", err))
 				}

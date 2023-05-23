@@ -52,7 +52,7 @@ func (pc PartialComposite) FetchEmbedding(ctx context.Context, content ...string
 func (pc PartialComposite) CountTokens(ctx context.Context, content string) (int, error) {
 	return pc.OpenaiTgenerator.CountTokens(content)
 }
-func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, from int, to int) (string, error) {
+func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error) {
 	return pc.OpenaiTgenerator.OffsetTokens(content, from, to)
 }
 func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {

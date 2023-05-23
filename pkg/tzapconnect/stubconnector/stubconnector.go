@@ -29,8 +29,11 @@ func (StubConnector) GenerateChat(ctx context.Context, messages []types.Message,
 func (StubConnector) CountTokens(ctx context.Context, content string) (int, error) {
 	return len("Hello world"), nil
 }
-func (StubConnector) OffsetTokens(ctx context.Context, content string, from int, to int) (string, error) {
-	return "Hell", nil
+func (StubConnector) OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error) {
+	return "Hell", 0, nil
+}
+func (StubConnector) RawTokens(ctx context.Context, content string) ([]string, error) {
+	return []string{}, nil
 }
 func (StubConnector) FetchEmbedding(ctx context.Context, content ...string) ([][]float32, error) {
 	return [][]float32{{0, 1, 2, 3, 4, 5}}, nil
