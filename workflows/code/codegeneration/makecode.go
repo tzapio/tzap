@@ -95,8 +95,7 @@ func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
 			AddUserMessage(
 				util.ReadFileP(config.FileIn),
 			).
-			RequestChatCompletion().
-			StoreCompletion(config.FileOut)
+			RequestChatCompletion()
 
 	}
 }
