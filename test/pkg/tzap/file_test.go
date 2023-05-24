@@ -35,7 +35,11 @@ func Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents(t *te
 	// Prepare temp files with content
 	content1 := "Test content 1"
 	content2 := "Test content 2"
-	tempFile1, err := os.CreateTemp(os.TempDir(), "Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents_1")
+	path, err := os.MkdirTemp("/tmp", "file-test")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	tempFile1, err := os.CreateTemp(path, "Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents_1")
 	if err != nil {
 		t.Fatalf("Failed to create temp file: %v", err)
 	}
@@ -44,7 +48,7 @@ func Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents(t *te
 	if err != nil {
 		t.Fatalf("Failed to write to temp file: %v", err)
 	}
-	tempFile2, err := os.CreateTemp(os.TempDir(), "Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents_2")
+	tempFile2, err := os.CreateTemp(path, "Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents_2")
 	if err != nil {
 		t.Fatalf("Failed to create temp file: %v", err)
 	}
@@ -55,7 +59,7 @@ func Test_LoadFileDir_given_path_and_match_expect_tzaps_with_file_contents(t *te
 	}
 
 	// Load the files with Tzap
-	path := os.TempDir()
+
 	tt := tzap.InternalNew()
 	tt.TG = &mockTG{}
 	loadedTzap := tt.LoadFileDir(path)
