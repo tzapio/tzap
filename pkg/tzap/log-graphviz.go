@@ -3,7 +3,7 @@ package tzap
 import (
 	"strings"
 
-	"github.com/tzapio/tzap/pkg/tl"
+	"github.com/tzapio/tzap/internal/logging/tl"
 )
 
 var GlobalTzaps []*Tzap

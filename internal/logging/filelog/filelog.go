@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
 )
 
@@ -39,7 +40,7 @@ func LogData(ctx context.Context, data interface{}, logType LogType) {
 			} else {
 				writeJSONToFile(filename, data)
 			}
-			fmt.Printf("Wrote log to file: %s\n", filename)
+			tl.UILogger.Printf("Wrote log to file: %s\n", filename)
 			return
 		}
 	}

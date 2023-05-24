@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed/localdb"
-	"github.com/tzapio/tzap/pkg/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
@@ -107,7 +107,7 @@ func FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embedding
 			if err != nil {
 				return err
 			}
-			fmt.Println("Added", added, "embeddings to cache")
+			tl.UILogger.Println("Added", added, "embeddings to cache")
 		}
 	}
 	return nil

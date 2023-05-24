@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/tzapio/tzap/pkg/tl"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"

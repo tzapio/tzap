@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/tzapio/tzap/internal/logging/filelog"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -62,13 +63,6 @@ func (t *Tzap) AsAssistantMessage() *Tzap {
 	content := t.Data["content"].(string)
 	return t.AddAssistantMessage(content)
 }
-func (t *Tzap) AsAssistantMessage2(s string, tp ...*Tzap) *Tzap {
-	if len(tp) > 0 {
-		t = tp[0]
-	}
-
-	return t.AddAssistantMessage(s)
-}
 
 // RequestOpenAIChat initializes the openai chat completion request and creates a new Tzap with the edited content.
 func (t *Tzap) CountTokens(content string) (int, error) {
@@ -89,14 +83,14 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 	filelog.LogData(t.C, t, filelog.TzapLog)
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, thread, filelog.RequestLog)
-	println("\n--- Completion:")
+	tl.UILogger.Println("\n--- Completion:")
 	result, err := t.TG.GenerateChat(t.C, thread, stream)
 
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)
 		return "", err
 	}
-	println("\n---")
+	tl.UILogger.Println("\n---")
 	getMessagesGraphViz(t)
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, result, filelog.ResponseLog)

@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/util"
 )
@@ -74,7 +75,7 @@ func Log(t *Tzap, messages ...interface{}) {
 // no locks. Make sure you locked GlobalMutex.
 func rawFlush() {
 	for _, message := range MessageBuffer {
-		fmt.Print(message)
+		tl.DeepLogger.Print(message)
 	}
 	// Clear the message buffer
 	MessageBuffer = []string{}

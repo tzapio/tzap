@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	tiktokenizer "github.com/tiktoken-go/tokenizer"
-	"github.com/tzapio/tzap/pkg/tl"
+	"github.com/tzapio/tzap/internal/logging/tl"
 )
 
 var _tokenizer tiktokenizer.Codec

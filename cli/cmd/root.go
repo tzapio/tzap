@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -36,6 +36,8 @@ var rootCmd = &cobra.Command{
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if settings.Verbose {
 			tl.EnableLogger()
+			tl.EnableUICompletionLogger()
+			tl.EnableUILogger()
 		}
 		//check subcommand if init or help
 		if cmd.Name() == "init" || cmd.Name() == "help" {
