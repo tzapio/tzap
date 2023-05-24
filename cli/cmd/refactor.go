@@ -45,11 +45,15 @@ It is used to generate refactor and document code or generate documentation file
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
-			t.
+			t = t.
 				ApplyWorkflowFN(
 					codegeneration.MakeCode(
-						basicConfig),
+						basicConfig,
+					),
 				)
+			if !dryrun {
+				t.StoreCompletion(basicConfig.FileOut)
+			}
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -60,6 +64,7 @@ It is used to generate refactor and document code or generate documentation file
 }
 var basicConfig = codegeneration.BasicRefactoringConfig{}
 var refactorFile string
+var dryrun bool
 
 func init() {
 	rootCmd.AddCommand(refactorCmd)
@@ -73,6 +78,7 @@ func init() {
 	refactorCmd.Flags().StringVar(&basicConfig.OutputFormat, "outputformat", "", "recommended - e.g. \"golang\")")
 	refactorCmd.Flags().StringVar(&basicConfig.Example, "example", "", "optional an example of the refactoring task, {typescript code}")
 	refactorCmd.Flags().StringSliceVarP(&basicConfig.InspirationFiles, "inspiration", "i", []string{}, "Optional comma-separated list of inspiration files or multiple -i flags.")
+	refactorCmd.Flags().BoolVar(&dryrun, "dryrun", false, "optional - if true, do not write to fileout, only print to stdout")
 }
 
 func loadConfig(filePath string) (*codegeneration.BasicRefactoringConfig, error) {
