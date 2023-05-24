@@ -93,7 +93,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&settings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
 	rootCmd.PersistentFlags().StringVar(&settings.IncludeList, "include", "", "Files include MD5 matching pattern.")
 	rootCmd.PersistentFlags().BoolVar(&settings.EnableLogs, "enablelogs", false, "Whether to enable logging.")
-	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./out", "Path and name of the log file.")
+	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./.tzap-data/logs", "Path and name of the log file.")
 	rootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
 	rootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
 	rootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
