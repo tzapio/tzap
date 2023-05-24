@@ -7,45 +7,37 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
-	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
+
 	"github.com/tzapio/tzap/pkg/util/stdin"
 	"github.com/tzapio/tzap/workflows/code/embed"
 )
 
-var inspirationFiles []string
+var inspirationFilesFlag string
 var embedsCountFlag int
 var nCountFlag int
 var promptFile string
-var disableIndex bool
+var disableindex bool
 var searchQuery string
 
 func init() {
 	rootCmd.AddCommand(embeddingPromptCmd)
-	embeddingPromptCmd.Flags().StringSliceVarP(&inspirationFiles,
-		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
-	embeddingPromptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10,
-		"Number of embeddings to use for the prompt generation")
-	embeddingPromptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15,
-		"Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
-	embeddingPromptCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
-		"For large projects disabling indexing speeds up the process.")
-	embeddingPromptCmd.Flags().StringVarP(&searchQuery, "search", "s", "",
-		"The search query to start the embedding prompt with. Default (<prompt>)")
+	embeddingPromptCmd.Flags().StringVarP(&inspirationFilesFlag, "inspiration", "i", "", "Comma-separated list of inspiration files")
+	embeddingPromptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the prompt generation")
+	embeddingPromptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15, "Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
+	embeddingPromptCmd.Flags().BoolVarP(&disableindex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
+	embeddingPromptCmd.Flags().StringVarP(&searchQuery, "search", "s", "", "The search query to start the embedding prompt with. Default (<prompt>)")
 }
 
 var embeddingPromptCmd = &cobra.Command{
 	Aliases: []string{"p", "prompt"},
 	Use:     "embeddingprompt <prompt>",
 	Short:   "Generate code or document content using code-search",
-	Long: `The 'embeddingprompt' command generates content based on code-searching existing files.
-	This enables GPT to be able to generate code with depth. To add breadth, the user can recommend 
-	needed Inspiration files like interfaces and types to enhance GPTs general understanding.
-	The inspiration files should be a comma-separated list of file paths.`,
+	Long: `The 'embeddingprompt' command generates content based on code-searching existing files. This enables GPT to be able to generate code with depth. To add breadth, the user can recommend needed Inspiration files like interfaces and types to enhance GPTs general understanding.
+The inspiration files should be a comma-separated list of file paths.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		tl.EnableUICompletionLogger()
 		embedsCount := embedsCountFlag
 		nCount := nCountFlag
 		if embedsCountFlag > nCountFlag {
@@ -60,39 +52,44 @@ var embeddingPromptCmd = &cobra.Command{
 			}
 		}
 
+		var inspirationFiles []string
+		if inspirationFilesFlag != "" {
+			inspirationFiles = strings.Split(inspirationFilesFlag, ",")
+		}
+
 		files, err := util.ListFilesInDir("./")
 		if err != nil {
 			panic(err)
 		}
+
 		files = cmdutil.GetNonExcludedFiles(files)
 
 		err = tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 			t.
+				// Process and create embeddings for all files in the current directory
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					if !disableIndex {
-						fmt.Println("Checking for file changes. (use -d to disable this check)...\n")
-						return t.ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
-							WorkTzap(func(t *tzap.Tzap) {
-								uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
-								if !ok {
-									panic("Loading embeddings went wrong")
-								}
-								if len(uncachedEmbeddings.Vectors) > 19 {
-									price := float64(len(uncachedEmbeddings.Vectors)*400) * 0.0004 / 1000
-									ok := stdin.ConfirmPrompt(fmt.Sprintf(
-										"Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD",
-										len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
-									if !ok {
-										panic("commit aborted by user")
-									}
-								}
-							}).
-							ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
-							ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB())
+					if disableindex {
+						return t
 					}
-					return t
+					fmt.Println("Checking for file changes. (use -d to disable this check)...\n")
+					return t.ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
+						WorkTzap(func(t *tzap.Tzap) {
+							uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
+							if !ok {
+								panic("Loading embeddings went wrong")
+							}
+							if len(uncachedEmbeddings.Vectors) > 19 {
+								price := float64(len(uncachedEmbeddings.Vectors)*400) * 0.0004 / 1000
+								ok := stdin.ConfirmPrompt(fmt.Sprintf("Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD", len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
+								if !ok {
+									panic("commit aborted by user")
+								}
+							}
+						}).
+						ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
+						ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB())
 				}).
 				WorkTzap(func(t *tzap.Tzap) {
 					if len(inspirationFiles) == 0 {
@@ -122,14 +119,13 @@ var embeddingPromptCmd = &cobra.Command{
 					return t.ApplyWorkflow(embed.EmbeddingInspirationWorkflow(searchQuery, inspirationFiles, embedsCount, nCount))
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					searchResults, ok := t.Data["searchResults"].(types.SearchResults)
-					if !ok {
-						panic("Error parsing search results")
-					}
+					searchResults := t.Data["searchResults"].(types.SearchResults)
+
 					t = t.AddSystemMessage(
 						"The following file contents are embeddings for the user input:",
 					)
 					fmt.Println(bold("\nSearch result embeddings:"))
+
 					for _, result := range searchResults.Results {
 						t = t.AddSystemMessage(result.Metadata["splitPart"])
 						tokens, err := t.CountTokens(result.Metadata["splitPart"])
@@ -145,16 +141,12 @@ var embeddingPromptCmd = &cobra.Command{
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					if content != "" {
-						fmt.Println(bold("--- Completion"))
 						t = t.AddUserMessage(content).RequestChatCompletion().AsAssistantMessage()
-						fmt.Println(bold("\n---"))
 					}
 					for {
-						input := stdin.GetStdinInput("\n\nAsk follow up question (or use ctrl+c to exit): ")
+						input := stdin.GetStdinInput("\n\n(We are slowly deprecating out.file, it's still required as an argument for compatability, but nothing will be written to file. Instead you can now follow up chat with code).\n\n Ask follow up question (or use ctrl+c to exit): ")
 						t = t.AddUserMessage(input)
-						fmt.Println(bold("--- Completion:"))
 						t = t.RequestChatCompletion().AsAssistantMessage()
-						fmt.Println(bold("\n---"))
 					}
 				})
 		})
