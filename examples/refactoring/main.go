@@ -1,16 +1,59 @@
 package main
 
 import (
+	"encoding/json"
+
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-
-	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/workflows/code/codegeneration"
 )
 
+type RefactoringConfig struct {
+	Language         string            `json:"language"`
+	Type             string            `json:"type"`
+	FileIn           string            `json:"inputs_extension"`
+	FileOut          string            `json:"outputs_extension"`
+	InspirationFiles map[string]string `json:"files"`
+	Mission          string            `json:"mission"`
+	Task             string            `json:"task"`
+}
+
+type FileConfig struct {
+	Description string `json:"description"`
+	Filepath    string `json:"filepath"`
+}
+
 func main() {
+	configJSON := `
+        {
+                "language": "golang",
+				"type":"basic",
+				"filein:":"",
+				"fileout":"",
+                "files": [
+                        {
+                                "description": "Interfaces for the tzap library",
+                                "filepath": "/workspaces/goman/tzaps/interfaces.go"
+                        },
+                        {
+                                "description": "General Tzap logic",
+                                "filepath": "/workspaces/goman/tzaps/tzap.go"
+                        },
+                        {
+                                "description": "Additional types",
+                                "filepath": "/workspaces/goman/tzaps/msg/message.go"
+                        }
+                ],
+                "mission": "Analyze what can be improved. Refactor the following file to be more readable. Make comments for the functions. Do not add any new public functions, only rewrite.",
+                "task": "Make unit tests. Use testify go. If needed create tmp files. Use package tzap_test. Use testnames Test_{function}_{givenCamelCase}_{expectCamelCase}"
+        }`
+	var configData RefactoringConfig
+	if err := json.Unmarshal([]byte(configJSON), &configData); err != nil {
+		panic(err)
+	}
+
 	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
 	if err != nil {
 		panic(err)
@@ -21,23 +64,12 @@ func main() {
 				MD5Rewrites: true,
 				OpenAIModel: openai.GPT4,
 				EnableLogs:  true})).
-		LoadFileDir("/workspaces/goman/tzaps", "*.go").
+		LoadFileDir("/workspaces/goman/tzaps").
 		Map(func(t *tzap.Tzap) *tzap.Tzap {
 			return t.
 				ApplyWorkflowFN(
-					codegeneration.MakeCodeGO(`
-You are helping the user writing a library for chatgpt prompting. You primarely write Golang. Most files already exists. Do not create new data structures.
-### Current interface: 
-//file: /workspaces/goman/tzaps/interfaces.go
-`+util.ReadFileP("/workspaces/goman/tzaps/interfaces.go")+`
-### General Tzap logic
-//file: /workspaces/goman/tzaps/tzap.go
-`+util.ReadFileP("/workspaces/goman/tzaps/tzap.go")+`
-### Additional types
-//file: /workspaces/goman/tzaps/msg/message.go
-`+util.ReadFileP("/workspaces/goman/tzaps/msg/message.go"),
-						//	"Make unit tests. Use testify go. If needed create tmp files. Use package tzap_test. Use testnames Test_{function}_{givenCamelCase}_{expectCamelCase}."),
-						"Analyze what can be improved. Refactor the following file to be more readable. Make comments for the functions. Do not add any new public functions, only rewrite."),
+					codegeneration.MakeCode(
+						codegeneration.BasicRefactoringConfig{}),
 				)
 		})
 }

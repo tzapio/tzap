@@ -71,7 +71,7 @@ func main() {
 					"/home/vscode/go/src/github.com/tzapio/tzap/ts/src/tzap.ts"))
 		}).
 		WorkTzap(func(t *tzap.Tzap) {
-			t.LoadFileDir("/home/vscode/go/src/github.com/tzapio/tzap/pkg/util/", "*.go").
+			t.LoadFileDir("/home/vscode/go/src/github.com/tzapio/tzap/pkg/util/").
 				Map(func(t *tzap.Tzap) *tzap.Tzap {
 					return t.
 						ApplyWorkflow(
