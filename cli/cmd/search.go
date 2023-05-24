@@ -20,9 +20,10 @@ func init() {
 }
 
 var searchCmd = &cobra.Command{
-	Use:   "search <query>",
-	Short: "Search for relevant embeddings using the query",
-	Args:  cobra.MinimumNArgs(1),
+	Aliases: []string{"s"},
+	Use:     "search <query>",
+	Short:   "Search for relevant embeddings using the query",
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		query := strings.Join(args, " ")
 
