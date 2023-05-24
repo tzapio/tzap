@@ -21,7 +21,7 @@ var settings struct {
 	ConfigPath    string
 	MD5Rewrites   bool
 	IncludeList   string
-	EnableLogs    bool
+	DisableLogs   bool
 	LoggerOutput  string
 	Stub          bool
 	Temperature   float32
@@ -57,7 +57,7 @@ var rootCmd = &cobra.Command{
 			AutoMode:      settings.AutoMode,
 			TruncateLimit: settings.TruncateLimit,
 			MD5Rewrites:   settings.MD5Rewrites,
-			EnableLogs:    settings.EnableLogs,
+			EnableLogs:    !settings.DisableLogs,
 			LoggerOutput:  settings.LoggerOutput,
 			Temperature:   settings.Temperature,
 		}
@@ -92,7 +92,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVar(&settings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
 	rootCmd.PersistentFlags().BoolVar(&settings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
 	rootCmd.PersistentFlags().StringVar(&settings.IncludeList, "include", "", "Files include MD5 matching pattern.")
-	rootCmd.PersistentFlags().BoolVar(&settings.EnableLogs, "enablelogs", false, "Whether to enable logging.")
+	rootCmd.PersistentFlags().BoolVar(&settings.DisableLogs, "enablelogs", true, "Whether to enable logging.")
 	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./.tzap-data/logs", "Path and name of the log file.")
 	rootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
 	rootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
