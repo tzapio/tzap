@@ -32,7 +32,7 @@ var rootCmd = &cobra.Command{
 	Use:     "tzap",
 	Short:   "Tzap Cli!",
 	Long:    `tbd`,
-	Version: "v0.7.19",
+	Version: "v0.7.20",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if settings.Verbose {
 			tl.EnableLogger()
