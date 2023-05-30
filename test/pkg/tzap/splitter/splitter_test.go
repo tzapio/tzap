@@ -1,7 +1,6 @@
 package splitter_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -22,7 +21,7 @@ func Test_GenericSplitter_TransformedItems_ReturnsExpectedData(t *testing.T) {
 
 	goObj := splitter.NewGenericOutputter(transformerFn, callbackFn)
 	output := goObj.GenericSplitter(root)
-	fmt.Printf("%+v\n", output)
+
 	if output == nil {
 		t.Error("should return a Tzap object")
 		return
