@@ -10,7 +10,8 @@ func PrepareEmbedFilesWorkflow(files []string) types.NamedWorkflow[*tzap.Tzap, *
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "prepareEmbedFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			rawFileEmbeddings := embed.PrepareEmbeddingsFromFiles(t, files)
+			embedder := embed.NewFileEmbedder(t)
+			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(files)
 			uncachedEmbeddings := embed.GetUncachedEmbeddings(rawFileEmbeddings)
 			data := types.MappedInterface{"rawFileEmbeddings": rawFileEmbeddings, "uncachedEmbeddings": uncachedEmbeddings}
 			return t.AddTzap(&tzap.Tzap{Name: "prepareEmbedFilesTzap", Data: data})

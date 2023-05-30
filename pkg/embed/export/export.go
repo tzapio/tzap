@@ -8,15 +8,15 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func SaveEmbeddingToFile(e types.Embeddings) {
+func ExportEmbeddingToFile(e types.Embeddings) {
 	if err := BatchEmbeddings(e); err != nil {
 		panic(err)
 	}
-	if err := SaveVectorsToFile(e, "./.tzap-data/files.json"); err != nil {
+	if err := ExportVectorsToFile(e, "./.tzap-data/files.json"); err != nil {
 		panic(err)
 	}
 }
-func SaveVectorsToFile(e types.Embeddings, filePath string) error {
+func ExportVectorsToFile(e types.Embeddings, filePath string) error {
 	embeddingJSON, err := json.Marshal(e)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func BatchEmbeddings(e types.Embeddings) error {
 			batchEmbeddingJson := types.Embeddings{
 				Vectors: batch,
 			}
-			err := SaveVectorsToFile(batchEmbeddingJson, filePath)
+			err := ExportVectorsToFile(batchEmbeddingJson, filePath)
 			if err != nil {
 				return err
 			}
