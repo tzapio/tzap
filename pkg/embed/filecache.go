@@ -13,7 +13,7 @@ func CheckFileCache(files []string) (changedFiles map[string]string, unchangedFi
 	unchangedFiles = map[string]string{}
 	db, err := localdb.NewFileDB("./.tzap-data/filesmd5.db")
 	if err != nil {
-		return
+		return nil, nil, err
 	}
 
 	for _, fileName := range files {
@@ -36,6 +36,5 @@ func CheckFileCache(files []string) (changedFiles map[string]string, unchangedFi
 		tl.Logger.Printf("File %s has changed. Old MD5: %s, New MD5: %s", fileName, cachedMD5, currentMD5)
 		changedFiles[fileName] = fileContentStr
 	}
-
-	return
+	return changedFiles, unchangedFiles, nil
 }
