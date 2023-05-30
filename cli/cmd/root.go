@@ -26,9 +26,11 @@ var settings struct {
 	Stub          bool
 	Temperature   float32
 	Verbose       bool
+	ApiMode       bool
+	Yes           bool
 }
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:     "tzap",
 	Short:   "Tzap Cli!",
 	Long:    `tbd`,
@@ -44,16 +46,12 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
-		err := cmdutil.SearchForTzapincludeAndChangeDir()
+		root, err := cmdutil.SearchForTzapincludeAndGetRootDir()
 		if err != nil {
 			return err
 		}
-		// print cwd
-		cwd, err := os.Getwd()
-		if err != nil {
-			return err
-		}
-		tl.Logger.Println("Current working directory:", cwd)
+		tl.Logger.Println("Current working directory:", root)
+		os.Chdir(root)
 		config := config.Configuration{
 			OpenAIModel:   modelMap[settings.Model],
 			AutoMode:      settings.AutoMode,
@@ -80,7 +78,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -89,14 +87,16 @@ func Execute() {
 var modelMap map[string]string = map[string]string{"gpt35": openai.GPT3Dot5Turbo, "gpt4": openai.GPT4}
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&settings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt4).")
-	rootCmd.PersistentFlags().BoolVar(&settings.AutoMode, "automode", false, "Whether to press yes on continue prompts.")
-	rootCmd.PersistentFlags().IntVar(&settings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
-	rootCmd.PersistentFlags().BoolVar(&settings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
-	rootCmd.PersistentFlags().StringVar(&settings.IncludeList, "include", "", "Files include MD5 matching pattern.")
-	rootCmd.PersistentFlags().BoolVar(&settings.DisableLogs, "disablelogs", false, "Whether to disable logging.")
-	rootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./.tzap-data/logs", "Path and name of the log file.")
-	rootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
-	rootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
-	rootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
+	RootCmd.PersistentFlags().StringVarP(&settings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt4).")
+	RootCmd.PersistentFlags().BoolVar(&settings.AutoMode, "automode", false, "Whether to press yes on continue prompts.")
+	RootCmd.PersistentFlags().IntVar(&settings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
+	RootCmd.PersistentFlags().BoolVar(&settings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
+	RootCmd.PersistentFlags().StringVar(&settings.IncludeList, "include", "", "Files include MD5 matching pattern.")
+	RootCmd.PersistentFlags().BoolVar(&settings.DisableLogs, "disablelogs", false, "Whether to disable logging.")
+	RootCmd.PersistentFlags().StringVar(&settings.LoggerOutput, "loggeroutput", "./.tzap-data/logs", "Path and name of the log file.")
+	RootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
+	RootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
+	RootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
+	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "Enable clean stdout outputs")
+	RootCmd.PersistentFlags().BoolVarP(&settings.Yes, "yes", "y", false, "Answer yes on prompts")
 }

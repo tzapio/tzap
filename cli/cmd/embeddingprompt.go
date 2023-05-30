@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
@@ -23,7 +24,7 @@ var disableIndex bool
 var searchQuery string
 
 func init() {
-	rootCmd.AddCommand(embeddingPromptCmd)
+	RootCmd.AddCommand(embeddingPromptCmd)
 	embeddingPromptCmd.Flags().StringSliceVarP(&inspirationFiles,
 		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
 	embeddingPromptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10,
@@ -60,65 +61,32 @@ var embeddingPromptCmd = &cobra.Command{
 			}
 		}
 
-		files, err := util.ListFilesInDir("./")
+		fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
 		if err != nil {
 			panic(err)
 		}
-		files = cmdutil.GetNonExcludedFiles(files)
-
+		files, err := fileInDirEvaluator.WalkDir("./")
+		if err != nil {
+			panic(err)
+		}
 		err = tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 			t.
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					if !disableIndex {
-						fmt.Println("Checking for file changes. (use -d to disable this check)...\n")
-						return t.ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
-							WorkTzap(func(t *tzap.Tzap) {
-								uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
-								if !ok {
-									panic("Loading embeddings went wrong")
-								}
-								if len(uncachedEmbeddings.Vectors) > 19 {
-									price := float64(len(uncachedEmbeddings.Vectors)*400) * 0.0004 / 1000
-									ok := stdin.ConfirmPrompt(fmt.Sprintf(
-										"Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD",
-										len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
-									if !ok {
-										panic("commit aborted by user")
-									}
-								}
-							}).
-							ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
-							ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB())
-					}
-					return t
-				}).
-				WorkTzap(func(t *tzap.Tzap) {
-					if len(inspirationFiles) == 0 {
-						fmt.Println(bold("Inspiration files: None (use --inspiration to add more)"))
-						return
-					}
-					fmt.Println(bold("\nInspiration files:"))
-					for _, inspirationFile := range inspirationFiles {
-						inspirationFile = strings.TrimSpace(inspirationFile)
-						tokens, err := t.CountTokens(util.ReadFileP(inspirationFile))
-						if err != nil {
-							panic(err)
-						}
-						fmt.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(inspirationFile)))
-
-					}
-				}).
+				ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, disableIndex, settings.Yes)).
+				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					if searchQuery == "" {
 						if content == "" {
+							if settings.ApiMode {
+								panic("search query required in ApiMode")
+							}
 							searchQuery = stdin.GetStdinInput("Enter your task/embedding search? (also available as -s <query>): ")
 						} else {
 							searchQuery = content
 						}
 					}
-					fmt.Println(bold("\nSearch query: "), yellow(searchQuery))
+					cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 					return t.ApplyWorkflow(embed.EmbeddingInspirationWorkflow(searchQuery, inspirationFiles, embedsCount, nCount))
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
@@ -129,32 +97,39 @@ var embeddingPromptCmd = &cobra.Command{
 					t = t.AddSystemMessage(
 						"The following file contents are embeddings for the user input:",
 					)
-					fmt.Println(bold("\nSearch result embeddings:"))
+					cmd.Println(cmdutil.Bold("\nSearch result embeddings:"))
 					for _, result := range searchResults.Results {
 						t = t.AddSystemMessage(result.Metadata["splitPart"])
 						tokens, err := t.CountTokens(result.Metadata["splitPart"])
 						if err != nil {
 							panic(err)
 						}
-						fmt.Println(fmt.Sprintf("\tt:%d\t%s", tokens, cyan(cmdutil.FormatVectorToClickable(result))))
+						cmd.Printf("\tt:%d\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result)))
 					}
 					time.Sleep(1 * time.Second)
-					fmt.Println()
+					cmd.Println()
 
 					return t
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					if content != "" {
-						fmt.Println(bold("--- Completion"))
-						t = t.AddUserMessage(content).RequestChatCompletion().AsAssistantMessage()
-						fmt.Println(bold("\n---"))
+						cmd.Println(cmdutil.Bold("--- Completion"))
+						t = t.AddUserMessage(content).RequestChatCompletion()
+						cmd.Println(cmdutil.Bold("\n---"))
+						if settings.ApiMode {
+							fmt.Print(t.Data["content"].(string))
+							return t.AsAssistantMessage()
+						}
+						t = t.AsAssistantMessage()
+
 					}
 					for {
 						input := stdin.GetStdinInput("\n\nAsk follow up question (or use ctrl+c to exit): ")
 						t = t.AddUserMessage(input)
-						fmt.Println(bold("--- Completion:"))
-						t = t.RequestChatCompletion().AsAssistantMessage()
-						fmt.Println(bold("\n---"))
+						cmd.Println(cmdutil.Bold("--- Completion:"))
+						t = t.RequestChatCompletion()
+						cmd.Println(cmdutil.Bold("\n---"))
+						t = t.AsAssistantMessage()
 					}
 				})
 		})
