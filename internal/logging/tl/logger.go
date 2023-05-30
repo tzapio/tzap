@@ -20,16 +20,15 @@ func init() {
 }
 
 func EnableLogger() {
-	Logger.SetOutput(io.Writer(os.Stdout))
-
+	Logger.SetOutput(io.Writer(os.Stderr))
 }
 func EnableUILogger() {
-	UICompletionLogger.SetOutput(io.Writer(os.Stdout))
+	UICompletionLogger.SetOutput(io.Writer(os.Stderr))
 }
 func EnableUICompletionLogger() {
-	UICompletionLogger.SetOutput(io.Writer(os.Stdout))
+	UICompletionLogger.SetOutput(io.Writer(os.Stderr))
 }
 
 func EnableDeepLogger() {
-	DeepLogger.SetOutput(io.Writer(os.Stdout))
+	DeepLogger.SetOutput(io.Writer(os.Stderr))
 }

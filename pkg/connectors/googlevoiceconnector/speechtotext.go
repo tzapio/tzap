@@ -2,7 +2,6 @@ package googlevoiceconnector
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	speech "cloud.google.com/go/speech/apiv1"
@@ -34,7 +33,6 @@ func (g *GoogleTgenerator) SpeechToText(ctx context.Context, audioContent *[]byt
 		return "nil", err
 	}
 	_ = resp
-	fmt.Printf("%+v\n", resp)
 	println(resp.Results[0].Alternatives[0].Transcript)
 	return resp.Results[0].Alternatives[0].Transcript, nil
 }

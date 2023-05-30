@@ -13,13 +13,11 @@ import (
 func (t *Tzap) LoadFileDir(dir string) *Tzap {
 	_, err := os.ReadDir(dir)
 	if err != nil {
-		fmt.Printf("Error reading directory: %v\n", err)
-		panic(err)
+		panic(fmt.Errorf("cannot read directory: %w", err))
 	}
 	files, err := util.ListFilesInDir(dir)
 	if err != nil {
-		fmt.Printf("Error listing files in directory: %v\n", err)
-		panic(err)
+		panic(fmt.Errorf("cannot list files in directory: %w", err))
 	}
 	return t.LoadFiles(files)
 }

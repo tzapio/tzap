@@ -2,6 +2,7 @@ package tzap
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 )
 
@@ -39,10 +40,9 @@ func tzapHandlePanic(err *error) {
 		length := runtime.Stack(stack, true)
 
 		// Print the error message
-		println(err)
-
+		println(r.(error).Error())
 		// Print the stack trace
-		println("%s\n", stack[:length])
+		fmt.Fprintf(os.Stderr, "%s\n", stack[:length])
 	}
 }
 func HandlePanic(fn func()) (err error) {

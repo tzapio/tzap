@@ -28,7 +28,8 @@ func ListFilesInDir(dir string) ([]string, error) {
 	var files []string
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			fmt.Printf("Warning: ListFilesInDir, error walking path %q: %v\n", path, err)
+			println(os.Getwd())
+			println(fmt.Sprintf("Warning: ListFilesInDir, error walking path %q: %v", path, err))
 			return nil
 		}
 		if !info.IsDir() {

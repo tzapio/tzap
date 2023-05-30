@@ -52,11 +52,9 @@ func (g *GoogleTgenerator) TextToSpeech(ctx context.Context, outputText, languag
 			SpeakingRate:  1.1,
 		},
 	}
-	fmt.Printf("%+v\n", request)
 	// Call the API
 	response, err := g.texttospeechClient.SynthesizeSpeech(ctx, request)
 	if err != nil {
-		fmt.Print(err.Error())
 		return nil, fmt.Errorf("failed to synthesize text %s", err)
 	}
 	return &response.AudioContent, nil
