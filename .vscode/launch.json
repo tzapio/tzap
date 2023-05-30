@@ -10,9 +10,10 @@
             "request": "launch",
             "mode": "auto",
             "env": {
-                "OPENAI_APIKEY": "fordebug"
+            
             },
-            "program": "${relativeFile}",
+            "program": "cli/main.go",
+            "args": ["p", "o", "--verbose", "can you rewrite process offset to not read whole files continiously? Perhaps split the content first into maximum 32k token?"],
             "cwd": "${workspaceFolder}"
         }
     ]
