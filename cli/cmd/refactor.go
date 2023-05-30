@@ -28,7 +28,7 @@ It is used to generate refactor and document code or generate documentation file
 			config, err := loadConfig(refactorFile)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error loading config file: %v\n", err)
-				fmt.Println(refactorJSONExample)
+				cmd.Println(refactorJSONExample)
 				os.Exit(1)
 			}
 			basicConfig = *config
@@ -39,7 +39,7 @@ It is used to generate refactor and document code or generate documentation file
 		}
 		if (basicConfig.FileIn == "") || (basicConfig.Task == "") {
 			fmt.Fprintf(os.Stderr, "error: filein and task are required\n")
-			fmt.Println(refactorJSONExample)
+			cmd.Println(refactorJSONExample)
 			os.Exit(1)
 		}
 		err := tzap.HandlePanic(func() {
@@ -67,7 +67,7 @@ var refactorFile string
 var dryrun bool
 
 func init() {
-	rootCmd.AddCommand(refactorCmd)
+	RootCmd.AddCommand(refactorCmd)
 
 	refactorCmd.Flags().StringVar(&refactorFile, "refactorfile", "", "the path to the refactor file")
 	refactorCmd.Flags().StringVar(&basicConfig.FileIn, "filein", "", "required - the file to refactor")

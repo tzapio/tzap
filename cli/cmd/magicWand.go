@@ -25,7 +25,7 @@ or you should provide the absolute path to the file. If the file is not found, a
 		filename := args[0]
 		if _, err := os.Stat(filename); os.IsNotExist(err) {
 			absoluteFilePath, _ := filepath.Abs(filename)
-			fmt.Println("Could not find file:", absoluteFilePath, " err:", err)
+			cmd.Println("Could not find file:", absoluteFilePath, " err:", err)
 			os.Exit(1)
 		}
 
@@ -42,5 +42,5 @@ or you should provide the absolute path to the file. If the file is not found, a
 }
 
 func init() {
-	rootCmd.AddCommand(magicWandCmd)
+	RootCmd.AddCommand(magicWandCmd)
 }

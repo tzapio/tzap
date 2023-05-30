@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os/exec"
 
 	"github.com/spf13/cobra"
@@ -26,10 +25,10 @@ var gitcommitCmd = &cobra.Command{
 		)
 		out, err := diff.CombinedOutput()
 		if err != nil {
-			fmt.Println("Could not get diff:", err)
+			cmd.Println("Could not get diff:", err)
 			return
 		}
-		fmt.Println(string(out))
+		cmd.Println(string(out))
 
 		t := cmdutil.GetTzapFromContext(cmd.Context()).
 			AddSystemMessage(`Write a git commit message maximum 30 words.
@@ -40,13 +39,13 @@ Template:
 
 		c, err := t.CountTokens(t.Message.Content)
 		if err != nil {
-			fmt.Println("Could not count tokens:", err)
+			cmd.Println("Could not count tokens:", err)
 			return
 		}
 		if c >= 3900 {
-			fmt.Printf("WARNING: diff is too long. TRUNCATING TO 3900 of %d estimated tokens\n", c)
+			cmd.Printf("WARNING: diff is too long. TRUNCATING TO 3900 of %d estimated tokens\n", c)
 		}
-		fmt.Printf("Summarizing %d estimated tokens\n", c)
+		cmd.Printf("Summarizing %d estimated tokens\n", c)
 		if !stdin.ConfirmPrompt("Continue?") {
 			return
 		}
@@ -55,24 +54,24 @@ Template:
 		offsetEnd := 0 + 3900
 		t.Message.Content, _, err = t.OffsetTokens(t.Message.Content, offsetStart, offsetEnd)
 		if err != nil {
-			fmt.Println("Could not offset tokens:", err)
+			cmd.Println("Could not offset tokens:", err)
 			return
 		}
 
 		content := t.RequestChatCompletion().Data["content"].(string)
-		fmt.Println("\n", content)
+		cmd.Println("\n", content)
 		if !stdin.ConfirmPrompt("Make the git commit?") {
 			return
 		}
 
 		cmd2 := exec.Command("git", "commit", "-m", content)
 		if err := cmd2.Run(); err != nil {
-			fmt.Printf("Could not git commit. Content: %s, Error: %s\n", content, err)
+			cmd.Printf("Could not git commit. Content: %s, Error: %s\n", content, err)
 			return
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(gitcommitCmd)
+	RootCmd.AddCommand(gitcommitCmd)
 }

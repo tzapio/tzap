@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -30,17 +29,17 @@ var semanticGitcommitCmd = &cobra.Command{
 				}).
 				WorkTzap(func(t *tzap.Tzap) {
 					diff := t.Data["git-diff"].(string)
-					fmt.Print("Reading staged git commit diffs")
+					cmd.Print("Reading staged git commit diffs")
 					if !showDiff {
-						fmt.Println(" (Use --show-diff to show the git diff)\n\n")
+						cmd.Println(" (Use --show-diff to show the git diff)\n\n")
 					} else {
-						fmt.Println(":")
+						cmd.Println(":")
 					}
 					time.Sleep(500 * time.Millisecond)
 					if showDiff {
-						fmt.Println()
-						fmt.Println(diff)
-						fmt.Println("\n\n")
+						cmd.Println()
+						cmd.Println(diff)
+						cmd.Println("\n\n")
 					}
 				}).
 				ApplyErrorWorkflow(git.ValidateDiff(), func(et *tzap.ErrorTzap) error {
@@ -87,7 +86,7 @@ func RequestChat() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 }
 
 func init() {
-	rootCmd.AddCommand(semanticGitcommitCmd)
+	RootCmd.AddCommand(semanticGitcommitCmd)
 	// add flag to show git diff
 	semanticGitcommitCmd.Flags().BoolVarP(&showDiff, "show-diff", "d", false, "Show git diff")
 }
