@@ -1,6 +1,6 @@
 github.com/dlclark/regexp2 v1.9.0 h1:pTK/l/3qYIKaRXuHnEnIf7Y5NxfRPfpb7dis6/gdlVI=
 github.com/dlclark/regexp2 v1.9.0/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
-github.com/sashabaranov/go-openai v1.9.3 h1:uNak3Rn5pPsKRs9bdT7RqRZEyej/zdZOEI2/8wvrFtM=
-github.com/sashabaranov/go-openai v1.9.3/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
-github.com/tiktoken-go/tokenizer v0.1.0 h1:c1fXriHSR/NmhMDTwUDLGiNhHwTV+ElABGvqhCWLRvY=
-github.com/tiktoken-go/tokenizer v0.1.0/go.mod h1:7SZW3pZUKWLJRilTvWCa86TOVIiiJhYj3FQ5V3alWcg=
+github.com/sashabaranov/go-openai v1.9.5 h1:z1VCMXsfnug+U0ceTTIXr/L26AYl9jafqA9lptlSX0c=
+github.com/sashabaranov/go-openai v1.9.5/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
+github.com/tzapio/tokenizer v0.0.3 h1:ZZEIFDxKmd7dpc5maZ/qEcPXSfhSUb67bAA/Q4eOJFI=
+github.com/tzapio/tokenizer v0.0.3/go.mod h1:4rOkxTkp0qhZoQGYhW1elsQjgymbEPYEuGEApY95qfQ=
