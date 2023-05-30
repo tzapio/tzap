@@ -2,9 +2,7 @@ package embed
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -48,20 +46,6 @@ func (fe *FileEmbedder) PrepareEmbeddingsFromFiles(files []string) types.Embeddi
 		panic(err)
 	}
 	return rawFileEmbeddings
-}
-
-func (fe *FileEmbedder) GetEmbeddingsFromFile() (types.Embeddings, error) {
-	tl.Logger.Println("Getting embeddings from file", "./.tzap-data/files.json")
-	filecontent, err := os.ReadFile("./.tzap-data/files.json")
-	if err != nil {
-		return types.Embeddings{}, err
-	}
-	var embeddings types.Embeddings
-
-	if err := json.Unmarshal(filecontent, &embeddings); err != nil {
-		return types.Embeddings{}, err
-	}
-	return embeddings, nil
 }
 
 func (fe *FileEmbedder) ProcessFiles(changedFiles map[string]string) (types.Embeddings, int, int) {
@@ -111,7 +95,6 @@ func (fe *FileEmbedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbedd
 	//println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
 	return missingIds, nil
 }
-
 func (fe *FileEmbedder) RemoveOldEmbeddings(deleteIds []string) error {
 	if err := fe.t.TG.DeleteEmbeddingDocuments(fe.t.C, deleteIds); err != nil {
 		return err
@@ -181,6 +164,7 @@ func (fe *FileEmbedder) ProcessOffset(filename, content string, start int, end i
 	if truncatedRealEnd > fileTokens {
 		truncatedRealEnd = fileTokens
 	}
+
 	realSplitPart, _, err := fe.t.TG.OffsetTokens(fe.t.C, content, start, truncatedRealEnd)
 	if err != nil {
 		return types.Vector{}, err

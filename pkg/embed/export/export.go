@@ -1,10 +1,11 @@
-package embed
+package export
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
 )
 
@@ -64,4 +65,18 @@ func deletePreviousBatch() error {
 		}
 	}
 	return nil
+}
+
+func GetEmbeddingsFromFile(filePath string) (types.Embeddings, error) {
+	tl.Logger.Println("Getting embeddings from file", filePath)
+	filecontent, err := os.ReadFile(filePath)
+	if err != nil {
+		return types.Embeddings{}, err
+	}
+	var embeddings types.Embeddings
+
+	if err := json.Unmarshal(filecontent, &embeddings); err != nil {
+		return types.Embeddings{}, err
+	}
+	return embeddings, nil
 }
