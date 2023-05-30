@@ -4,18 +4,19 @@ import (
 	"errors"
 	"strings"
 
-	tiktokenizer "github.com/tiktoken-go/tokenizer"
+	"github.com/tzapio/tokenizer/codec"
+	enc "github.com/tzapio/tokenizer/codec/cl100k_base"
 	"github.com/tzapio/tzap/internal/logging/tl"
 )
 
-var _tokenizer tiktokenizer.Codec
+var _tokenizer codec.Codec
 
 func init() {
-	enc, err := tiktokenizer.Get(tiktokenizer.Cl100kBase)
+	/*enc, err := tiktokenizer.Get(tiktokenizer.Cl100kBase)
 	if err != nil {
 		panic("error getting tokenizer")
-	}
-	_tokenizer = enc
+	}*/
+	_tokenizer = *enc.NewCl100kBase()
 }
 
 func CountTokens(content string) (int, error) {
