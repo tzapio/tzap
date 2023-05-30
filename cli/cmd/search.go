@@ -18,8 +18,8 @@ var ignoreFiles []string
 
 func init() {
 	RootCmd.AddCommand(searchCmd)
-	searchCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 20, "Number of embeddings to use for the search")
-	searchCmd.Flags().IntVarP(&nCountFlag, "ncount", "n", 30, "Number of embeddings to use for the search")
+	searchCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
+	searchCmd.Flags().IntVarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
 	searchCmd.Flags().BoolVarP(&printEmbedding, "printembedding", "p", false, "Output the embeddings themeselves")
 	searchCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
 	searchCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
