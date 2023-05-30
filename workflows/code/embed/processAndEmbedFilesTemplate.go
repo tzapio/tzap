@@ -58,17 +58,6 @@ func SaveAndLoadEmbeddingsToDB() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	}
 }
 
-func generateEmbeddings(t *tzap.Tzap, files []string) types.Embeddings {
-	// Generate embedding files.
-	embed.PrepareEmbeddingsFromFiles(t, files)
-	// Load embeddings from file.
-	embeddings, err := embed.GetEmbeddingsFromFile()
-	if err != nil {
-		panic(err)
-	}
-	return embeddings
-}
-
 func saveEmbeddingsToTzap(t *tzap.Tzap, embeddings types.Embeddings) *tzap.Tzap {
 	for _, vector := range embeddings.Vectors {
 		err := t.TG.AddEmbeddingDocument(t.C, vector.ID, vector.Values, vector.Metadata)
