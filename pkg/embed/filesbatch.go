@@ -9,6 +9,7 @@ import (
 	"github.com/tzapio/tzap/pkg/embed/localdb"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/pkg/util"
 )
 
 func GetCachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
@@ -26,7 +27,7 @@ func GetCachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
 			if kv.Value != "" {
 				float32Vector := []float32{}
 				if err := json.Unmarshal([]byte(kv.Value), &float32Vector); err != nil {
-					fmt.Println("cannot unmarshal", splitPart, err.Error())
+					println("cannot unmarshal", splitPart, err.Error())
 					continue
 				}
 				if len(float32Vector) == 1536 {
@@ -40,7 +41,7 @@ func GetCachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
 					cachedEmbeddings = append(cachedEmbeddings, vector)
 					continue
 				} else {
-					fmt.Println("invalid vector length", splitPart, err.Error())
+					println("invalid vector length", splitPart, err.Error())
 					continue
 				}
 			}
@@ -69,6 +70,8 @@ func GetUncachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
 }
 
 func FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embeddings) error {
+	var storedFiles []string
+
 	if len(uncachedEmbeddings.Vectors) > 0 {
 		batchSize := 100
 
@@ -86,6 +89,7 @@ func FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embedding
 			batch := uncachedEmbeddings.Vectors[i:end]
 			var inputStrings []string
 			for _, vector := range batch {
+				storedFiles = append(storedFiles, vector.Metadata["filename"])
 				inputStrings = append(inputStrings, vector.Metadata["splitPart"])
 			}
 
@@ -109,6 +113,23 @@ func FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embedding
 			}
 			tl.UILogger.Println("Added", added, "embeddings to cache")
 		}
+		db2, err := localdb.NewFileDB("./.tzap-data/filesmd5.db")
+		if err != nil {
+			return err
+		}
+		var keyvals []types.KeyValue
+		for _, file := range storedFiles {
+			content, err := os.ReadFile(file)
+			if err != nil {
+				return err
+			}
+			keyvals = append(keyvals, types.KeyValue{Key: file, Value: util.MD5HashByte(content)})
+		}
+		added, err := db2.BatchSet(keyvals)
+		if err != nil {
+			panic("failing to store changed files should not happend and has probably caused some kind of corruption")
+		}
+		tl.Logger.Printf("Added %d files to md5 cache", added)
 	}
 	return nil
 }

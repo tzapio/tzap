@@ -13,33 +13,19 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-func LazyPrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddings {
-	rawFileEmbeddings, totalTokens, totalLines := ProcessFiles(t, files)
-	idsToDelete, err := GetDrift(t, rawFileEmbeddings)
+func PrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddings {
+	tl.Logger.Println("Preparing embeddings from files", len(files))
+	changedFiles, unchangedFiles, err := CheckFileCache(files)
 	if err != nil {
 		panic(err)
 	}
-	if err := RemoveOldEmbeddings(t, idsToDelete); err != nil {
+	rawFileEmbeddings, _, _ := ProcessFiles(t, changedFiles)
+	storedEmbeddings, err := t.TG.ListAllEmbeddingsIds(t.C)
+	if err != nil {
 		panic(err)
 	}
-	uncachedEmbeddings := GetUncachedEmbeddings(rawFileEmbeddings)
-	if len(uncachedEmbeddings.Vectors) > 0 {
-		if err := FetchAndCacheNewEmbeddings(t, uncachedEmbeddings); err != nil {
-			panic(err)
-		}
-	}
 
-	cachedEmbeddings := GetCachedEmbeddings(rawFileEmbeddings)
-	SaveEmbeddingToFile(cachedEmbeddings)
-
-	fmt.Printf("Total Files: %d, Total Embeddings: %d, Total Tokens: %d, Total Lines: %d\n", len(files), len(rawFileEmbeddings.Vectors), totalTokens, totalLines)
-	return cachedEmbeddings
-}
-
-func PrepareEmbeddingsFromFiles(t *tzap.Tzap, files []string) types.Embeddings {
-	tl.Logger.Println("Preparing embeddings from files", len(files))
-	rawFileEmbeddings, _, _ := ProcessFiles(t, files)
-	idsToDelete, err := GetDrift(t, rawFileEmbeddings)
+	idsToDelete, err := GetDrift(storedEmbeddings, rawFileEmbeddings, unchangedFiles)
 	if err != nil {
 		panic(err)
 	}
@@ -64,15 +50,14 @@ func GetEmbeddingsFromFile() (types.Embeddings, error) {
 	return embeddings, nil
 }
 
-func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
-	tl.Logger.Println("Processing files", len(files))
+func ProcessFiles(t *tzap.Tzap, changedFiles map[string]string) (types.Embeddings, int, int) {
+	tl.Logger.Println("Processing files", len(changedFiles))
 	totalTokens := 0
 	totalLines := 0
 
 	embeddings := types.Embeddings{}
-
-	for _, file := range files {
-		fileTokens, lines, content, err := ProcessFile(file, t)
+	for file, content := range changedFiles {
+		fileTokens, lines, err := ProcessFile(content, t)
 		if err != nil {
 			panic(err)
 		}
@@ -88,26 +73,25 @@ func ProcessFiles(t *tzap.Tzap, files []string) (types.Embeddings, int, int) {
 
 		embeddings.Vectors = append(embeddings.Vectors, fileEmbeddings.Vectors...)
 	}
-	tl.Logger.Println("Processed files", len(files), "Total Embeddings", len(embeddings.Vectors), "Total Tokens", totalTokens, "Total Lines", totalLines)
+	tl.Logger.Println("Processed files", len(changedFiles), "Total Embeddings", len(embeddings.Vectors), "Total Tokens", totalTokens, "Total Lines", totalLines)
 	return embeddings, totalTokens, totalLines
 }
 
-func GetDrift(t *tzap.Tzap, nowEmbeddings types.Embeddings) ([]string, error) {
-	storedEmbeddings, err := t.TG.ListAllEmbeddingsIds(t.C)
-	if err != nil {
-		return nil, err
-	}
-
+func GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings types.Embeddings, unchangedFiles map[string]string) ([]string, error) {
 	nowEmbeddingsIds := make(map[string]struct{})
 	for _, vectorID := range nowEmbeddings.Vectors {
 		nowEmbeddingsIds[vectorID.ID] = struct{}{}
 	}
 	missingIds := []string{}
 	for _, storedVector := range storedEmbeddings.Results {
+		filename := storedVector.Metadata["filename"]
+		if _, exists := unchangedFiles[filename]; exists {
+			continue
+		}
 		if _, exists := nowEmbeddingsIds[storedVector.ID]; !exists {
 
 			missingIds = append(missingIds, storedVector.ID)
-			tzap.Log(t, "Drift: ", storedVector)
+			tl.Logger.Println("Drift: ", storedVector)
 		}
 	}
 	//println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
@@ -115,11 +99,8 @@ func GetDrift(t *tzap.Tzap, nowEmbeddings types.Embeddings) ([]string, error) {
 }
 
 func RemoveOldEmbeddings(t *tzap.Tzap, deleteIds []string) error {
-	for _, deleteId := range deleteIds {
-		if err := t.TG.DeleteEmbeddingDocument(t.C, deleteId); err != nil {
-			return err
-		}
-		tzap.Log(t, "Deleted: ", deleteId)
+	if err := t.TG.DeleteEmbeddingDocuments(t.C, deleteIds); err != nil {
+		return err
 	}
 	return nil
 }
@@ -161,21 +142,15 @@ func ProcessFileOffsets(t *tzap.Tzap, file string, content string, fileTokens in
 
 	return types.Embeddings{Vectors: vectors}, nil
 }
-func ProcessFile(filename string, t *tzap.Tzap) (int, int, string, error) {
-	fileContent, err := os.ReadFile(filename)
-	if err != nil {
-		return 0, 0, "", err
-	}
-
-	content := string(fileContent)
+func ProcessFile(content string, t *tzap.Tzap) (int, int, error) {
 	lines := strings.Count(content, "\n")
 
 	fileTokens, err := t.TG.CountTokens(context.Background(), content)
 	if err != nil {
-		return 0, 0, "", err
+		return 0, 0, err
 	}
 
-	return fileTokens, lines, content, nil
+	return fileTokens, lines, nil
 }
 
 func ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, step int, chunkStart int, lineStart int, fileTokens int) (types.Vector, error) {
