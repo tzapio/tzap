@@ -36,8 +36,6 @@ func FetchOrCachedEmbeddingForFilesWorkflow() types.NamedWorkflow[*tzap.Tzap, *t
 				panic("Loading embeddings went wrong")
 			}
 			cachedEmbeddings := embed.GetCachedEmbeddings(rawFileEmbeddings)
-			embed.SaveEmbeddingToFile(cachedEmbeddings)
-
 			data := types.MappedInterface{"embeddings": cachedEmbeddings}
 			return t.AddTzap(&tzap.Tzap{Name: "fetchOrCachedEmbeddingForFilesTzap", Data: data})
 		},
