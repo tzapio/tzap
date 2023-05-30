@@ -13,6 +13,7 @@ type TGenerator interface {
 	AddEmbeddingDocument(ctx context.Context, id string, embedding []float32, metadata map[string]string) error
 	GetEmbeddingDocument(ctx context.Context, id string) (Vector, bool, error)
 	DeleteEmbeddingDocument(ctx context.Context, id string) error
+	DeleteEmbeddingDocuments(ctx context.Context, ids []string) error
 	SearchWithEmbedding(ctx context.Context, embedding QueryFilter, k int) (SearchResults, error)
 	ListAllEmbeddingsIds(ctx context.Context) (SearchResults, error)
 	GenerateChat(ctx context.Context, messages []Message, stream bool) (string, error)

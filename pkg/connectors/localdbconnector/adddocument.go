@@ -44,3 +44,13 @@ func (idx *LocalembedTGenerator) DeleteEmbeddingDocument(ctx context.Context, do
 	}
 	return nil
 }
+func (idx *LocalembedTGenerator) DeleteEmbeddingDocuments(ctx context.Context, docIDs []string) error {
+	var pairs []types.KeyValue
+	for _, docID := range docIDs {
+		pairs = append(pairs, types.KeyValue{Key: docID, Value: ""})
+	}
+	if _, err := idx.db.BatchSet(pairs); err != nil {
+		return err
+	}
+	return nil
+}

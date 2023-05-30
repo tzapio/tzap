@@ -2,7 +2,6 @@ package tzapconnect
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/tzapio/tzap/pkg/config"
@@ -14,7 +13,7 @@ import (
 func WithConfig(openai_apikey string, conf config.Configuration) types.TzapConnector {
 	tg, err := newBaseconnector(openai_apikey)
 	if err != nil {
-		fmt.Println(err)
+		println(err)
 		os.Exit(1)
 	}
 	return func() (types.TGenerator, config.Configuration) {
@@ -66,6 +65,9 @@ func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, docID strin
 }
 func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
 	return pc.EmbeddingGenerator.DeleteEmbeddingDocument(ctx, docID)
+}
+func (pc PartialComposite) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
+	return pc.EmbeddingGenerator.DeleteEmbeddingDocuments(ctx, ids)
 }
 func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
 	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx)

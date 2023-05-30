@@ -60,6 +60,9 @@ func (tg *mockTG) GetEmbeddingDocument(ctx context.Context, docID string) (types
 func (tg *mockTG) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
 	return nil
 }
+func (tg *mockTG) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
+	return nil
+}
 func (tg *mockTG) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }

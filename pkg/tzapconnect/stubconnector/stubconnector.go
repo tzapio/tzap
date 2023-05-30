@@ -50,6 +50,9 @@ func (StubConnector) GetEmbeddingDocument(ctx context.Context, docID string) (ty
 func (StubConnector) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
 	return nil
 }
+func (StubConnector) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
+	return nil
+}
 func (StubConnector) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
