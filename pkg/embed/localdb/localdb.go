@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
 )
 
@@ -110,6 +111,7 @@ func (db *FileDB) BatchSet(pairs []types.KeyValue) (int, error) {
 	c := 0
 	for _, kv := range pairs {
 		if db.data[kv.Key] == kv.Value {
+			tl.Logger.Println("BatchSet - WARNING: Key already exists. Continue. ", kv.Key)
 			continue
 		}
 		c++
