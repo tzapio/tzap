@@ -1,4 +1,4 @@
-out/
+out
 *.md5
 node_modules
 release
@@ -6,7 +6,7 @@ release
 npm/README.md
 npm/bin
 npm/release
-.tzap-data/
-.redis-data/
+.tzap-data
 *.gox
 .DS_Store
+animation

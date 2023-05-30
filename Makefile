@@ -4,6 +4,8 @@ build: gomodtidy
 release:
 	make gomodtidy
 	go test ./...
+	git pull
+	git push
 	make -C cli build
 	make -C cli tzapPrepareRelease
 	make -C cli tzapWriteRelease
