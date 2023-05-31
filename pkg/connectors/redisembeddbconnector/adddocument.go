@@ -6,7 +6,7 @@ import (
 	"github.com/RediSearch/redisearch-go/v2/redisearch"
 )
 
-func (idx *RedisembedTgenerator) AddEmbeddingDocument(ctx context.Context, docID string, embedding []float32, metadata map[string]string) error {
+func (idx *RedisembedTgenerator) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
 	doc := redisearch.NewDocument(docID, 1.0).
 		Set("oaiemb", toBytes(embedding))
 	for k, v := range metadata {
