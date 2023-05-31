@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/localdbconnector"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector"
@@ -22,11 +23,14 @@ func WithConfig(openai_apikey string, conf config.Configuration) types.TzapConne
 }
 
 func newBaseconnector(openai_apikey string) (types.TGenerator, error) {
+	tl.Logger.Println("Initializing tzapConnect")
 	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey)
+	tl.Logger.Println("Open AI Client Initialized")
 	embeddingC, err := localdbconnector.InitiateLocalDB("./.tzap-data/fileembeddings.db")
 	if err != nil {
 		return nil, err
 	}
+	tl.Logger.Println("Local DB Client Initialized")
 	partialComposite := PartialComposite{OpenaiTgenerator: openaiC, EmbeddingGenerator: embeddingC}
 	var myInterface types.TGenerator = partialComposite
 	return myInterface, nil
@@ -45,7 +49,7 @@ func (pc PartialComposite) TextToSpeech(ctx context.Context, content, language, 
 func (pc PartialComposite) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {
 	return pc.OpenaiTgenerator.GenerateChat(ctx, messages, stream)
 }
-func (pc PartialComposite) FetchEmbedding(ctx context.Context, content ...string) ([][]float32, error) {
+func (pc PartialComposite) FetchEmbedding(ctx context.Context, content ...string) ([][1536]float32, error) {
 	return pc.OpenaiTgenerator.FetchEmbedding(ctx, content...)
 }
 func (pc PartialComposite) CountTokens(ctx context.Context, content string) (int, error) {
@@ -57,7 +61,7 @@ func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, fro
 func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, embedding, k)
 }
-func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, docID string, embedding []float32, metadata map[string]string) error {
+func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
 	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, docID, embedding, metadata)
 }
 func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {

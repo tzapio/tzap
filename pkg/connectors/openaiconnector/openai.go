@@ -9,14 +9,19 @@ import (
 	"time"
 
 	"github.com/sashabaranov/go-openai"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/output"
+	"github.com/tzapio/tzap/pkg/connectors/openaiconnector/tokenizer"
 
 	"github.com/tzapio/tzap/pkg/types"
 )
 
 func InitiateOpenaiClient(apikey string) *OpenaiTgenerator {
-	return &OpenaiTgenerator{client: getClient(apikey)}
+	tl.Logger.Println("Initiating OpenAI Client")
+	tokenizer := tokenizer.NewTokenizer()
+
+	return &OpenaiTgenerator{client: getClient(apikey), tokenizer: tokenizer}
 }
 
 func getClient(apikey string) *openai.Client {
