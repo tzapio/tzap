@@ -12,7 +12,7 @@ var UILogger *log.Logger
 var UICompletionLogger *log.Logger
 
 func init() {
-	Logger = log.New(io.Discard, "Tzap ", log.Lshortfile)
+	Logger = log.New(io.Discard, "Tzap ", log.Lshortfile|log.Lmicroseconds)
 	DeepLogger = log.New(io.Discard, "", 0)
 	UILogger = log.New(io.Discard, "", 0)
 	UICompletionLogger = log.New(io.Discard, "", 0)
