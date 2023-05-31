@@ -35,13 +35,13 @@ func (StubConnector) OffsetTokens(ctx context.Context, content string, from int,
 func (StubConnector) RawTokens(ctx context.Context, content string) ([]string, error) {
 	return []string{}, nil
 }
-func (StubConnector) FetchEmbedding(ctx context.Context, content ...string) ([][]float32, error) {
-	return [][]float32{{0, 1, 2, 3, 4, 5}}, nil
+func (StubConnector) FetchEmbedding(ctx context.Context, content ...string) ([][1536]float32, error) {
+	return [][1536]float32{{0, 1, 2, 3, 4, 5}}, nil
 }
 func (StubConnector) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
-func (StubConnector) AddEmbeddingDocument(ctx context.Context, docID string, embedding []float32, metadata map[string]string) error {
+func (StubConnector) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
 	return nil
 }
 func (StubConnector) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
