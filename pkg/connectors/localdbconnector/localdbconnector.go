@@ -7,11 +7,11 @@ import (
 
 type LocalembedTGenerator struct {
 	*types.UnimplementedTGenerator
-	db *localdb.FileDB
+	db *localdb.FileDB[types.Vector]
 }
 
 func InitiateLocalDB(filePath string) (types.TGenerator, error) {
-	db, err := localdb.NewFileDB(filePath)
+	db, err := localdb.NewFileDB[types.Vector](filePath)
 	if err != nil {
 		return nil, err
 	}
