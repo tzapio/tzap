@@ -6,11 +6,12 @@ import (
 	"strings"
 
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/pkg/embed"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/pkg/util/stdin"
-	"github.com/tzapio/tzap/workflows/code/embed"
+	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
 func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
@@ -36,7 +37,7 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 		},
 	}
 }
-func LoadAndFetchEmbeddings(files []string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndFetchEmbeddings(files []string, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndFetchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -44,10 +45,10 @@ func LoadAndFetchEmbeddings(files []string, disableIndex, yes bool) types.NamedW
 				if !disableIndex {
 					println("Checking for file changes. (use -d to disable this check)...\n")
 					return t.
-						ApplyWorkflow(embed.PrepareEmbedFilesWorkflow(files)).
+						ApplyWorkflow(embedworkflows.PrepareEmbedFilesWorkflow(files, embedder)).
 						ApplyWorkflow(ConfirmEmbeddingSearch(yes)).
-						ApplyWorkflow(embed.FetchOrCachedEmbeddingForFilesWorkflow()).
-						ApplyWorkflow(embed.SaveAndLoadEmbeddingsToDB())
+						ApplyWorkflow(embedworkflows.FetchOrCachedEmbeddingForFilesWorkflow()).
+						ApplyWorkflow(embedworkflows.SaveAndLoadEmbeddingsToDB())
 				}
 				return t
 			})
