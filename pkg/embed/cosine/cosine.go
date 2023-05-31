@@ -5,7 +5,7 @@ import (
 	"sort"
 )
 
-func dotProduct(a, b []float32) float32 {
+func dotProduct(a, b [1536]float32) float32 {
 	if len(a) != len(b) {
 		panic("Vectors must have the same dimensions")
 	}
@@ -17,7 +17,7 @@ func dotProduct(a, b []float32) float32 {
 	return dot
 }
 
-func magnitude(x []float32) float32 {
+func magnitude(x [1536]float32) float32 {
 	var mag float32 = 0.0
 	for _, v := range x {
 		mag += v * v
@@ -25,7 +25,7 @@ func magnitude(x []float32) float32 {
 	return float32(math.Sqrt(float64(mag)))
 }
 
-func CosineSimilarity(a, b []float32) float32 {
+func CosineSimilarity(a, b [1536]float32) float32 {
 	return dotProduct(a, b) / (magnitude(a) * magnitude(b))
 }
 
@@ -34,7 +34,7 @@ type Result struct {
 	Similarity float32
 }
 
-func SearchByCosineSimilarity(results [][]float32, query []float32) []Result {
+func SearchByCosineSimilarity(results [][1536]float32, query [1536]float32) []Result {
 	similarities := make([]Result, len(results))
 
 	for i, result := range results {

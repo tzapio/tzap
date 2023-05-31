@@ -16,7 +16,7 @@ func BenchmarkFileDB_Set(b *testing.B) {
 	}
 	defer os.Remove(tempFile.Name())
 
-	db, err := localdb.NewFileDB(tempFile.Name())
+	db, err := localdb.NewFileDB[string](tempFile.Name())
 	if err != nil {
 		b.Fatalf("Error creating FileDB: %v", err)
 	}
@@ -38,14 +38,14 @@ func BenchmarkFileDB_BatchSet(b *testing.B) {
 	}
 	defer os.Remove(tempFile.Name())
 
-	db, err := localdb.NewFileDB(tempFile.Name())
+	db, err := localdb.NewFileDB[string](tempFile.Name())
 	if err != nil {
 		b.Fatalf("Error creating FileDB: %v", err)
 	}
 
-	pairs := make([]types.KeyValue, b.N)
+	pairs := make([]types.KeyValue[string], b.N)
 	for i := 0; i < b.N; i++ {
-		pairs[i] = types.KeyValue{
+		pairs[i] = types.KeyValue[string]{
 			Key:   fmt.Sprintf("key%d", i),
 			Value: fmt.Sprintf("value%d", i),
 		}

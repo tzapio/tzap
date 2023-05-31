@@ -4,31 +4,31 @@ import (
 	"os"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/util"
 )
 
-func (fe *FileEmbedder) CheckFileCache(files []string) (changedFiles map[string]string, unchangedFiles map[string]string, err error) {
+func (fe *Embedder) CheckFileCache(files []string) (changedFiles map[string]string, unchangedFiles map[string]int64, err error) {
 	changedFiles = map[string]string{}
-	unchangedFiles = map[string]string{}
+	unchangedFiles = map[string]int64{}
 
 	for _, fileName := range files {
-		if _, fileErr := os.Stat(fileName); os.IsNotExist(fileErr) {
+		fileStats, fileErr := os.Stat(fileName)
+		if os.IsNotExist(fileErr) {
 			changedFiles[fileName] = ""
+			continue
+		}
+		currentEditTime := fileStats.ModTime().UnixNano()
+
+		cachedEditTime, exists := fe.filesTimestampsDB.Get(fileName)
+		if exists && !isTimePassedSignificant(currentEditTime, cachedEditTime) {
+			unchangedFiles[fileName] = cachedEditTime
 			continue
 		}
 		fileContent, err := os.ReadFile(fileName)
 		if err != nil {
 			continue
 		}
-		currentMD5 := util.MD5HashByte(fileContent)
 		fileContentStr := string(fileContent)
-
-		cachedMD5, exists := fe.md5db.Get(fileName)
-		if exists && currentMD5 == cachedMD5 {
-			unchangedFiles[fileName] = fileContentStr
-			continue
-		}
-		tl.Logger.Printf("File %s has changed. Old MD5: %s, New MD5: %s", fileName, cachedMD5, currentMD5)
+		tl.Logger.Printf("File %s has changed. Old Edittime: %d, New Edittime: %d, TimeDiff: %d", fileName, cachedEditTime, currentEditTime, cachedEditTime-currentEditTime)
 		changedFiles[fileName] = fileContentStr
 	}
 	return changedFiles, unchangedFiles, nil

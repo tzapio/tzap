@@ -1,37 +1,49 @@
 package localdb
 
 import (
-	"bufio"
-	"encoding/json"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sync"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/embed/localdb/gobber"
 	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/util/reflectutil"
 )
 
-type FileDB struct {
+type FileDB[T any] struct {
 	filePath    string
-	data        map[string]string
-	scanKeyList []types.KeyValue
+	data        map[string]T
+	scanKeyList []types.KeyValue[T]
 	lock        sync.RWMutex
+	ready       chan struct{} // signal when the data is ready
 }
 
-func NewFileDB(filePath string) (*FileDB, error) {
-	db := &FileDB{
+func NewFileDB[T any](filePath string) (*FileDB[T], error) {
+	tl.Logger.Printf("NewFileDB: %s\n", filePath)
+	db := &FileDB[T]{
 		filePath: filePath,
-		data:     make(map[string]string),
+		data:     make(map[string]T),
+		ready:    make(chan struct{}),
 	}
+	go func() {
+		// close the channel to signal we're done
+		defer close(db.ready)
 
-	if err := db.load(); err != nil {
-		return nil, err
-	}
+		if err := db.load(); err != nil {
+			tl.Logger.Printf("error loading data: %v", err)
+			// handle error, you may want to pass it out to the caller
+			// or store it in the FileDB structure and check it before usage
+		}
+	}()
 
 	return db, nil
 }
-
-func (db *FileDB) load() error {
+func (db *FileDB[T]) waitReady() {
+	<-db.ready
+}
+func (db *FileDB[T]) load() error {
 	file, err := os.Open(db.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -49,35 +61,39 @@ func (db *FileDB) load() error {
 		}
 	}
 	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		var kv types.KeyValue
-		if err := json.Unmarshal(scanner.Bytes(), &kv); err != nil {
-			return err
+	reader := gobber.NewGobReaderIO(file)
+	for {
+		var kv types.KeyValue[T]
+		err := reader.Read(&kv)
+		if err != nil {
+			break
 		}
 		db.scanKeyList = append(db.scanKeyList, kv)
-		if kv.Value == "" {
+		if reflectutil.IsZero(kv.Value) {
 			delete(db.data, kv.Key)
 			continue
 		}
 		db.data[kv.Key] = kv.Value
+
 	}
-	return scanner.Err()
+	tl.Logger.Printf("Done NewFileDB: %s Loaded: %d\n", db.filePath, len(db.data))
+	return nil
 }
-func (db *FileDB) GetAll() []types.KeyValue {
+func (db *FileDB[T]) GetAll() []types.KeyValue[T] {
+	db.waitReady()
 	db.lock.RLock()
 	defer db.lock.RUnlock()
-	var values []types.KeyValue
+	var values []types.KeyValue[T]
 	for key, value := range db.data {
-		if value == "" {
+		if reflectutil.IsZero(value) {
 			continue
 		}
-		values = append(values, types.KeyValue{Key: key, Value: value})
+		values = append(values, types.KeyValue[T]{Key: key, Value: value})
 	}
 	return values
 }
-func (db *FileDB) ScanGet(key string) (types.KeyValue, bool) {
+func (db *FileDB[T]) ScanGet(key string) (types.KeyValue[T], bool) {
+	db.waitReady()
 	db.lock.RLock()
 	defer db.lock.RUnlock()
 	for _, kv := range db.scanKeyList {
@@ -85,21 +101,22 @@ func (db *FileDB) ScanGet(key string) (types.KeyValue, bool) {
 			return kv, true
 		}
 	}
-	return types.KeyValue{}, false
+	return types.KeyValue[T]{}, false
 }
-func (db *FileDB) Get(key string) (string, bool) {
+func (db *FileDB[T]) Get(key string) (T, bool) {
+	db.waitReady()
 	db.lock.RLock()
 	defer db.lock.RUnlock()
 	value, exists := db.data[key]
 	return value, exists
 }
 
-func (db *FileDB) Set(key, value string) error {
-	_, err := db.BatchSet([]types.KeyValue{{Key: key, Value: value}})
+func (db *FileDB[T]) Set(key string, value T) error {
+	_, err := db.BatchSet([]types.KeyValue[T]{{Key: key, Value: value}})
 	return err
 }
-
-func (db *FileDB) BatchSet(pairs []types.KeyValue) (int, error) {
+func (db *FileDB[T]) BatchSet(pairs []types.KeyValue[T]) (int, error) {
+	db.waitReady()
 	db.lock.Lock()
 	defer db.lock.Unlock()
 
@@ -109,27 +126,33 @@ func (db *FileDB) BatchSet(pairs []types.KeyValue) (int, error) {
 	}
 	defer file.Close()
 	c := 0
+	writer := gobber.NewGobWriterIO(file)
 	for _, kv := range pairs {
-		if db.data[kv.Key] == kv.Value {
-			tl.Logger.Println("BatchSet - WARNING: Key already exists. Continue. ", kv.Key)
+		if reflect.DeepEqual(db.data[kv.Key], kv.Value) {
+			tl.Logger.Println("BatchSet - WARNING: Key already exists. ", kv.Key)
 			continue
 		}
 		c++
-		data, err := json.Marshal(kv)
+		err := writer.Write(kv)
 		if err != nil {
-			println("BatchSet - WARNING: Cannot marshal data. Continue. ", err.Error())
-			continue
+			return c, err
 		}
+		/*
+			data, err := json.Marshal(kv)
+			if err != nil {
+				println("BatchSet - WARNING: Cannot marshal data. Continue. ", err.Error())
+				continue
+			}
 
-		if _, err := file.Write(data); err != nil {
-			return c, err
-		}
-		if _, err := file.WriteString("\n"); err != nil {
-			return c, err
-		}
+			if _, err := file.Write(data); err != nil {
+				return c, err
+			}
+			if _, err := file.WriteString("\n"); err != nil {
+				return c, err
+			}*/
 		db.scanKeyList = append(db.scanKeyList, kv)
 
-		if kv.Value != "" {
+		if !reflectutil.IsZero(kv.Value) {
 			db.data[kv.Key] = kv.Value
 		} else {
 			delete(db.data, kv.Key)

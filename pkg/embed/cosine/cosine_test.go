@@ -31,8 +31,8 @@ func TestCosineDistance(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		a        []float32
-		b        []float32
+		a        [1536]float32
+		b        [1536]float32
 		expected float32
 	}{
 		{
@@ -61,7 +61,7 @@ func TestCosineDistance(t *testing.T) {
 	}
 
 	/*
-		var results = [][]float32{}
+		var results = [][1536]float{}
 
 		for _, vector := range data.Vectors {
 			results = append(results, vector.Values)

@@ -30,7 +30,7 @@ func GetQuery(t *tzap.Tzap, input string) (types.QueryRequest, error) {
 	return query, nil
 }
 
-func getEmbeddings(t *tzap.Tzap, input string) ([][]float32, error) {
+func getEmbeddings(t *tzap.Tzap, input string) ([][1536]float32, error) {
 	embeddings, err := t.TG.FetchEmbedding(context.Background(), input)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func getEmbeddings(t *tzap.Tzap, input string) ([][]float32, error) {
 	return embeddings, nil
 }
 
-func CreateQueryFilters(embeddings [][]float32) []types.QueryFilter {
+func CreateQueryFilters(embeddings [][1536]float32) []types.QueryFilter {
 	var queryFilters []types.QueryFilter
 	for _, embedding := range embeddings {
 		queryFilters = append(queryFilters, types.QueryFilter{

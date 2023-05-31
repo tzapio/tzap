@@ -12,20 +12,22 @@ import (
 	"github.com/tzapio/tzap/pkg/util"
 )
 
-type FileEmbedder struct {
-	t     *tzap.Tzap
-	md5db *localdb.FileDB
+type Embedder struct {
+	t                 *tzap.Tzap
+	filesTimestampsDB *localdb.FileDB[int64]
+	*EmbeddingCache
 }
 
-func NewFileEmbedder(t *tzap.Tzap) *FileEmbedder {
-	md5db, err := localdb.NewFileDB("./.tzap-data/filesmd5.db")
+func NewEmbedder(t *tzap.Tzap) *Embedder {
+	filesTimestampsDB, err := localdb.NewFileDB[int64]("./.tzap-data/filesTimestamps.db")
 	if err != nil {
 		panic(err)
 	}
-	return &FileEmbedder{t: t, md5db: md5db}
+	embeddingCache := NewEmbeddingCache(filesTimestampsDB)
+	return &Embedder{t: t, filesTimestampsDB: filesTimestampsDB, EmbeddingCache: embeddingCache}
 }
 
-func (fe *FileEmbedder) PrepareEmbeddingsFromFiles(files []string) types.Embeddings {
+func (fe *Embedder) PrepareEmbeddingsFromFiles(files []string) types.Embeddings {
 	tl.Logger.Println("Preparing embeddings from files", len(files))
 	changedFiles, unchangedFiles, err := fe.CheckFileCache(files)
 	if err != nil {
@@ -48,7 +50,7 @@ func (fe *FileEmbedder) PrepareEmbeddingsFromFiles(files []string) types.Embeddi
 	return rawFileEmbeddings
 }
 
-func (fe *FileEmbedder) ProcessFiles(changedFiles map[string]string) (types.Embeddings, int, int) {
+func (fe *Embedder) ProcessFiles(changedFiles map[string]string) (types.Embeddings, int, int) {
 	tl.Logger.Println("Processing files", len(changedFiles))
 	totalTokens := 0
 	totalLines := 0
@@ -75,7 +77,7 @@ func (fe *FileEmbedder) ProcessFiles(changedFiles map[string]string) (types.Embe
 	return embeddings, totalTokens, totalLines
 }
 
-func (fe *FileEmbedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings types.Embeddings, unchangedFiles map[string]string) ([]string, error) {
+func (fe *Embedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings types.Embeddings, unchangedFiles map[string]int64) ([]string, error) {
 	nowEmbeddingsIds := make(map[string]struct{})
 	for _, vectorID := range nowEmbeddings.Vectors {
 		nowEmbeddingsIds[vectorID.ID] = struct{}{}
@@ -95,13 +97,13 @@ func (fe *FileEmbedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbedd
 	//println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
 	return missingIds, nil
 }
-func (fe *FileEmbedder) RemoveOldEmbeddings(deleteIds []string) error {
+func (fe *Embedder) RemoveOldEmbeddings(deleteIds []string) error {
 	if err := fe.t.TG.DeleteEmbeddingDocuments(fe.t.C, deleteIds); err != nil {
 		return err
 	}
 	return nil
 }
-func (fe *FileEmbedder) ProcessFileOffsets(file string, content string, fileTokens int) (types.Embeddings, error) {
+func (fe *Embedder) ProcessFileOffsets(file string, content string, fileTokens int) (types.Embeddings, error) {
 	vectors := []types.Vector{}
 	baseStep := 200
 	step := 4000
@@ -139,7 +141,7 @@ func (fe *FileEmbedder) ProcessFileOffsets(file string, content string, fileToke
 
 	return types.Embeddings{Vectors: vectors}, nil
 }
-func (fe *FileEmbedder) ProcessFile(content string) (int, int, error) {
+func (fe *Embedder) ProcessFile(content string) (int, int, error) {
 	lines := strings.Count(content, "\n")
 
 	fileTokens, err := fe.t.TG.CountTokens(context.Background(), content)
@@ -150,7 +152,7 @@ func (fe *FileEmbedder) ProcessFile(content string) (int, int, error) {
 	return fileTokens, lines, nil
 }
 
-func (fe *FileEmbedder) ProcessOffset(filename, content string, start int, end int, step int, chunkStart int, lineStart int, fileTokens int) (types.Vector, error) {
+func (fe *Embedder) ProcessOffset(filename, content string, start int, end int, step int, chunkStart int, lineStart int, fileTokens int) (types.Vector, error) {
 	truncatedEnd := end
 	if end > fileTokens {
 		truncatedEnd = fileTokens
