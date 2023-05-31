@@ -28,8 +28,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/tzapio/tokenizer v0.0.3 h1:ZZEIFDxKmd7dpc5maZ/qEcPXSfhSUb67bAA/Q4eOJFI=
-github.com/tzapio/tokenizer v0.0.3/go.mod h1:4rOkxTkp0qhZoQGYhW1elsQjgymbEPYEuGEApY95qfQ=
+github.com/tzapio/tokenizer v0.0.4 h1:auz21PBRFaubj3JHD6V5TDn7s+qiG8ciORI+zXeTVyA=
+github.com/tzapio/tokenizer v0.0.4/go.mod h1:4rOkxTkp0qhZoQGYhW1elsQjgymbEPYEuGEApY95qfQ=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.8.0 h1:EBmGv8NaZBZTWvrbjNoL6HVt+IVy3QDQpJs7VRIw3tU=
 golang.org/x/sys v0.8.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=

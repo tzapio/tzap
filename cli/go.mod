@@ -26,7 +26,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sashabaranov/go-openai v1.9.5 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/tzapio/tokenizer v0.0.3 // indirect
+	github.com/tzapio/tokenizer v0.0.4 // indirect
 	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.0.0-00010101000000-000000000000 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
