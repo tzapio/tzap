@@ -35,6 +35,7 @@ var RootCmd = &cobra.Command{
 	Short:   "Tzap Cli",
 	Version: "v0.7.21",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		tl.Logger.Println("Cobra CLI Root start")
 		if settings.Verbose {
 			tl.EnableLogger()
 			tl.EnableUICompletionLogger()
@@ -70,7 +71,9 @@ var RootCmd = &cobra.Command{
 			}
 			connector = tzapconnect.WithConfig(apikey, config)
 		}
+
 		t := tzap.NewWithConnector(connector)
+		tl.Logger.Println("Tzap initialized")
 		cmd.SetContext(cmdutil.SetTzapInContext(cmd.Context(), t))
 		return nil
 	},

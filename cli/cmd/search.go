@@ -8,9 +8,12 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/embed"
+	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/workflows/code/embed"
+	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
 var printEmbedding bool
@@ -32,23 +35,43 @@ var searchCmd = &cobra.Command{
 	Short:   "Search for relevant embeddings using the query",
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		query := strings.Join(args, " ")
+		tl.Logger.Println("Cobra CLI Search start")
+		searchQuery := strings.Join(args, " ")
 
-		fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
-		if err != nil {
-			panic(err)
-		}
-		files, err := fileInDirEvaluator.WalkDir("./")
-		if err != nil {
-			panic(err)
-		}
-		err = tzap.HandlePanic(func() {
+		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
-			t = t.ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, disableIndex, settings.Yes))
-			searchResults := t.ApplyWorkflow(embed.SearchFilesWorkflow(query, nil, embedsCountFlag, nCountFlag)).
-				Data["searchResults"].(types.SearchResults)
 
+			queryWait := singlewait.New(func() types.QueryRequest {
+				tl.Logger.Println("Query start")
+
+				query, err := embed.GetQuery(t, searchQuery)
+				if err != nil {
+					panic(err)
+				}
+				tl.Logger.Println("Query end")
+				return query
+			})
+			fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
+			if err != nil {
+				panic(err)
+			}
+			var embedder *embed.Embedder
+			files := []string{}
+			if !disableIndex {
+				embedder = embed.NewEmbedder(t)
+				tl.Logger.Println("Indexing files...")
+				files, err = fileInDirEvaluator.WalkDir("./")
+				if err != nil {
+					panic(err)
+				}
+				tl.Logger.Println("Finished index files...")
+			}
+
+			t = t.ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, settings.Yes))
+			searchResults := t.ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), nil, embedsCountFlag, nCountFlag)).
+				Data["searchResults"].(types.SearchResults)
+			tl.Logger.Println("Showing results")
 			cmd.Println("\nSearch result embeddings:")
 			var metadatas []map[string]string
 			for _, result := range searchResults.Results {

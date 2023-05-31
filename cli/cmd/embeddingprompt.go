@@ -9,11 +9,13 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/embed"
+	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/pkg/util/stdin"
-	"github.com/tzapio/tzap/workflows/code/embed"
+	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
 var inspirationFiles []string
@@ -61,19 +63,26 @@ var embeddingPromptCmd = &cobra.Command{
 			}
 		}
 
-		fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
-		if err != nil {
-			panic(err)
-		}
-		files, err := fileInDirEvaluator.WalkDir("./")
-		if err != nil {
-			panic(err)
-		}
-		err = tzap.HandlePanic(func() {
+		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
+
+			var files []string
+			var embedder *embed.Embedder
+			if !disableIndex {
+				fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
+				if err != nil {
+					panic(err)
+				}
+				files, err = fileInDirEvaluator.WalkDir("./")
+				if err != nil {
+					panic(err)
+				}
+				embedder = embed.NewEmbedder(t)
+			}
+
 			t.
-				ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, disableIndex, settings.Yes)).
+				ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, settings.Yes)).
 				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					if searchQuery == "" {
@@ -86,8 +95,19 @@ var embeddingPromptCmd = &cobra.Command{
 							searchQuery = content
 						}
 					}
+
+					queryWait := singlewait.New(func() types.QueryRequest {
+						tl.Logger.Println("Query start")
+
+						query, err := embed.GetQuery(t, searchQuery)
+						if err != nil {
+							panic(err)
+						}
+						tl.Logger.Println("Query end")
+						return query
+					})
 					cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
-					return t.ApplyWorkflow(embed.EmbeddingInspirationWorkflow(searchQuery, inspirationFiles, embedsCount, nCount))
+					return t.ApplyWorkflow(embedworkflows.EmbeddingInspirationWorkflow(queryWait.GetData(), inspirationFiles, embedsCount, nCount))
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					searchResults, ok := t.Data["searchResults"].(types.SearchResults)
