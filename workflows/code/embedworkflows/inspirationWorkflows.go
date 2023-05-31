@@ -1,4 +1,4 @@
-package embed
+package embedworkflows
 
 import (
 	"github.com/tzapio/tzap/pkg/types"
