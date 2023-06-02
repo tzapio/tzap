@@ -81,7 +81,7 @@ var embeddingPromptCmd = &cobra.Command{
 					cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 				}).
 				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-				ApplyWorkflow(applications.LoadAndSearchEmbeddings(inspirationFiles, searchQuery, embedsCount, nCount, disableIndex, settings.Yes)).
+				ApplyWorkflow(applications.LoadAndSearchEmbeddings(applications.LoadAndSearchEmbeddingArgs{inspirationFiles, searchQuery, embedsCount, nCount, disableIndex, settings.Yes})).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					searchResults, ok := t.Data["searchResults"].(types.SearchResults)
 					if !ok {
