@@ -9,12 +9,21 @@ import (
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
-func LoadAndSearchEmbeddings(excludeFiles []string, searchQuery string, k int, n int, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+type LoadAndSearchEmbeddingArgs struct {
+	ExcludeFiles []string `json:"exclude_files"`
+	SearchQuery  string   `json:"search_query"`
+	K            int      `json:"k"`
+	N            int      `json:"n"`
+	DisableIndex bool     `json:"disable_index"`
+	Yes          bool     `json:"yes"`
+}
+
+func LoadAndSearchEmbeddings(args LoadAndSearchEmbeddingArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndSearchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			queryWait := singlewait.New(func() types.QueryRequest {
-				query, err := embed.GetQuery(t, searchQuery)
+				query, err := embed.GetQuery(t, args.SearchQuery)
 				if err != nil {
 					panic(err)
 				}
@@ -22,8 +31,8 @@ func LoadAndSearchEmbeddings(excludeFiles []string, searchQuery string, k int, n
 			})
 
 			return t.
-				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", disableIndex, yes)).
-				ApplyWorkflow(embedworkflows.EmbeddingInspirationWorkflow(queryWait.GetData(), excludeFiles, k, n))
+				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", args.DisableIndex, args.Yes)).
+				ApplyWorkflow(embedworkflows.EmbeddingInspirationWorkflow(queryWait.GetData(), args.ExcludeFiles, args.K, args.N))
 		},
 	}
 }
