@@ -4,13 +4,15 @@ import (
 	"os"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (fe *Embedder) CheckFileCache(files []string) (changedFiles map[string]string, unchangedFiles map[string]int64, err error) {
+func (fe *Embedder) CheckFileCache(files []types.FileReader) (changedFiles map[string]string, unchangedFiles map[string]int64, err error) {
 	changedFiles = map[string]string{}
 	unchangedFiles = map[string]int64{}
 
-	for _, fileName := range files {
+	for _, file := range files {
+		fileName := file.Filepath()
 		fileStats, fileErr := os.Stat(fileName)
 		if os.IsNotExist(fileErr) {
 			changedFiles[fileName] = ""

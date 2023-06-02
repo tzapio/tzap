@@ -27,7 +27,7 @@ func NewEmbedder(t *tzap.Tzap) *Embedder {
 	return &Embedder{t: t, filesTimestampsDB: filesTimestampsDB, EmbeddingCache: embeddingCache}
 }
 
-func (fe *Embedder) PrepareEmbeddingsFromFiles(files []string) types.Embeddings {
+func (fe *Embedder) PrepareEmbeddingsFromFiles(files []types.FileReader) types.Embeddings {
 	tl.Logger.Println("Preparing embeddings from files", len(files))
 	changedFiles, unchangedFiles, err := fe.CheckFileCache(files)
 	if err != nil {
