@@ -6,16 +6,15 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/applications"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
+
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/pkg/util/stdin"
-	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
 var inspirationFiles []string
@@ -68,9 +67,7 @@ var embeddingPromptCmd = &cobra.Command{
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 			t.
-				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", disableIndex, settings.Yes)).
-				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+				WorkTzap(func(t *tzap.Tzap) {
 					if searchQuery == "" {
 						if content == "" {
 							if settings.ApiMode {
@@ -81,19 +78,10 @@ var embeddingPromptCmd = &cobra.Command{
 							searchQuery = content
 						}
 					}
-
-					queryWait := singlewait.New(func() types.QueryRequest {
-						tl.Logger.Println("Query start")
-						query, err := embed.GetQuery(t, searchQuery)
-						if err != nil {
-							panic(err)
-						}
-						tl.Logger.Println("Query end")
-						return query
-					})
 					cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
-					return t.ApplyWorkflow(embedworkflows.EmbeddingInspirationWorkflow(queryWait.GetData(), inspirationFiles, embedsCount, nCount))
 				}).
+				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
+				ApplyWorkflow(applications.LoadAndSearchEmbeddings(inspirationFiles, searchQuery, embedsCount, nCount, disableIndex, settings.Yes)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					searchResults, ok := t.Data["searchResults"].(types.SearchResults)
 					if !ok {
