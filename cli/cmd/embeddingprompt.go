@@ -37,6 +37,7 @@ func init() {
 		"For large projects disabling indexing speeds up the process.")
 	embeddingPromptCmd.Flags().StringVarP(&searchQuery, "search", "s", "",
 		"The search query to start the embedding prompt with. Default (<prompt>)")
+	embeddingPromptCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
 }
 
 var embeddingPromptCmd = &cobra.Command{
@@ -66,23 +67,8 @@ var embeddingPromptCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
-
-			var files []string
-			var embedder *embed.Embedder
-			if !disableIndex {
-				fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
-				if err != nil {
-					panic(err)
-				}
-				files, err = fileInDirEvaluator.WalkDir("./")
-				if err != nil {
-					panic(err)
-				}
-				embedder = embed.NewEmbedder(t)
-			}
-
 			t.
-				ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, settings.Yes)).
+				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", disableIndex, settings.Yes)).
 				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					if searchQuery == "" {
@@ -98,7 +84,6 @@ var embeddingPromptCmd = &cobra.Command{
 
 					queryWait := singlewait.New(func() types.QueryRequest {
 						tl.Logger.Println("Query start")
-
 						query, err := embed.GetQuery(t, searchQuery)
 						if err != nil {
 							panic(err)

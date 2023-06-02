@@ -18,6 +18,7 @@ import (
 
 var printEmbedding bool
 var ignoreFiles []string
+var zipURL string
 
 func init() {
 	RootCmd.AddCommand(searchCmd)
@@ -26,7 +27,10 @@ func init() {
 	searchCmd.Flags().BoolVarP(&printEmbedding, "printembedding", "p", false, "Output the embeddings themeselves")
 	searchCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
 	searchCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
+
 		"For large projects disabling indexing speeds up the process.")
+	searchCmd.Flags().StringVarP(&zipURL, "zipurl", "z", "", "URL of the zip file to search files from")
+
 }
 
 var searchCmd = &cobra.Command{
@@ -52,23 +56,9 @@ var searchCmd = &cobra.Command{
 				tl.Logger.Println("Query end")
 				return query
 			})
-			fileInDirEvaluator, err := cmdutil.NewFileInDirEvaluator()
-			if err != nil {
-				panic(err)
-			}
-			var embedder *embed.Embedder
-			files := []string{}
-			if !disableIndex {
-				embedder = embed.NewEmbedder(t)
-				tl.Logger.Println("Indexing files...")
-				files, err = fileInDirEvaluator.WalkDir("./")
-				if err != nil {
-					panic(err)
-				}
-				tl.Logger.Println("Finished index files...")
-			}
 
-			t = t.ApplyWorkflow(cliworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, settings.Yes))
+			t = t.
+				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", disableIndex, settings.Yes))
 			searchResults := t.ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), nil, embedsCountFlag, nCountFlag)).
 				Data["searchResults"].(types.SearchResults)
 			tl.Logger.Println("Showing results")
