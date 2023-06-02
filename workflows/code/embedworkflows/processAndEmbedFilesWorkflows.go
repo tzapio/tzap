@@ -58,19 +58,14 @@ func SaveAndLoadEmbeddingsToDB() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 			if !ok {
 				panic("Loading embeddings went wrong")
 			}
-
+			for _, vector := range embeddings.Vectors {
+				err := t.TG.AddEmbeddingDocument(t.C, vector.ID, vector.Values, vector.Metadata)
+				if err != nil {
+					panic(err)
+				}
+			}
 			// Store in local vector db (if default tzapconnector)
-			return saveEmbeddingsToTzap(t, embeddings)
+			return t
 		},
 	}
-}
-
-func saveEmbeddingsToTzap(t *tzap.Tzap, embeddings types.Embeddings) *tzap.Tzap {
-	for _, vector := range embeddings.Vectors {
-		err := t.TG.AddEmbeddingDocument(t.C, vector.ID, vector.Values, vector.Metadata)
-		if err != nil {
-			panic(err)
-		}
-	}
-	return t
 }

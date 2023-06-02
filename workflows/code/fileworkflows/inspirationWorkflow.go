@@ -1,4 +1,4 @@
-package embedworkflows
+package fileworkflows
 
 import (
 	"github.com/tzapio/tzap/pkg/types"
@@ -16,7 +16,7 @@ func InspirationWorkflow(inspirationFiles []string) types.NamedWorkflow[*tzap.Tz
 				LoadFiles(inspirationFiles).
 				Reduce(func(t *tzap.Tzap, child *tzap.Tzap) *tzap.Tzap {
 					return t.AddSystemMessage(
-						"###file: "+child.Data["filepath"].(string),
+						"####file: "+child.Data["filepath"].(string),
 						child.Data["content"].(string))
 				})
 		},

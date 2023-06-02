@@ -11,7 +11,6 @@ func EmbeddingInspirationWorkflow(query types.QueryRequest, inspirationFiles []s
 		Name: "embeddingInspirationWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.
-				ApplyWorkflow(InspirationWorkflow(inspirationFiles)).
 				ApplyWorkflow(SearchFilesWorkflow(query, inspirationFiles, k, n))
 		},
 	}
