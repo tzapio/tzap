@@ -66,7 +66,12 @@ func (db *FileDB[T]) load() error {
 		var kv types.KeyValue[T]
 		err := reader.Read(&kv)
 		if err != nil {
-			break
+			if err.Error() == "EOF" {
+				break
+			}
+			println("Old version of .tzap-data/*.db present. Please delete the .tzap-data/*.db ")
+			println(err.Error())
+			os.Exit(1)
 		}
 		db.scanKeyList = append(db.scanKeyList, kv)
 		if reflectutil.IsZero(kv.Value) {
