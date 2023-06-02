@@ -7,7 +7,7 @@ import (
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/workflows/code/embedworkflows"
+	"github.com/tzapio/tzap/workflows/code/fileworkflows"
 )
 
 func main() {
@@ -20,7 +20,7 @@ func main() {
 	tzap.
 		NewWithConnector(
 			tzapconnect.WithConfig(openai_apikey, config.Configuration{MD5Rewrites: true})).
-		ApplyWorkflow(embedworkflows.InspirationWorkflow(
+		ApplyWorkflow(fileworkflows.InspirationWorkflow(
 			[]string{
 				"README.md",
 				"cli/cmd/semanticgitcommit.go",
