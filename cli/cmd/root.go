@@ -31,9 +31,9 @@ var settings struct {
 }
 
 var RootCmd = &cobra.Command{
-	Use:     "tzap",
-	Short:   "Tzap Cli",
-	Version: "v0.7.21",
+	Use:   "tzap",
+	Short: "Tzap Cli",
+
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		tl.Logger.Println("Cobra CLI Root start")
 		if settings.Verbose {
