@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -13,6 +14,30 @@ import (
 	"github.com/tzapio/tzap/pkg/util/stdin"
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
+
+func IndexFilesAndEmbeddings(dir string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "indexFilesAndEmbeddings",
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
+			if disableIndex {
+				return t
+			}
+			fileInDirEvaluator, err := cmdutil.NewFileEvaluator()
+			if err != nil {
+				panic(err)
+			}
+			embedder := embed.NewEmbedder(t)
+			tl.Logger.Println("Indexing files...")
+			files, err := fileInDirEvaluator.WalkDir("./")
+			if err != nil {
+				panic(err)
+			}
+			tl.Logger.Println("Finished index files...")
+
+			return t.ApplyWorkflow(LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
+		},
+	}
+}
 
 func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
@@ -29,7 +54,8 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 						"Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD",
 						len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
 					if !ok {
-						panic("commit aborted by user")
+						println("Fetching embeddings aborted by user")
+						os.Exit(0)
 					}
 				}
 			}
@@ -37,7 +63,7 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 		},
 	}
 }
-func LoadAndFetchEmbeddings(files []string, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndFetchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {

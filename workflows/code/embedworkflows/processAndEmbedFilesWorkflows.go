@@ -8,11 +8,10 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func PrepareEmbedFilesWorkflow(files []string, embedder *embed.Embedder) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func PrepareEmbedFilesWorkflow(files []types.FileReader, embedder *embed.Embedder) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "prepareEmbedFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-
 			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(files)
 			uncachedEmbeddings := embedder.GetUncachedEmbeddings(rawFileEmbeddings)
 			data := types.MappedInterface{"rawFileEmbeddings": rawFileEmbeddings, "uncachedEmbeddings": uncachedEmbeddings, "embedder": embedder}

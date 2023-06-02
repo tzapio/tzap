@@ -45,7 +45,7 @@ func TestWalkDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create test .gitignore file: %v", err)
 	}
-	evaluator, err := cmdutil.NewFileInDirEvaluator()
+	evaluator, err := cmdutil.NewFileEvaluator()
 	if err != nil {
 		t.Fatalf("error creating FileInDirEvaluator: %v", err)
 	}
@@ -62,14 +62,14 @@ func TestWalkDir(t *testing.T) {
 	}
 
 	for i, file := range expected {
-		if file != result[i] {
+		if file != result[i].Filepath() {
 			t.Fatalf("expected %s, but got %s", file, result[i])
 		}
 	}
 }
 
 func Test_shouldTraverseDir(t *testing.T) {
-	evaluator := cmdutil.NewFileInDirEvaluatorWithPatterns([]string{"exclude"}, []string{"*.txt"})
+	evaluator := cmdutil.NewFileEvaluatorWithPatterns([]string{"exclude"}, []string{"*.txt"})
 	tests := map[string]bool{
 		"exclude":         false,
 		"include":         true,
@@ -85,7 +85,7 @@ func Test_shouldTraverseDir(t *testing.T) {
 
 }
 func Test_shouldKeepPath(t *testing.T) {
-	evaluator := cmdutil.NewFileInDirEvaluatorWithPatterns([]string{"exclude"}, []string{"*.txt"})
+	evaluator := cmdutil.NewFileEvaluatorWithPatterns([]string{"exclude"}, []string{"*.txt"})
 	tests := map[string]bool{
 		"exclude/file.txt":  false,
 		"include/file.txt":  true,

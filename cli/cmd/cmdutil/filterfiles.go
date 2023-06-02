@@ -8,7 +8,8 @@ import (
 
 func FilterWithExcludePattern(inFiles []string, excludePattern []string) (outFiles []string) {
 	object := ignore.CompileIgnoreLines(excludePattern...)
-	filteredFiles := map[string]struct{}{}
+
+	filteredFiles := make(map[string]struct{}, len(inFiles)/2)
 	for _, file := range inFiles {
 		if object.MatchesPath(file) {
 			filteredFiles[file] = struct{}{}

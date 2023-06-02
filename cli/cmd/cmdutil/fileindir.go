@@ -1,54 +1,35 @@
 package cmdutil
 
 import (
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
-	ignore "github.com/sabhiram/go-gitignore"
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/types"
 )
 
-type FileInDirEvaluator struct {
-	includeMatcher *ignore.GitIgnore
-	excludeMatcher *ignore.GitIgnore
+// FileInDir represents a file in a directory.
+type FileInDir struct {
+	FilePath string
 }
 
-func NewFileInDirEvaluator() (*FileInDirEvaluator, error) {
-	excludePatterns := []string{".git", ".DS_Store", "desktop.ini"}
-	ignoreFiles := []string{".tzapignore"}
-	if _, err := os.Stat(".gitignore"); err == nil {
-		ignoreFiles = append(ignoreFiles, ".gitignore")
-	}
-	patterns, err := ReadFilterPatternFiles(ignoreFiles...)
-	if err != nil {
-		return nil, err
-	}
-	excludePatterns = append(excludePatterns, patterns...)
+func (f *FileInDir) Filepath() string {
+	return f.FilePath
+}
 
-	includePatterns, err := ReadFilterPatternFiles(".tzapinclude")
-	if err != nil {
-		return nil, err
-	}
+func (f *FileInDir) Open() (io.ReadCloser, error) {
+	return os.Open(f.FilePath)
+}
 
-	return NewFileInDirEvaluatorWithPatterns(excludePatterns, includePatterns), nil
-}
-func NewFileInDirEvaluatorWithPatterns(excludePatterns []string, includePatterns []string) *FileInDirEvaluator {
-	excludeMatcher := ignore.CompileIgnoreLines(excludePatterns...)
-	includeMatcher := ignore.CompileIgnoreLines(includePatterns...)
-	return &FileInDirEvaluator{excludeMatcher: excludeMatcher, includeMatcher: includeMatcher}
-}
-func (e *FileInDirEvaluator) ShouldKeepPath(path string) bool {
-	exclude := e.excludeMatcher.MatchesPath(path)
-	include := e.includeMatcher.MatchesPath(path)
-	return include && !exclude
-}
-func (e *FileInDirEvaluator) ShouldTraverseDir(path string) bool {
+func (e *FileEvaluator) ShouldTraverseDir(path string) bool {
 	return !e.excludeMatcher.MatchesPath(path)
 }
-func (e *FileInDirEvaluator) WalkDir(dir string) ([]string, error) {
-	var list []string
+
+func (e *FileEvaluator) WalkDir(dir string) ([]types.FileReader, error) {
+	var list []types.FileReader
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -77,7 +58,7 @@ func (e *FileInDirEvaluator) WalkDir(dir string) ([]string, error) {
 				return err
 			}
 			relPath = strings.TrimPrefix(relPath, "./")
-			list = append(list, filepath.ToSlash(relPath))
+			list = append(list, &FileInDir{FilePath: filepath.ToSlash(relPath)})
 			return nil
 		}
 		tl.Logger.Println("SKIPFILE", path)
