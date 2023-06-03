@@ -92,12 +92,12 @@ var embeddingPromptCmd = &cobra.Command{
 					)
 					cmd.Println(cmdutil.Bold("\nSearch result embeddings:"))
 					for _, result := range searchResults.Results {
-						t = t.AddSystemMessage(result.Metadata["splitPart"])
-						tokens, err := t.CountTokens(result.Metadata["splitPart"])
+						t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
+						tokens, err := t.CountTokens(result.Vector.Metadata.SplitPart)
 						if err != nil {
 							panic(err)
 						}
-						cmd.Printf("\tt:%d\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result)))
+						cmd.Printf("\tt:%d\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
 					}
 					time.Sleep(1 * time.Second)
 					cmd.Println()
