@@ -90,7 +90,7 @@ var modelMap map[string]string = map[string]string{"gpt35": openai.GPT3Dot5Turbo
 
 func init() {
 	RootCmd.PersistentFlags().StringVarP(&settings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt4).")
-	RootCmd.PersistentFlags().BoolVar(&settings.AutoMode, "automode", false, "Whether to press yes on continue prompts.")
+	RootCmd.PersistentFlags().BoolVar(&settings.AutoMode, "automode", false, "Some but not all functions prompt if you want to overwrite an existing file. Putting automode to true enaled overwriting for those cases. Setting this to false does not disable anything.")
 	RootCmd.PersistentFlags().IntVar(&settings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
 	RootCmd.PersistentFlags().BoolVar(&settings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
 	RootCmd.PersistentFlags().StringVar(&settings.IncludeList, "include", "", "Files include MD5 matching pattern.")
@@ -99,6 +99,6 @@ func init() {
 	RootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
 	RootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
 	RootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
-	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "Enable clean stdout outputs")
-	RootCmd.PersistentFlags().BoolVarP(&settings.Yes, "yes", "y", false, "Answer yes on prompts")
+	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "INTERNAL: Enable clean stdout outputs")
+	RootCmd.PersistentFlags().BoolVarP(&settings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
 }
