@@ -9,18 +9,7 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func CreateQueryJSON(t *tzap.Tzap, filename string, input string) error {
-	query, err := GetQuery(t, input)
-	if err != nil {
-		return err
-	}
-	if err := SaveQueryAsJSON(query, filename); err != nil {
-		return err
-	}
-	return nil
-}
-
-func GetQuery(t *tzap.Tzap, input string) (types.QueryRequest, error) {
+func NewQuery(t *tzap.Tzap, input string) (types.QueryRequest, error) {
 	embeddings, err := getEmbeddings(t, input)
 	if err != nil {
 		return types.QueryRequest{}, err

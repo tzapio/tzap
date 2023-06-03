@@ -47,9 +47,9 @@ func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int,
 }
 
 func filterSearchResults(searchResults types.SearchResults, excludedFiles []string, k int) types.SearchResults {
-	filteredResults := []types.Vector{}
+	filteredResults := []types.SearchResult{}
 	for _, result := range searchResults.Results {
-		fileName := result.Metadata["filename"]
+		fileName := result.Vector.Metadata.Filename
 		isExcluded := false
 		for _, excludedFile := range excludedFiles {
 			if fileName == excludedFile {

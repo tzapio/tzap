@@ -2,6 +2,7 @@ package types
 
 import (
 	"io"
+	"io/fs"
 )
 
 // FileReader is an interface that wraps file reading operations.
@@ -10,4 +11,5 @@ type FileReader interface {
 	Open() (io.ReadCloser, error)
 	// Name returns the name of the file.
 	Filepath() string
+	Stat() (fs.FileInfo, error)
 }

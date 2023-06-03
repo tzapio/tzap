@@ -41,7 +41,7 @@ func (StubConnector) FetchEmbedding(ctx context.Context, content ...string) ([][
 func (StubConnector) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
-func (StubConnector) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
+func (StubConnector) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	return nil
 }
 func (StubConnector) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {

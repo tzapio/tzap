@@ -14,11 +14,13 @@ func (idx *RedisembedTgenerator) ListAllEmbeddingsIds(ctx context.Context) (type
 	}
 	results := types.SearchResults{}
 	for _, doc := range res {
-		result := types.Vector{ID: doc.Id, Metadata: map[string]string{}}
+		result := types.Vector{ID: doc.Id, Metadata: types.Metadata{}}
 		for key, value := range doc.Properties {
-			result.Metadata[key] = value.(string)
+			_ = value
+			panic(key)
+			//result.Metadata[key] = value.(string)
 		}
-		results.Results = append(results.Results, result)
+		results.Results = append(results.Results, types.SearchResult{Vector: result})
 	}
 	return results, nil
 }
@@ -38,11 +40,13 @@ func (idx *RedisembedTgenerator) SearchWithEmbedding(ctx context.Context, embedd
 
 	results := types.SearchResults{}
 	for _, doc := range res {
-		result := types.Vector{ID: doc.Id, Metadata: map[string]string{}}
+		result := types.Vector{ID: doc.Id, Metadata: types.Metadata{}}
 		for key, value := range doc.Properties {
-			result.Metadata[key] = value.(string)
+			_ = value
+			panic(key)
+			//result.Metadata[key] = value.(string)
 		}
-		results.Results = append(results.Results, result)
+		results.Results = append(results.Results, types.SearchResult{Vector: result, Similarity: doc.Properties["__vec_score"].(float32)})
 	}
 	return results, nil
 }

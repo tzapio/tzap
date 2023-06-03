@@ -1,12 +1,21 @@
 package types
 
 type Vector struct {
-	ID        string            `json:"id"`
-	TimeStamp int               `json:"timestamp"`
-	Metadata  map[string]string `json:"metadata"`
-	Values    [1536]float32     `json:"values"`
+	ID        string        `json:"id"`
+	TimeStamp int           `json:"timestamp"`
+	Metadata  Metadata      `json:"metadata"`
+	Values    [1536]float32 `json:"values"`
 }
-
+type Metadata struct {
+	ID            string `json:"id"`
+	Filename      string `json:"filename"`
+	Start         int    `json:"start"`
+	End           int    `json:"end"`
+	LineStart     int    `json:"lineStart"`
+	TruncatedEnd  int    `json:"truncatedEnd"`
+	SplitPart     string `json:"splitPart"`
+	RealSplitPart string `json:"realSplitPart"`
+}
 type Embeddings struct {
 	Vectors []Vector `json:"vectors"`
 }
@@ -28,8 +37,12 @@ type QueryRequest struct {
 	Namespace       string        `json:"namespace"`
 	Queries         []QueryFilter `json:"queries"`
 }
+type SearchResult struct {
+	Vector     Vector  `json:"vector"`
+	Similarity float32 `json:"score"`
+}
 type SearchResults struct {
-	Results []Vector
+	Results []SearchResult
 }
 type KeyValue[T any] struct {
 	Key   string `json:"key"`

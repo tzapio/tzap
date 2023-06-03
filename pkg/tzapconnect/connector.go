@@ -61,7 +61,7 @@ func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, fro
 func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, embedding, k)
 }
-func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
+func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, docID, embedding, metadata)
 }
 func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {

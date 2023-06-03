@@ -6,7 +6,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *LocalembedTGenerator) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
+func (idx *LocalembedTGenerator) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	v := types.Vector{
 		ID:        docID,
 		TimeStamp: 0,

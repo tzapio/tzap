@@ -9,7 +9,6 @@ import (
 	"github.com/tzapio/tzap/pkg/embed/localdb"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/util"
 )
 
 type Embedder struct {
@@ -84,13 +83,13 @@ func (fe *Embedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings
 	}
 	missingIds := []string{}
 	for _, storedVector := range storedEmbeddings.Results {
-		filename := storedVector.Metadata["filename"]
+		filename := storedVector.Vector.Metadata.Filename
 		if _, exists := unchangedFiles[filename]; exists {
 			continue
 		}
-		if _, exists := nowEmbeddingsIds[storedVector.ID]; !exists {
+		if _, exists := nowEmbeddingsIds[storedVector.Vector.ID]; !exists {
 
-			missingIds = append(missingIds, storedVector.ID)
+			missingIds = append(missingIds, storedVector.Vector.ID)
 			tl.Logger.Println("Drift: ", storedVector)
 		}
 	}
@@ -131,7 +130,7 @@ func (fe *Embedder) ProcessFileOffsets(file string, content string, fileTokens i
 			start += baseStep
 			end += baseStep
 
-			lines := strings.Count(partialVector.Metadata["realSplitPart"], "\n")
+			lines := strings.Count(partialVector.Metadata.RealSplitPart, "\n")
 			lineStart += lines
 		}
 
@@ -173,24 +172,21 @@ func (fe *Embedder) ProcessOffset(filename, content string, start int, end int, 
 	}
 
 	splitPart = "###embedding from file: " + filename + "\n" + splitPart
-	metadataStart := fmt.Sprintf("%d", chunkStart+start)
-	metadataEnd := fmt.Sprintf("%d", chunkStart+end)
-	metadataLineStart := fmt.Sprintf("%d", lineStart)
-	metadataTruncatedEnd := fmt.Sprintf("%d", truncatedEnd)
-	metadataSplitMd5 := util.MD5Hash(splitPart)
+	metadataStart := chunkStart + start
+	metadataEnd := chunkStart + end
+	metadataLineStart := lineStart
+	metadataTruncatedEnd := truncatedEnd
 
-	id := filename + "-" + metadataStart + "-" + metadataEnd
+	id := fmt.Sprintf("%s-%d-%d", filename, metadataStart, metadataEnd)
 
-	metadata := map[string]string{
-		"id":            id,
-		"filename":      filename,
-		"start":         metadataStart,
-		"end":           metadataEnd,
-		"lineStart":     metadataLineStart,
-		"truncatedEnd":  metadataTruncatedEnd,
-		"splitPart":     splitPart,
-		"realSplitPart": realSplitPart,
-		"splitMd5":      metadataSplitMd5,
-	}
-	return types.Vector{ID: id, Metadata: metadata}, nil
+	return types.Vector{ID: id, Metadata: types.Metadata{
+		ID:            id,
+		Filename:      filename,
+		Start:         metadataStart,
+		End:           metadataEnd,
+		LineStart:     metadataLineStart,
+		TruncatedEnd:  metadataTruncatedEnd,
+		SplitPart:     splitPart,
+		RealSplitPart: realSplitPart,
+	}}, nil
 }

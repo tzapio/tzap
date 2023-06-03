@@ -30,7 +30,7 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(embeddings types.Embeddings) types
 	var cachedEmbeddings []types.Vector
 
 	for _, vector := range embeddings.Vectors {
-		splitPart := vector.Metadata["splitPart"]
+		splitPart := vector.Metadata.SplitPart
 		kv, exists := ec.embeddingCacheDB.ScanGet(splitPart)
 		if exists {
 			if !reflectutil.IsZero(kv.Value) {
@@ -45,7 +45,7 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(embeddings types.Embeddings) types
 					}
 
 					cachedEmbeddings = append(cachedEmbeddings, vector)
-					storedFiles[vector.Metadata["filename"]] = struct{}{}
+					storedFiles[vector.Metadata.Filename] = struct{}{}
 					continue
 				} else {
 					println("invalid vector length", splitPart)
@@ -77,7 +77,7 @@ func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings types.Embeddings) typ
 	var uncachedEmbeddings []types.Vector
 
 	for _, vector := range embeddings.Vectors {
-		splitPart := vector.Metadata["splitPart"]
+		splitPart := vector.Metadata.SplitPart
 		kv, exists := ec.embeddingCacheDB.ScanGet(splitPart)
 		if !exists || reflectutil.IsZero(kv.Value) {
 			uncachedEmbeddings = append(uncachedEmbeddings, vector)
@@ -102,8 +102,8 @@ func (ec *EmbeddingCache) FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbed
 			batch := uncachedEmbeddings.Vectors[i:end]
 			var inputStrings []string
 			for _, vector := range batch {
-				storedFiles[vector.Metadata["filename"]] = struct{}{}
-				inputStrings = append(inputStrings, vector.Metadata["splitPart"])
+				storedFiles[vector.Metadata.Filename] = struct{}{}
+				inputStrings = append(inputStrings, vector.Metadata.SplitPart)
 			}
 
 			embeddingsResult, err := t.TG.FetchEmbedding(t.C, inputStrings...)

@@ -13,7 +13,8 @@ func (fe *Embedder) CheckFileCache(files []types.FileReader) (changedFiles map[s
 
 	for _, file := range files {
 		fileName := file.Filepath()
-		fileStats, fileErr := os.Stat(fileName)
+
+		fileStats, fileErr := file.Stat()
 		if os.IsNotExist(fileErr) {
 			changedFiles[fileName] = ""
 			continue

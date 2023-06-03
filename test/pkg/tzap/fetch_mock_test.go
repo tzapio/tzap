@@ -51,7 +51,7 @@ func (tg *mockTG) FetchEmbedding(ctx context.Context, content ...string) ([][153
 func (tg *mockTG) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
-func (tg *mockTG) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata map[string]string) error {
+func (tg *mockTG) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	return nil
 }
 func (tg *mockTG) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {

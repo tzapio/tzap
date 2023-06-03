@@ -11,7 +11,9 @@ func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context) (type
 	allResults := idx.db.GetAll()
 	listEmbeddings := types.SearchResults{}
 	for _, vector := range allResults {
-		listEmbeddings.Results = append(listEmbeddings.Results, vector.Value)
+		listEmbeddings.Results = append(listEmbeddings.Results, types.SearchResult{
+			Vector:     vector.Value,
+			Similarity: 0.0})
 	}
 	return listEmbeddings, nil
 }
@@ -31,7 +33,9 @@ func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, embedd
 		k = len(results)
 	}
 	for _, r := range results[:k] {
-		searchResults.Results = append(searchResults.Results, vectors[r.Index])
+		searchResults.Results = append(searchResults.Results, types.SearchResult{
+			Vector:     vectors[r.Index],
+			Similarity: r.Similarity})
 	}
 	return searchResults, nil
 }
