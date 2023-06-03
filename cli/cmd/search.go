@@ -49,7 +49,7 @@ var searchCmd = &cobra.Command{
 			queryWait := singlewait.New(func() types.QueryRequest {
 				tl.Logger.Println("Query start")
 
-				query, err := embed.GetQuery(t, searchQuery)
+				query, err := embed.NewQuery(t, searchQuery)
 				if err != nil {
 					panic(err)
 				}
@@ -63,19 +63,19 @@ var searchCmd = &cobra.Command{
 				Data["searchResults"].(types.SearchResults)
 			tl.Logger.Println("Showing results")
 			cmd.Println("\nSearch result embeddings:")
-			var metadatas []map[string]string
+			var metadatas []types.Metadata
 			for _, result := range searchResults.Results {
-				tokens, err := t.CountTokens(result.Metadata["splitPart"])
+				tokens, err := t.CountTokens(result.Vector.Metadata.SplitPart)
 				if err != nil {
 					panic("could not count tokens in search result")
 				}
-				cmd.Printf("\tt:%d\t%s", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result)))
+				cmd.Printf("\tt:%d\t%s", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
 				if printEmbedding {
-					cmd.Printf("\n\n\t%s", result.Metadata["splitPart"])
+					cmd.Printf("\n\n\t%s", result.Vector.Metadata.SplitPart)
 				}
 				cmd.Println()
 				if settings.ApiMode {
-					metadatas = append(metadatas, result.Metadata)
+					metadatas = append(metadatas, result.Vector.Metadata)
 				}
 
 			}

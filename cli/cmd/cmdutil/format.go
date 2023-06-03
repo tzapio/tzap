@@ -1,7 +1,11 @@
 package cmdutil
 
-import "github.com/tzapio/tzap/pkg/types"
+import (
+	"fmt"
+
+	"github.com/tzapio/tzap/pkg/types"
+)
 
 func FormatVectorToClickable(v types.Vector) string {
-	return v.Metadata["filename"] + ":" + v.Metadata["lineStart"]
+	return fmt.Sprintf("%s:%d", v.Metadata.Filename, v.Metadata.LineStart)
 }
