@@ -12,7 +12,7 @@ if (arch === 'x64') {
 }
 
 let binaryName;
-const version = "v0.8.0"
+const version = "v0.8.1"
 if (platform === 'win32') {
   binaryName = `tzap-${version}-windows-${arch}.exe`;
 } else if (platform === 'darwin') {
