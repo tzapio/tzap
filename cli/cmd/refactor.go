@@ -74,7 +74,7 @@ func init() {
 	refactorCmd.Flags().StringVar(&basicConfig.FileOut, "fileout", "", "optional - the output file (default filein)")
 	refactorCmd.Flags().StringVar(&basicConfig.Mission, "mission", "", "optional - a description of the overall mission for the project")
 	refactorCmd.Flags().StringVar(&basicConfig.Task, "task", "Analyze what can be improved. Refactor code to use better variable names and remove duplication. Refactor the following file to be more readable. Add documentation. Do not add any new public functions, only rewrite.", "required - a description of the refactoring task")
-	refactorCmd.Flags().StringVar(&basicConfig.Mission, "plan", "", "a description to steer output. Recommended if you generate something else than code")
+	refactorCmd.Flags().StringVar(&basicConfig.Plan, "plan", "", "a description to steer output. Recommended if you generate something else than code")
 	refactorCmd.Flags().StringVar(&basicConfig.OutputFormat, "outputformat", "", "recommended - e.g. \"golang\")")
 	refactorCmd.Flags().StringVar(&basicConfig.Example, "example", "", "optional an example of the refactoring task, {typescript code}")
 	refactorCmd.Flags().StringSliceVarP(&basicConfig.InspirationFiles, "inspiration", "i", []string{}, "Optional comma-separated list of inspiration files or multiple -i flags.")
@@ -101,6 +101,7 @@ const refactorJSONExample = `{
     "task": "Analyze what can be improved. Refactor code to use better variable names and remove duplication. Refactor the following file to be more readable. Make comments for the functions. Do not add any new public functions, only rewrite.",
     "plan": "Do not write any text because this file will be saved directly to output.go",
     "outputformat": "golang",
+	"searchQuery": "BETA: if set; append embeddings using searchQuery as key",
     "example": "func doSomething(w http.ResponseWriter, r *http.Request, db *sql.DB) error {\n          // function logic\n    }",
     "inspirationfiles": [
         "/path/to/inspiration/file1.go",
