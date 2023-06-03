@@ -2,6 +2,7 @@ package cosine_test
 
 import (
 	"encoding/json"
+	"fmt"
 	"math"
 	"os"
 	"testing"
@@ -60,15 +61,14 @@ func TestCosineDistance(t *testing.T) {
 		})
 	}
 
-	/*
-		var results = [][1536]float{}
+	var results = [][1536]float32{}
 
-		for _, vector := range data.Vectors {
-			results = append(results, vector.Values)
-		}
-		// SearchByCosineSimilarity
-		res := cosine.SearchByCosineSimilarity(results, query.Queries[0].Values)
-		for _, r := range res {
-			println(data.Vectors[r.Index].ID, fmt.Sprintf("%f", r.Similarity), data.Vectors[r.Index].Metadata["filename"])
-		}*/
+	for _, vector := range data.Vectors {
+		results = append(results, vector.Values)
+	}
+	// SearchByCosineSimilarity
+	res := cosine.SearchByCosineSimilarity(results, query.Queries[0].Values)
+	for _, r := range res {
+		println(data.Vectors[r.Index].ID, fmt.Sprintf("%f", r.Similarity), data.Vectors[r.Index].Metadata.Filename)
+	}
 }
