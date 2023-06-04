@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
-PREVIOUS_VERSION=v0.7.21
-VERSION=v0.8.1
+PREVIOUS_VERSION=v0.8.1
+VERSION=v0.8.2
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION)" -trimpath
 
@@ -13,7 +13,7 @@ clean:
 
 build: clean
 	mkdir -p ../release
-	GOOS=js GOARCH=wasm go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME).wasm ./cmd/nodejswasm/main.go
+	GOOS=js GOARCH=wasm go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME).wasm ./wasm/main.go
 	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-amd64 .
 	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-linux-amd64 .
 	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-amd64.exe .

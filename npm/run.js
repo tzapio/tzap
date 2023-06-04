@@ -2,7 +2,6 @@
 const { spawn } = require('child_process');
 const os = require('os');
 const path = require('path');
-
 const platform = os.platform();
 let arch = os.arch();
 
@@ -12,7 +11,7 @@ if (arch === 'x64') {
 }
 
 let binaryName;
-const version = "v0.8.1"
+const version = "v0.8.2"
 if (platform === 'win32') {
   binaryName = `tzap-${version}-windows-${arch}.exe`;
 } else if (platform === 'darwin') {
