@@ -25,6 +25,9 @@ func (f *FileInZip) Filepath() string {
 func (f *FileInZip) Open() (io.ReadCloser, error) {
 	return f.Zipfile.Open()
 }
+func (f *FileInZip) Stat() (fs.FileInfo, error) {
+	return virtualFileInfo{file: f.Zipfile}, nil
+}
 func (f *FileInZip) Exists() bool {
 	return true
 }
@@ -54,7 +57,6 @@ func (e *FileEvaluator) WalkDirFromURL(url string) ([]types.FileReader, error) {
 		if !file.FileInfo().IsDir() && e.ShouldKeepPath(path) {
 			tl.Logger.Println("KEEPFILE", path)
 			list = append(list, &FileInZip{Zipfile: file, FilePath: path})
-
 		} else {
 			tl.Logger.Println("SKIPFILE", path)
 		}

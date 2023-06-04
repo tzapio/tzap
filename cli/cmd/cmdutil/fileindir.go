@@ -24,6 +24,11 @@ func (f *FileInDir) Open() (io.ReadCloser, error) {
 	return os.Open(f.FilePath)
 }
 
+// stat
+func (f *FileInDir) Stat() (fs.FileInfo, error) {
+	return os.Stat(f.FilePath)
+}
+
 func (e *FileEvaluator) ShouldTraverseDir(path string) bool {
 	return !e.excludeMatcher.MatchesPath(path)
 }
