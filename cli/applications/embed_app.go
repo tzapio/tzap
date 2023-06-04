@@ -23,7 +23,7 @@ func LoadAndSearchEmbeddings(args LoadAndSearchEmbeddingArgs) types.NamedWorkflo
 		Name: "loadAndSearchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			queryWait := singlewait.New(func() types.QueryRequest {
-				query, err := embed.GetQuery(t, args.SearchQuery)
+				query, err := embed.NewQuery(t, args.SearchQuery)
 				if err != nil {
 					panic(err)
 				}
@@ -33,6 +33,7 @@ func LoadAndSearchEmbeddings(args LoadAndSearchEmbeddingArgs) types.NamedWorkflo
 			return t.
 				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", args.DisableIndex, args.Yes)).
 				ApplyWorkflow(embedworkflows.EmbeddingInspirationWorkflow(queryWait.GetData(), args.ExcludeFiles, args.K, args.N))
+
 		},
 	}
 }
