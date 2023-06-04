@@ -13,7 +13,7 @@
             
             },
             "program": "cli/main.go",
-            "args": ["p", "o", "--verbose", "can you rewrite process offset to not read whole files continiously? Perhaps split the content first into maximum 32k token?"],
+            "args": ["search", "--verbose", "hello"],
             "cwd": "${workspaceFolder}"
         }
     ]
