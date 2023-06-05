@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/spf13/cobra"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 
-	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/pkg/util/stdin"
@@ -63,47 +61,42 @@ var embeddingPromptCmd = &cobra.Command{
 				content = strings.Join(args[0:], " ")
 			}
 		}
-
+		if searchQuery == "" {
+			if content == "" {
+				if settings.ApiMode {
+					panic("search query required in ApiMode")
+				}
+				searchQuery = stdin.GetStdinInput("Enter your task/embedding search? (also available as -s <query>): ")
+			} else {
+				searchQuery = content
+			}
+		}
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 
+			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
+				ExcludeFiles: inspirationFiles,
+				SearchQuery:  searchQuery,
+				K:            embedsCount,
+				N:            nCount,
+				DisableIndex: disableIndex,
+				Yes:          settings.Yes,
+			})
+
 			t.
-				WorkTzap(func(t *tzap.Tzap) {
-					if searchQuery == "" {
-						if content == "" {
-							if settings.ApiMode {
-								panic("search query required in ApiMode")
-							}
-							searchQuery = stdin.GetStdinInput("Enter your task/embedding search? (also available as -s <query>): ")
-						} else {
-							searchQuery = content
-						}
-					}
-					cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
-				}).
 				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-				ApplyWorkflow(action.LoadAndSearchEmbeddingsWorkflow(action.LoadAndSearchEmbeddingsArgs{inspirationFiles, searchQuery, embedsCount, nCount, disableIndex, settings.Yes})).
+				ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					searchResults, ok := t.Data["searchResults"].(types.SearchResults)
-					if !ok {
-						panic("Error parsing search results")
-					}
+					searchResults := output.SearchResults
+
 					t = t.AddSystemMessage(
 						"The following file contents are embeddings for the user input:",
 					)
-					cmd.Println(cmdutil.Bold("\nSearch result embeddings:"))
 					for _, result := range searchResults.Results {
 						t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
-						tokens, err := t.CountTokens(result.Vector.Metadata.SplitPart)
-						if err != nil {
-							panic(err)
-						}
-						cmd.Printf("\tt:%d\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
 					}
-					time.Sleep(1 * time.Second)
-					cmd.Println()
-
 					return t
 				}).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
