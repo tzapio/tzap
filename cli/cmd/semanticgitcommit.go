@@ -76,7 +76,7 @@ func RequestChat() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
 			extraPrompt := t.Data["extraPrompt"].(string)
 			diff := t.Data["git-diff"].(string)
-			t = t.SetInitialSystemContent(`Write one commit using semantic commit specification. \n\n` + CV100)
+			t = t.AddSystemMessage(`Write one commit using semantic commit specification. \n\n` + CV100)
 			if extraPrompt != "" {
 				t = t.AddUserMessage(extraPrompt)
 			}
