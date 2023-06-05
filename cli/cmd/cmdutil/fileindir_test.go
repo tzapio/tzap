@@ -1,7 +1,6 @@
 package cmdutil_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,7 +14,7 @@ func TestWalkDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to get current working directory: %v", err)
 	}
-	dir, err := ioutil.TempDir("", "testdir")
+	dir, err := os.MkdirTemp("", "testdir")
 	if err != nil {
 		t.Fatalf("failed to create temporary directory: %v", err)
 	}
@@ -25,23 +24,23 @@ func TestWalkDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to change directory: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dir, "testfile.txt"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(dir, "testfile.txt"), []byte("test"), 0644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dir, "qe.go"), []byte("test"), 0644)
+	err = os.WriteFile(filepath.Join(dir, "qe.go"), []byte("test"), 0644)
 	if err != nil {
 		t.Fatalf("failed to create test file: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dir, ".gitignore"), []byte("testfile.txt"), 0644)
+	err = os.WriteFile(filepath.Join(dir, ".gitignore"), []byte("testfile.txt"), 0644)
 	if err != nil {
 		t.Fatalf("failed to create test .gitignore file: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dir, ".tzapignore"), []byte("testfile.txt"), 0644)
+	err = os.WriteFile(filepath.Join(dir, ".tzapignore"), []byte("testfile.txt"), 0644)
 	if err != nil {
 		t.Fatalf("failed to create test .gitignore file: %v", err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dir, ".tzapinclude"), []byte("*.go"), 0644)
+	err = os.WriteFile(filepath.Join(dir, ".tzapinclude"), []byte("*.go"), 0644)
 	if err != nil {
 		t.Fatalf("failed to create test .gitignore file: %v", err)
 	}
