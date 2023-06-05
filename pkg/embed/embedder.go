@@ -171,7 +171,7 @@ func (fe *Embedder) ProcessOffset(filename, content string, start int, end int, 
 		return types.Vector{}, err
 	}
 
-	splitPart = "###embedding from file: " + filename + "\n" + splitPart
+	splitPart = "####embedding from file: " + filename + "\n" + splitPart
 	metadataStart := chunkStart + start
 	metadataEnd := chunkStart + end
 	metadataLineStart := lineStart
