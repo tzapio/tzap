@@ -17,8 +17,10 @@ func (t *Tzap) ApplyWorkflowFN(nt func(*Tzap) *Tzap) *Tzap {
 	Log(t, "Applying workflow FN")
 	return nt(t.CloneTzap(&Tzap{Name: "ApplyWorkflow"}))
 }
+
+// WARNING: ApplyWorkflow clones messages from previous Tzap instances. This duplicates the message.
 func (t *Tzap) ApplyWorkflow(nt types.NamedWorkflow[*Tzap, *Tzap]) *Tzap {
-	Log(t, "Applying workflow FN")
+	Log(t, "Applying workflow")
 	workflowResult := nt.Workflow(t.CloneTzap(&Tzap{Name: "ApplyWorkflow (" + nt.Name + ") Start"}))
 	endWorkflow := workflowResult.CloneTzap(&Tzap{Name: "ApplyWorkflow (" + nt.Name + ") End"})
 	endWorkflow.Message = types.Message{}
