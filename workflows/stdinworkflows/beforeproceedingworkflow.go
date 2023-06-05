@@ -19,10 +19,11 @@ func BeforeProceeding(changes string) string {
 	file.WriteString(changes)
 	file.Close()
 
-	println("\n\nFile: ", file.Name())
-	println("")
+	lastChanges := changes
 	for {
-		key := stdin.GetStdinInput("Edit files at file location. \n\n \n - press c and enter to open in vscode. \n - press v and enter to open in vim. \n - press enter to continue. \n\n")
+		println("\n\nFile: ", file.Name())
+		println("")
+		key := stdin.GetStdinInput("Edit files at file location.\n\n - press c and enter to open in vscode. \n - press v and enter to open in vim. \n - press enter to continue. \n\n")
 		if key == "v" {
 			// open vim
 			cmd := exec.Command("vim", file.Name())
@@ -33,22 +34,31 @@ func BeforeProceeding(changes string) string {
 			if err != nil {
 				panic(err)
 			}
+			key = ""
 		}
 		if key == "c" {
 			// open code
 			exec.Command("code", file.Name()).Run()
 		}
 		if key == "" {
-			break
+			bytes, err := os.ReadFile(file.Name())
+			if err != nil {
+				panic(err)
+			}
+			defer file.Close()
+			if string(bytes) == lastChanges {
+				return string(bytes)
+			} else {
+				println("\n\nChanges detected:\n")
+				println("---")
+				println(string(bytes))
+				println("---")
+				lastChanges = string(bytes)
+				continue
+			}
 		}
 	}
-	bytes, err := os.ReadFile(file.Name())
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
 
-	return string(bytes)
 }
 func BeforeCompletionWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{

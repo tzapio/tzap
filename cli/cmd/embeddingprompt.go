@@ -90,12 +90,13 @@ var embeddingPromptCmd = &cobra.Command{
 				ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					searchResults := output.SearchResults
-
-					t = t.AddSystemMessage(
-						"The following file contents are embeddings for the user input:",
-					)
-					for _, result := range searchResults.Results {
-						t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
+					if len(searchResults.Results) > 0 {
+						t = t.AddSystemMessage(
+							"The following file contents are embeddings for the user input:",
+						)
+						for _, result := range searchResults.Results {
+							t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
+						}
 					}
 					return t
 				}).
