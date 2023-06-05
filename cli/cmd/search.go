@@ -6,17 +6,14 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/action"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
-var printEmbedding bool
 var ignoreFiles []string
 var zipURL string
 
@@ -24,7 +21,6 @@ func init() {
 	RootCmd.AddCommand(searchCmd)
 	searchCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
 	searchCmd.Flags().IntVarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
-	searchCmd.Flags().BoolVarP(&printEmbedding, "printembedding", "p", false, "Output the embeddings themeselves")
 	searchCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
 	searchCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
 
@@ -45,49 +41,30 @@ var searchCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
-
-			queryWait := singlewait.New(func() types.QueryRequest {
-				tl.Logger.Println("Query start")
-
-				query, err := embed.NewQuery(t, searchQuery)
-				if err != nil {
-					panic(err)
-				}
-				tl.Logger.Println("Query end")
-				return query
+			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
+				ExcludeFiles: []string{},
+				SearchQuery:  searchQuery,
+				K:            embedsCountFlag,
+				N:            nCountFlag,
+				DisableIndex: disableIndex,
+				Yes:          settings.Yes,
 			})
 
-			t = t.
-				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", disableIndex, settings.Yes))
-			searchResults := t.ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), nil, embedsCountFlag, nCountFlag)).
-				Data["searchResults"].(types.SearchResults)
-			tl.Logger.Println("Showing results")
-			cmd.Println("\nSearch result embeddings:")
-			var metadatas []types.Metadata
-			for _, result := range searchResults.Results {
-				tokens, err := t.CountTokens(result.Vector.Metadata.SplitPart)
-				if err != nil {
-					panic("could not count tokens in search result")
-				}
-				cmd.Printf("\tt:%d\t%s", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
-				if printEmbedding {
-					cmd.Printf("\n\n\t%s", result.Vector.Metadata.SplitPart)
-				}
-				cmd.Println()
-				if settings.ApiMode {
+			searchResults := output.SearchResults
+			if settings.ApiMode {
+				var metadatas []types.Metadata
+				for _, result := range searchResults.Results {
 					metadatas = append(metadatas, result.Vector.Metadata)
 				}
-
-			}
-			if settings.ApiMode {
-				byte, err := json.Marshal(metadatas)
+				byte, err := json.MarshalIndent(metadatas, "", "  ")
 				if err != nil {
 					panic(err)
 				}
 				embeddingJson := string(byte)
 				fmt.Println(embeddingJson)
+			} else {
+				t.ApplyWorkflow(cliworkflows.PrintSearchResults(searchResults))
 			}
-			cmd.Println()
 		})
 
 		if err != nil {
