@@ -26,17 +26,14 @@ func FetchOrCachedEmbeddingForFilesWorkflow() types.NamedWorkflow[*tzap.Tzap, *t
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			embedder, ok := t.Data["embedder"].(*embed.Embedder)
 			if !ok {
-				if err := embedder.FetchAndCacheNewEmbeddings(t, types.Embeddings{}); err != nil {
-					panic(err)
-				}
-				panic(fmt.Errorf("loading embeddings went wrong. embedder"))
+				panic(fmt.Errorf("loading embedder went wrong"))
 			}
 			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
 			if !ok {
 				panic("Loading embeddings went wrong")
 			}
 			if len(uncachedEmbeddings.Vectors) > 0 {
-				if err := embedder.FetchAndCacheNewEmbeddings(t, uncachedEmbeddings); err != nil {
+				if err := embedder.FetchThenCacheNewEmbeddings(t, uncachedEmbeddings); err != nil {
 					panic(err)
 				}
 			}
