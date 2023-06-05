@@ -32,7 +32,12 @@ func (fe *Embedder) PrepareEmbeddingsFromFiles(files []types.FileReader) types.E
 	if err != nil {
 		panic(err)
 	}
-	rawFileEmbeddings, _, _ := fe.ProcessFiles(changedFiles)
+
+	rawFileEmbeddings, err := fe.ProcessFiles(changedFiles)
+	if err != nil {
+		panic(err)
+	}
+
 	storedEmbeddings, err := fe.t.TG.ListAllEmbeddingsIds(fe.t.C)
 	if err != nil {
 		panic(err)
@@ -49,7 +54,7 @@ func (fe *Embedder) PrepareEmbeddingsFromFiles(files []types.FileReader) types.E
 	return rawFileEmbeddings
 }
 
-func (fe *Embedder) ProcessFiles(changedFiles map[string]string) (types.Embeddings, int, int) {
+func (fe *Embedder) ProcessFiles(changedFiles map[string]string) (types.Embeddings, error) {
 	tl.Logger.Println("Processing files", len(changedFiles))
 	totalTokens := 0
 	totalLines := 0
@@ -63,17 +68,17 @@ func (fe *Embedder) ProcessFiles(changedFiles map[string]string) (types.Embeddin
 		totalLines += lines
 		totalTokens += fileTokens
 
-		//fmt.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
+		tl.Logger.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
 
 		fileEmbeddings, err := fe.ProcessFileOffsets(file, content, fileTokens)
 		if err != nil {
-			panic(err)
+			return types.Embeddings{}, err
 		}
 
 		embeddings.Vectors = append(embeddings.Vectors, fileEmbeddings.Vectors...)
 	}
 	tl.Logger.Println("Processed files", len(changedFiles), "Total Embeddings", len(embeddings.Vectors), "Total Tokens", totalTokens, "Total Lines", totalLines)
-	return embeddings, totalTokens, totalLines
+	return embeddings, nil
 }
 
 func (fe *Embedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings types.Embeddings, unchangedFiles map[string]int64) ([]string, error) {
@@ -93,7 +98,7 @@ func (fe *Embedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings
 			tl.Logger.Println("Drift: ", storedVector)
 		}
 	}
-	//println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
+	tl.Logger.Println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
 	return missingIds, nil
 }
 func (fe *Embedder) RemoveOldEmbeddings(deleteIds []string) error {
