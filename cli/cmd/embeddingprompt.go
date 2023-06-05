@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/cli/applications"
+
+	"github.com/tzapio/tzap/cli/action"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -66,6 +67,7 @@ var embeddingPromptCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
+
 			t.
 				WorkTzap(func(t *tzap.Tzap) {
 					if searchQuery == "" {
@@ -81,7 +83,7 @@ var embeddingPromptCmd = &cobra.Command{
 					cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 				}).
 				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-				ApplyWorkflow(applications.LoadAndSearchEmbeddings(applications.LoadAndSearchEmbeddingArgs{inspirationFiles, searchQuery, embedsCount, nCount, disableIndex, settings.Yes})).
+				ApplyWorkflow(action.LoadAndSearchEmbeddingsWorkflow(action.LoadAndSearchEmbeddingsArgs{inspirationFiles, searchQuery, embedsCount, nCount, disableIndex, settings.Yes})).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 					searchResults, ok := t.Data["searchResults"].(types.SearchResults)
 					if !ok {
@@ -110,8 +112,13 @@ var embeddingPromptCmd = &cobra.Command{
 						t = t.AddUserMessage(content).RequestChatCompletion()
 						cmd.Println(cmdutil.Bold("\n---"))
 						if settings.ApiMode {
-							fmt.Print(t.Data["content"].(string))
-							return t.AsAssistantMessage()
+							t = t.AsAssistantMessage()
+							jsonString, err := t.GetThreadAsJSON()
+							if err != nil {
+								panic(err)
+							}
+							fmt.Print(jsonString)
+							return t
 						}
 						t = t.AsAssistantMessage()
 
