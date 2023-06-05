@@ -10,3 +10,4 @@ npm/release
 *.gox
 .DS_Store
 animation
+generated

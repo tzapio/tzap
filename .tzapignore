@@ -16,3 +16,7 @@ node_modules
 .vscode
 pkg/connectors/googlevoiceconnector
 pkg/connectors/redisembeddbconnector
+cli/cmd/embeddingpromptv2.go
+mermaid
+*wasm*
+*prompt*
