@@ -13,22 +13,27 @@ import (
 
 // FileInDir represents a file in a directory.
 type FileInDir struct {
-	FilePath string
+	filePath   string
+	collection string
 }
 
 func (f *FileInDir) Filepath() string {
-	return f.FilePath
+	return f.filePath
 }
 
 func (f *FileInDir) Open() (io.ReadCloser, error) {
-	return os.Open(f.FilePath)
+	return os.Open(f.filePath)
 }
 
-// stat
 func (f *FileInDir) Stat() (fs.FileInfo, error) {
-	return os.Stat(f.FilePath)
+	return os.Stat(f.filePath)
 }
-
+func (f *FileInDir) Collection() string {
+	return f.collection
+}
+func (f *FileInDir) CollectionFileString() string {
+	return f.collection + "@" + f.filePath
+}
 func (e *FileEvaluator) ShouldTraverseDir(path string) bool {
 	return !e.excludeMatcher.MatchesPath(path)
 }
@@ -63,7 +68,7 @@ func (e *FileEvaluator) WalkDir(dir string) ([]types.FileReader, error) {
 				return err
 			}
 			relPath = strings.TrimPrefix(relPath, "./")
-			list = append(list, &FileInDir{FilePath: filepath.ToSlash(relPath)})
+			list = append(list, &FileInDir{filePath: filepath.ToSlash(relPath), collection: dir})
 			return nil
 		}
 		tl.Logger.Println("SKIPFILE", path)

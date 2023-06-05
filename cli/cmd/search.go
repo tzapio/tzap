@@ -48,6 +48,7 @@ var searchCmd = &cobra.Command{
 				N:            nCountFlag,
 				DisableIndex: disableIndex,
 				Yes:          settings.Yes,
+				ZipURL:       zipURL,
 			})
 			if settings.ApiMode {
 				var metadatas []types.Metadata

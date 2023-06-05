@@ -14,22 +14,28 @@ import (
 
 // FileInZip represents a file in a zip archive.
 type FileInZip struct {
-	FilePath string
-	Zipfile  *zip.File
+	filePath   string
+	zipfile    *zip.File
+	collection string
 }
 
 func (f *FileInZip) Filepath() string {
-	return f.FilePath
+	return f.filePath
 }
 
 func (f *FileInZip) Open() (io.ReadCloser, error) {
-	return f.Zipfile.Open()
+	return f.zipfile.Open()
 }
 
 func (f *FileInZip) Stat() (fs.FileInfo, error) {
-	return virtualFileInfo{file: f.Zipfile}, nil
+	return virtualFileInfo{file: f.zipfile}, nil
 }
-
+func (f *FileInZip) Collection() string {
+	return f.collection
+}
+func (f *FileInZip) CollectionFileString() string {
+	return f.collection + "@" + f.filePath
+}
 func (e *FileEvaluator) WalkDirFromURL(url string) ([]types.FileReader, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -54,7 +60,7 @@ func (e *FileEvaluator) WalkDirFromURL(url string) ([]types.FileReader, error) {
 
 		if !file.FileInfo().IsDir() && e.ShouldKeepPath(path) {
 			tl.Logger.Println("KEEPFILE", path)
-			list = append(list, &FileInZip{Zipfile: file, FilePath: path})
+			list = append(list, &FileInZip{zipfile: file, filePath: path, collection: url})
 		} else {
 			tl.Logger.Println("SKIPFILE", path)
 		}

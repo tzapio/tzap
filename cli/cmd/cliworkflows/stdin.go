@@ -14,6 +14,28 @@ import (
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
+func IndexZipFilesAndEmbeddings(zipURL string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "indexFilesAndEmbeddings",
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
+			if disableIndex {
+				return t
+			}
+			fileInDirEvaluator, err := cmdutil.NewFileEvaluator()
+			if err != nil {
+				panic(err)
+			}
+			embedder := embed.NewEmbedder(t)
+			tl.Logger.Println("Indexing files...")
+			files, err := fileInDirEvaluator.WalkDirFromURL(zipURL)
+			if err != nil {
+				panic(err)
+			}
+			tl.Logger.Println("Finished index files...")
+			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
+		},
+	}
+}
 func IndexFilesAndEmbeddings(dir string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "indexFilesAndEmbeddings",
