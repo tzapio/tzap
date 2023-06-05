@@ -60,3 +60,22 @@ func PrintInspirationFiles(inspirationFiles []string) types.NamedWorkflow[*tzap.
 		},
 	}
 }
+func PrintSearchResults(searchResults types.SearchResults) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "listInspirationFiles",
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
+			return t.WorkTzap(func(t *tzap.Tzap) {
+				tl.Logger.Println("Showing results")
+				println("\nSearch result embeddings:")
+				for _, result := range searchResults.Results {
+					tokens, err := t.CountTokens(result.Vector.Metadata.SplitPart)
+					if err != nil {
+						panic(err)
+					}
+					fmt.Fprintf(os.Stderr, "\tt:%d\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
+				}
+				println()
+			})
+		},
+	}
+}
