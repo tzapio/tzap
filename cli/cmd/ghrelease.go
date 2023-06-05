@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/pkg/util/stdin"
+	"github.com/tzapio/tzap/workflows/stdinworkflows"
 )
 
 const (
@@ -87,7 +88,8 @@ Template:
 Repository: ` + string(url))).
 			AddUserMessage(fmt.Sprintf("Title: %s\n\nGit Commits:\n%s", title, summary))
 
-		res := t.RequestChatCompletion()
+		res := t.RequestChatCompletion().
+			ApplyWorkflow(stdinworkflows.BeforeProceedingWorkflow())
 
 		// Parse the JSON object
 		var data map[string]string
