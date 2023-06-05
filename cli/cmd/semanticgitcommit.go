@@ -9,6 +9,7 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/workflows/code/git"
 	"github.com/tzapio/tzap/workflows/code/gocode"
+	"github.com/tzapio/tzap/workflows/stdinworkflows"
 	"github.com/tzapio/tzap/workflows/truncate"
 )
 
@@ -79,9 +80,10 @@ func RequestChat() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 			if extraPrompt != "" {
 				t = t.AddUserMessage(extraPrompt)
 			}
-			t = t.AddUserMessage(diff)
-
-			return t.RequestChatCompletion().ErrorTzap(nil)
+			return t.AddUserMessage(diff).
+				RequestChatCompletion().
+				ApplyWorkflow(stdinworkflows.BeforeProceedingWorkflow()).
+				ErrorTzap(nil)
 		}}
 }
 
