@@ -49,11 +49,9 @@ var searchCmd = &cobra.Command{
 				DisableIndex: disableIndex,
 				Yes:          settings.Yes,
 			})
-
-			searchResults := output.SearchResults
 			if settings.ApiMode {
 				var metadatas []types.Metadata
-				for _, result := range searchResults.Results {
+				for _, result := range output.SearchResults.Results {
 					metadatas = append(metadatas, result.Vector.Metadata)
 				}
 				byte, err := json.MarshalIndent(metadatas, "", "  ")
@@ -63,7 +61,7 @@ var searchCmd = &cobra.Command{
 				embeddingJson := string(byte)
 				fmt.Println(embeddingJson)
 			} else {
-				t.ApplyWorkflow(cliworkflows.PrintSearchResults(searchResults))
+				t.ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults))
 			}
 		})
 
