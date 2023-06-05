@@ -87,7 +87,7 @@ func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings types.Embeddings) typ
 	return types.Embeddings{Vectors: uncachedEmbeddings}
 }
 
-func (ec *EmbeddingCache) FetchAndCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embeddings) error {
+func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embeddings) error {
 	var storedFiles map[string]struct{} = map[string]struct{}{}
 
 	if len(uncachedEmbeddings.Vectors) > 0 {
