@@ -10,6 +10,16 @@ func (t *Tzap) MutationTzap(fn func(*Tzap) *Tzap) *Tzap {
 }
 
 // WorkTzap executes the provided function and returns the Tzap object.
+func (t *Tzap) If(b bool, tfn func(*Tzap) *Tzap, ffn func(*Tzap) *Tzap) *Tzap {
+	Log(t, "If Tzap")
+	if b {
+		return tfn(t)
+	}
+	return ffn(t)
+
+}
+
+// WorkTzap executes the provided function and returns the Tzap object.
 func (t *Tzap) WorkTzap(fn func(*Tzap)) *Tzap {
 	Log(t, "Work Tzap")
 	tb := t.CloneTzap(&Tzap{Name: "Work"})
