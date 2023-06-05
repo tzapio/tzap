@@ -6,16 +6,6 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func EmbeddingInspirationWorkflow(query types.QueryRequest, inspirationFiles []string, k int, n int) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
-	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
-		Name: "embeddingInspirationWorkflow",
-		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			return t.
-				ApplyWorkflow(SearchFilesWorkflow(query, inspirationFiles, k, n))
-		},
-	}
-}
-
 // k is amount of embeddings to be included.
 // When using inspiration files, embeddings are likely to be duplicated and as such are filtered out. n is used to increase how many embeddings are fetched but are trimmed to only contain top K after filtering.
 func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int, n int) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
