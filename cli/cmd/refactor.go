@@ -13,7 +13,7 @@ import (
 )
 
 var refactorCmd = &cobra.Command{
-	Use:   "refactor [filein] [fileout] \nOR\n tzap refactor --refactorfile refactorfile.json \nOR\n tzap refactor --filein filein [--fileout fileout] [see for all params: tzap refactor --help] \n\n Json example: \n" + refactorJSONExample,
+	Use:   "refactor [filein] [fileout] \nOR\n tzap refactor --refactorconfig refactorconfig.json \nOR\n tzap refactor --filein filein [--fileout fileout] [see for all params: tzap refactor --help] \n\n Json example: \n" + refactorJSONExample,
 	Short: "Refactors code",
 	Long: `The refactor command enables you to refactor code using either command-line flags or a configuration file. 
 It is used to generate refactor and document code or generate documentation files.`,
@@ -24,8 +24,8 @@ It is used to generate refactor and document code or generate documentation file
 			if len(args) > 1 {
 				basicConfig.FileOut = args[1]
 			}
-		} else if refactorFile != "" {
-			config, err := loadConfig(refactorFile)
+		} else if refactorConfig != "" {
+			config, err := loadConfig(refactorConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error loading config file: %v\n", err)
 				cmd.Println(refactorJSONExample)
@@ -63,13 +63,13 @@ It is used to generate refactor and document code or generate documentation file
 	},
 }
 var basicConfig = codegeneration.BasicRefactoringConfig{}
-var refactorFile string
+var refactorConfig string
 var dryrun bool
 
 func init() {
 	RootCmd.AddCommand(refactorCmd)
 
-	refactorCmd.Flags().StringVar(&refactorFile, "refactorfile", "", "the path to the refactor file")
+	refactorCmd.Flags().StringVar(&refactorConfig, "refactorconfig", "", "the path to the refactor file")
 	refactorCmd.Flags().StringVar(&basicConfig.FileIn, "filein", "", "required - the file to refactor")
 	refactorCmd.Flags().StringVar(&basicConfig.FileOut, "fileout", "", "optional - the output file (default filein)")
 	refactorCmd.Flags().StringVar(&basicConfig.Mission, "mission", "", "optional - a description of the overall mission for the project")
