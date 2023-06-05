@@ -44,6 +44,14 @@ func getThread(t *Tzap) []types.Message {
 	}
 	return append(messages, t.Message)
 }
+func (t *Tzap) GetThreadAsJSON() (string, error) {
+	messages := GetThread(t)
+	jsonBytes, err := json.MarshalIndent(messages, "", "  ")
+	if err != nil {
+		return "", nil
+	}
+	return string(jsonBytes), err
+}
 func (t *Tzap) StoreThread(filePath string) *ErrorTzap {
 	messages := GetThread(t)
 	jsonBytes, err := json.Marshal(messages)
@@ -52,18 +60,21 @@ func (t *Tzap) StoreThread(filePath string) *ErrorTzap {
 	}
 
 	if err := os.WriteFile(filePath, jsonBytes, 0644); err != nil {
-		t.ErrorTzap(fmt.Errorf("StoreThread: error storing thread: %w", err))
+		return t.ErrorTzap(fmt.Errorf("StoreThread: error storing thread: %w", err))
 	}
 
 	return t.ErrorTzap(nil)
 }
-func (t *Tzap) LoadThreadFile(filePath string) *ErrorTzap {
+func (t *Tzap) LoadThreadString(content string) *ErrorTzap {
 	var messages []types.Message
-	err := json.Unmarshal([]byte(util.ReadFileP(filePath)), &messages)
+	err := json.Unmarshal([]byte(content), &messages)
 	if err != nil {
-		t.ErrorTzap(fmt.Errorf("error loading thread: %w", err))
+		return t.ErrorTzap(fmt.Errorf("error loading thread: %w", err))
 	}
 	return t.LoadThread(messages).ErrorTzap(nil)
+}
+func (t *Tzap) LoadThreadFile(filePath string) *ErrorTzap {
+	return t.LoadThreadString(util.ReadFileP(filePath))
 }
 
 func (t *Tzap) LoadThread(messages []types.Message) *Tzap {
