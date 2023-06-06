@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
@@ -36,49 +37,73 @@ var RootCmd = &cobra.Command{
 
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		tl.Logger.Println("Cobra CLI Root start")
+
 		if settings.Verbose {
 			tl.EnableLogger()
 			tl.EnableUICompletionLogger()
 			tl.EnableUILogger()
 		}
 		//check subcommand if init or help
-		if cmd.Name() == "init" || cmd.Name() == "help" {
+		if cmd.Name() == "init" || cmd.Name() == "help" || cmd.Name() == "install" {
 			return nil
 		}
-
-		root, err := cmdutil.SearchForTzapincludeAndGetRootDir()
+		projectDB := types.ProjectDB{}
+		libsFiles, err := os.ReadDir("./.tzap-data")
 		if err != nil {
 			return err
 		}
-		tl.Logger.Println("Current working directory:", root)
-		os.Chdir(root)
-		config := config.Configuration{
-			OpenAIModel:   modelMap[settings.Model],
-			AutoMode:      settings.AutoMode,
-			TruncateLimit: settings.TruncateLimit,
-			MD5Rewrites:   settings.MD5Rewrites,
-			EnableLogs:    !settings.DisableLogs,
-			LoggerOutput:  settings.LoggerOutput,
-			Temperature:   settings.Temperature,
-		}
-		var connector types.TzapConnector
-		if settings.Stub {
-			connector = stubconnector.StubWithConfig(config)
-		} else {
-			apikey, err := tzapconnect.LoadOPENAI_APIKEY()
-			if err != nil {
-				return err
+
+		for _, lib := range libsFiles {
+			if lib.IsDir() {
+				if lib.Name() != "logs" {
+					var name types.ProjectName = types.ProjectName(lib.Name())
+
+					var projectDir types.ProjectDir = types.ProjectDir(path.Join("./.tzap-data/", string(name)))
+					projectDB[name] = projectDir
+					tl.Logger.Println("Loaded lib ProjectDB:", name, projectDir)
+				}
 			}
-			connector = tzapconnect.WithConfig(apikey, config)
+		}
+		t, err := initializeTzap(projectDB)
+		if err != nil {
+			return err
 		}
 
-		t := tzap.NewWithConnector(connector)
 		tl.Logger.Println("Tzap initialized")
 		cmd.SetContext(cmdutil.SetTzapInContext(cmd.Context(), t))
 		return nil
 	},
 }
 
+func initializeTzap(projectDB types.ProjectDB) (*tzap.Tzap, error) {
+	root, err := cmdutil.SearchForTzapincludeAndGetRootDir()
+	if err != nil {
+		return nil, err
+	}
+	tl.Logger.Println("Current working directory:", root)
+	os.Chdir(root)
+	config := config.Configuration{
+		OpenAIModel:   modelMap[settings.Model],
+		AutoMode:      settings.AutoMode,
+		TruncateLimit: settings.TruncateLimit,
+		MD5Rewrites:   settings.MD5Rewrites,
+		EnableLogs:    !settings.DisableLogs,
+		LoggerOutput:  settings.LoggerOutput,
+		Temperature:   settings.Temperature,
+	}
+	var connector types.TzapConnector
+	if settings.Stub {
+		connector = stubconnector.StubWithConfig(config)
+	} else {
+		apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+		if err != nil {
+			return nil, err
+		}
+		connector = tzapconnect.WithConfig(apikey, projectDB, config)
+	}
+
+	return tzap.NewWithConnector(connector), nil
+}
 func Execute() {
 	err := RootCmd.Execute()
 	if err != nil {
