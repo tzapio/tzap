@@ -15,18 +15,15 @@ import (
 )
 
 var ignoreFiles []string
-var zipURL string
+var lib string
 
 func init() {
 	RootCmd.AddCommand(searchCmd)
 	searchCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
 	searchCmd.Flags().IntVarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
 	searchCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
-	searchCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
-
-		"For large projects disabling indexing speeds up the process.")
-	searchCmd.Flags().StringVarP(&zipURL, "zipurl", "z", "", "URL of the zip file to search files from")
-
+	searchCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
+	searchCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 
 var searchCmd = &cobra.Command{
@@ -41,14 +38,18 @@ var searchCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
+			var libname types.ProjectName = types.LOCALPROJECTNAME
+			if lib != "" {
+				libname = types.ProjectName(lib)
+			}
 			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  searchQuery,
+				Lib:          libname,
 				K:            embedsCountFlag,
 				N:            nCountFlag,
 				DisableIndex: disableIndex,
 				Yes:          settings.Yes,
-				ZipURL:       zipURL,
 			})
 			if settings.ApiMode {
 				var metadatas []types.Metadata
