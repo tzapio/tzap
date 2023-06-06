@@ -8,11 +8,12 @@ import (
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/connectors/localdbconnector"
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector"
+	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func WithConfig(openai_apikey string, libs types.ProjectDB, conf config.Configuration) types.TzapConnector {
-	newLibs := make(types.ProjectDB)
+func WithConfig(openai_apikey string, libs project.ProjectDB, conf config.Configuration) types.TzapConnector {
+	newLibs := make(project.ProjectDB)
 	newLibs["@LOCAL"] = "./.tzap-data/"
 	for k, v := range libs {
 		newLibs[k] = v
@@ -28,7 +29,7 @@ func WithConfig(openai_apikey string, libs types.ProjectDB, conf config.Configur
 	}
 }
 
-func newBaseconnector(openai_apikey string, libs types.ProjectDB) (types.TGenerator, error) {
+func newBaseconnector(openai_apikey string, libs project.ProjectDB) (types.TGenerator, error) {
 	tl.Logger.Println("Initializing tzapConnect")
 	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey)
 
@@ -65,21 +66,21 @@ func (pc PartialComposite) CountTokens(ctx context.Context, content string) (int
 func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error) {
 	return pc.OpenaiTgenerator.OffsetTokens(content, from, to)
 }
-func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, project string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
-	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, project, embedding, k)
+func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, projectName string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, projectName, embedding, k)
 }
-func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, project string, docID string, embedding [1536]float32, metadata types.Metadata) error {
-	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, project, docID, embedding, metadata)
+func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, projectName string, docID string, embedding [1536]float32, metadata types.Metadata) error {
+	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, projectName, docID, embedding, metadata)
 }
-func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, project string, docID string) (types.Vector, bool, error) {
-	return pc.EmbeddingGenerator.GetEmbeddingDocument(ctx, project, docID)
+func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, projectName string, docID string) (types.Vector, bool, error) {
+	return pc.EmbeddingGenerator.GetEmbeddingDocument(ctx, projectName, docID)
 }
-func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, project string, docID string) error {
-	return pc.EmbeddingGenerator.DeleteEmbeddingDocument(ctx, project, docID)
+func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, projectName string, docID string) error {
+	return pc.EmbeddingGenerator.DeleteEmbeddingDocument(ctx, projectName, docID)
 }
-func (pc PartialComposite) DeleteEmbeddingDocuments(ctx context.Context, project string, ids []string) error {
-	return pc.EmbeddingGenerator.DeleteEmbeddingDocuments(ctx, project, ids)
+func (pc PartialComposite) DeleteEmbeddingDocuments(ctx context.Context, projectName string, ids []string) error {
+	return pc.EmbeddingGenerator.DeleteEmbeddingDocuments(ctx, projectName, ids)
 }
-func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context, project string) (types.SearchResults, error) {
-	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx, project)
+func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context, projectName string) (types.SearchResults, error) {
+	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx, projectName)
 }

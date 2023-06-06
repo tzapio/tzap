@@ -9,13 +9,14 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
+	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
-func IndexZipFilesAndEmbeddings(name types.ProjectName, projectDir types.ProjectDir, zipURL string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.ProjectDir, zipURL string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "indexFilesAndEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -48,7 +49,7 @@ func IndexFilesAndEmbeddings(dir string, disableIndex, yes bool) types.NamedWork
 			if disableIndex {
 				return t
 			}
-			fileEvaluator, err := fileevaluator.New(types.LOCALPROJECTNAME)
+			fileEvaluator, err := fileevaluator.New(project.LOCALPROJECTNAME)
 			if err != nil {
 				panic(err)
 			}
@@ -59,10 +60,10 @@ func IndexFilesAndEmbeddings(dir string, disableIndex, yes bool) types.NamedWork
 			if err != nil {
 				panic(err)
 			}
-			embedder := embed.NewEmbedder(t, types.LOCALPROJECTNAME, filesStampsDB, files)
+			embedder := embed.NewEmbedder(t, project.LOCALPROJECTNAME, filesStampsDB, files)
 			tl.Logger.Println("Finished index files...")
 
-			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(types.LOCALPROJECTNAME, files, embedder, disableIndex, yes))
+			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(project.LOCALPROJECTNAME, files, embedder, disableIndex, yes))
 		},
 	}
 }

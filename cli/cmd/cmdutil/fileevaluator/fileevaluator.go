@@ -4,18 +4,18 @@ import (
 	"os"
 
 	ignore "github.com/sabhiram/go-gitignore"
-	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/project"
 )
 
 type FileEvaluator struct {
 	includeMatcher *ignore.GitIgnore
 	excludeMatcher *ignore.GitIgnore
-	name           types.ProjectName
+	name           project.ProjectName
 }
 
 var baseExcludePatterns = []string{".git", ".DS_Store", "desktop.ini"}
 
-func New(name types.ProjectName) (*FileEvaluator, error) {
+func New(name project.ProjectName) (*FileEvaluator, error) {
 	ignoreFiles := []string{".tzapignore"}
 	if _, err := os.Stat(".gitignore"); err == nil {
 		ignoreFiles = append(ignoreFiles, ".gitignore")
@@ -33,7 +33,7 @@ func New(name types.ProjectName) (*FileEvaluator, error) {
 
 	return NewWithPatterns(name, excludePatterns, includePatternsFromFile), nil
 }
-func NewWithPatterns(name types.ProjectName, excludePatterns []string, includePatterns []string) *FileEvaluator {
+func NewWithPatterns(name project.ProjectName, excludePatterns []string, includePatterns []string) *FileEvaluator {
 	excludeMatcher := ignore.CompileIgnoreLines(excludePatterns...)
 	includeMatcher := ignore.CompileIgnoreLines(includePatterns...)
 	return &FileEvaluator{name: name, excludeMatcher: excludeMatcher, includeMatcher: includeMatcher}

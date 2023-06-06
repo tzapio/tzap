@@ -5,12 +5,13 @@ import (
 	"os"
 
 	"github.com/tzapio/tzap/pkg/embed"
+	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
-func LoadAndFetchEmbeddings(name types.ProjectName, files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndFetchEmbeddings(name project.ProjectName, files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndFetchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {

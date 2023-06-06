@@ -10,6 +10,7 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
@@ -38,9 +39,9 @@ var searchCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
-			var libname types.ProjectName = types.LOCALPROJECTNAME
+			var libname project.ProjectName = project.LOCALPROJECTNAME
 			if lib != "" {
-				libname = types.ProjectName(lib)
+				libname = project.ProjectName(lib)
 			}
 			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
 				ExcludeFiles: []string{},

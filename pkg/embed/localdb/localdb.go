@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -44,6 +45,9 @@ func (db *FileDB[T]) waitReady() {
 	<-db.ready
 }
 func (db *FileDB[T]) load() error {
+	if strings.HasPrefix(db.filePath, "@MEMORY") {
+		return nil
+	}
 	file, err := os.Open(db.filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -124,47 +128,44 @@ func (db *FileDB[T]) BatchSet(pairs []types.KeyValue[T]) (int, error) {
 	db.waitReady()
 	db.lock.Lock()
 	defer db.lock.Unlock()
+	var writer *gobber.GobWriter
+	var file *os.File
+	if !strings.HasPrefix(db.filePath, "@MEMORY") {
+		filer, err := os.OpenFile(db.filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			return 0, err
+		}
+		file = filer
+		defer file.Close()
 
-	file, err := os.OpenFile(db.filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return 0, err
+		writer = gobber.NewGobWriterIO(file)
 	}
-	defer file.Close()
+
 	c := 0
-	writer := gobber.NewGobWriterIO(file)
 	for _, kv := range pairs {
 		if reflect.DeepEqual(db.data[kv.Key], kv.Value) {
 			tl.Logger.Println("BatchSet - WARNING: Key already exists. ", kv.Key)
 			continue
 		}
 		c++
-		err := writer.Write(kv)
-		if err != nil {
-			return c, err
+		if writer != nil {
+			if err := writer.Write(kv); err != nil {
+				return c, err
+			}
 		}
-		/*
-			data, err := json.Marshal(kv)
-			if err != nil {
-				println("BatchSet - WARNING: Cannot marshal data. Continue. ", err.Error())
-				continue
-			}
 
-			if _, err := file.Write(data); err != nil {
-				return c, err
-			}
-			if _, err := file.WriteString("\n"); err != nil {
-				return c, err
-			}*/
 		db.scanKeyList = append(db.scanKeyList, kv)
-
 		if !reflectutil.IsZero(kv.Value) {
 			db.data[kv.Key] = kv.Value
 		} else {
 			delete(db.data, kv.Key)
 		}
 	}
-	if err := file.Sync(); err != nil {
-		return c, err
+
+	if writer != nil {
+		if err := file.Sync(); err != nil {
+			return c, err
+		}
 	}
 
 	return c, nil

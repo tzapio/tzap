@@ -60,3 +60,26 @@ func BenchmarkFileDB_BatchSet(b *testing.B) {
 		b.Fatalf("Expected wrote to be %d, but got %d", b.N, wrote)
 	}
 }
+func BenchmarkFileDB_InMemory_BatchSet(b *testing.B) {
+	db, err := localdb.NewFileDB[string]("@MEMORY/TEST")
+	if err != nil {
+		b.Fatalf("Error creating FileDB: %v", err)
+	}
+
+	pairs := make([]types.KeyValue[string], b.N)
+	for i := 0; i < b.N; i++ {
+		pairs[i] = types.KeyValue[string]{
+			Key:   fmt.Sprintf("key%d", i),
+			Value: fmt.Sprintf("value%d", i),
+		}
+	}
+
+	b.ResetTimer()
+	wrote, err := db.BatchSet(pairs)
+	if err != nil {
+		b.Fatalf("Error in BatchSet: %v", err)
+	}
+	if wrote != b.N {
+		b.Fatalf("Expected wrote to be %d, but got %d", b.N, wrote)
+	}
+}

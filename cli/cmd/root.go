@@ -8,6 +8,7 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
+	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -47,18 +48,17 @@ var RootCmd = &cobra.Command{
 		if cmd.Name() == "init" || cmd.Name() == "help" || cmd.Name() == "install" {
 			return nil
 		}
-		projectDB := types.ProjectDB{}
-		libsFiles, err := os.ReadDir("./.tzap-data")
+		projectDB := project.ProjectDB{}
+		libs, err := os.ReadDir("./.tzap-data")
 		if err != nil {
 			return err
 		}
 
-		for _, lib := range libsFiles {
+		for _, lib := range libs {
 			if lib.IsDir() {
 				if lib.Name() != "logs" {
-					var name types.ProjectName = types.ProjectName(lib.Name())
-
-					var projectDir types.ProjectDir = types.ProjectDir(path.Join("./.tzap-data/", string(name)))
+					var name project.ProjectName = project.ProjectName(lib.Name())
+					var projectDir project.ProjectDir = project.ProjectDir(path.Join("./.tzap-data/", string(name)))
 					projectDB[name] = projectDir
 					tl.Logger.Println("Loaded lib ProjectDB:", name, projectDir)
 				}
@@ -75,7 +75,7 @@ var RootCmd = &cobra.Command{
 	},
 }
 
-func initializeTzap(projectDB types.ProjectDB) (*tzap.Tzap, error) {
+func initializeTzap(projectDB project.ProjectDB) (*tzap.Tzap, error) {
 	root, err := cmdutil.SearchForTzapincludeAndGetRootDir()
 	if err != nil {
 		return nil, err

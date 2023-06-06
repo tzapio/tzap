@@ -8,6 +8,7 @@ import (
 
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed/localdb"
+	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
@@ -15,15 +16,15 @@ import (
 type Embedder struct {
 	t                 *tzap.Tzap
 	filesTimestampsDB *localdb.FileDB[int64]
-	name              types.ProjectName
+	name              project.ProjectName
 	files             []types.FileReader
 	*EmbeddingCache
 }
 
-func NewFilestampsDB(projectDir types.ProjectDir) (*localdb.FileDB[int64], error) {
+func NewFilestampsDB(projectDir project.ProjectDir) (*localdb.FileDB[int64], error) {
 	return localdb.NewFileDB[int64](path.Join(string(projectDir), "filesTimestamps.db"))
 }
-func NewEmbedder(t *tzap.Tzap, name types.ProjectName, filesTimestampsDB *localdb.FileDB[int64], files []types.FileReader) *Embedder {
+func NewEmbedder(t *tzap.Tzap, name project.ProjectName, filesTimestampsDB *localdb.FileDB[int64], files []types.FileReader) *Embedder {
 	embeddingCache := NewEmbeddingCache(filesTimestampsDB)
 	return &Embedder{t: t, filesTimestampsDB: filesTimestampsDB, name: name, files: files, EmbeddingCache: embeddingCache}
 }
