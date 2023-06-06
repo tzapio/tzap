@@ -10,7 +10,7 @@ import (
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
-func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndFetchEmbeddings(name types.ProjectName, files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndFetchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -18,10 +18,10 @@ func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, 
 				if !disableIndex {
 					println("Checking for file changes. (use -d to disable this check)...\n")
 					return t.
-						ApplyWorkflow(PrepareEmbedFilesWorkflow(files, embedder)).
+						ApplyWorkflow(PrepareEmbedFilesWorkflow(name, files, embedder)).
 						ApplyWorkflow(ConfirmEmbeddingSearch(yes)).
-						ApplyWorkflow(FetchOrCachedEmbeddingForFilesWorkflow()).
-						ApplyWorkflow(SaveAndLoadEmbeddingsToDB())
+						ApplyWorkflow(FetchOrCachedEmbeddingForFilesWorkflow(files)).
+						ApplyWorkflow(SaveAndLoadEmbeddingsToDB(name))
 				}
 				return t
 			})

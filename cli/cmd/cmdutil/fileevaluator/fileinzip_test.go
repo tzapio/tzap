@@ -1,4 +1,4 @@
-package cmdutil_test
+package fileevaluator_test
 
 import (
 	"archive/zip"
@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 )
 
 func TestWalkDirFromURL(t *testing.T) {
@@ -26,7 +26,7 @@ func TestWalkDirFromURL(t *testing.T) {
 	defer ts.Close()
 
 	// Instantiate a FileInDirEvaluator
-	evaluator := cmdutil.NewFileEvaluatorWithPatterns([]string{}, []string{"*.txt"})
+	evaluator := fileevaluator.NewWithPatterns("GIT", []string{}, []string{"*.txt"})
 
 	// Call WalkDirFromURL with the test server URL
 	result, err := evaluator.WalkDirFromURL(ts.URL)

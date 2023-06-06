@@ -2,7 +2,6 @@ package embed
 
 import (
 	"encoding/json"
-	"os"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed/localdb"
@@ -23,7 +22,7 @@ func NewEmbeddingCache(filesTimestampsDB *localdb.FileDB[int64]) *EmbeddingCache
 	}
 	return &EmbeddingCache{embeddingCacheDB, filesTimestampsDB}
 }
-func (ec *EmbeddingCache) GetCachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
+func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddings types.Embeddings) (types.Embeddings, error) {
 	var storedFiles map[string]struct{} = map[string]struct{}{}
 
 	tl.Logger.Println("Getting cached embeddings", len(embeddings.Vectors))
@@ -58,19 +57,23 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(embeddings types.Embeddings) types
 	if len(storedFiles) > 0 {
 		var keyvals []types.KeyValue[int64]
 		for file := range storedFiles {
-			fileStat, err := os.Stat(file)
-			if err != nil {
-				panic(err)
+			for _, fileReader := range files {
+				if fileReader.Filepath() == file {
+					fileStat, err := fileReader.Stat()
+					if err != nil {
+						return types.Embeddings{}, err
+					}
+					keyvals = append(keyvals, types.KeyValue[int64]{Key: file, Value: fileStat.ModTime().UnixNano()})
+				}
 			}
-			keyvals = append(keyvals, types.KeyValue[int64]{Key: file, Value: fileStat.ModTime().UnixNano()})
 		}
 		added, err := ec.filesTimestampsDB.BatchSet(keyvals)
 		if err != nil {
 			panic("failing to store changed files should not happend and has probably caused some kind of corruption")
 		}
-		tl.Logger.Printf("Added %d files to md5 cache. Total: %d", added, len(storedFiles))
+		tl.Logger.Printf("Added %d files to file cache. Total: %d", added, len(storedFiles))
 	}
-	return types.Embeddings{Vectors: cachedEmbeddings}
+	return types.Embeddings{Vectors: cachedEmbeddings}, nil
 }
 
 func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
@@ -87,7 +90,7 @@ func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings types.Embeddings) typ
 	return types.Embeddings{Vectors: uncachedEmbeddings}
 }
 
-func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbeddings types.Embeddings) error {
+func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []types.FileReader, uncachedEmbeddings types.Embeddings) error {
 	var storedFiles map[string]struct{} = map[string]struct{}{}
 
 	if len(uncachedEmbeddings.Vectors) > 0 {
@@ -129,11 +132,15 @@ func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, uncachedEmbe
 		if len(storedFiles) > 0 {
 			var keyvals []types.KeyValue[int64]
 			for file := range storedFiles {
-				fileStat, err := os.Stat(file)
-				if err != nil {
-					return err
+				for _, fileReader := range files {
+					if fileReader.Filepath() == file {
+						fileStat, err := fileReader.Stat()
+						if err != nil {
+							return err
+						}
+						keyvals = append(keyvals, types.KeyValue[int64]{Key: file, Value: fileStat.ModTime().UnixNano()})
+					}
 				}
-				keyvals = append(keyvals, types.KeyValue[int64]{Key: file, Value: fileStat.ModTime().UnixNano()})
 			}
 			added, err := ec.filesTimestampsDB.BatchSet(keyvals)
 			if err != nil {

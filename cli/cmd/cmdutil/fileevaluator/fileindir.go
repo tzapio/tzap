@@ -1,4 +1,4 @@
-package cmdutil
+package fileevaluator
 
 import (
 	"io"
@@ -13,8 +13,7 @@ import (
 
 // FileInDir represents a file in a directory.
 type FileInDir struct {
-	filePath   string
-	collection string
+	filePath string
 }
 
 func (f *FileInDir) Filepath() string {
@@ -28,12 +27,7 @@ func (f *FileInDir) Open() (io.ReadCloser, error) {
 func (f *FileInDir) Stat() (fs.FileInfo, error) {
 	return os.Stat(f.filePath)
 }
-func (f *FileInDir) Collection() string {
-	return f.collection
-}
-func (f *FileInDir) CollectionFileString() string {
-	return f.collection + "@" + f.filePath
-}
+
 func (e *FileEvaluator) ShouldTraverseDir(path string) bool {
 	return !e.excludeMatcher.MatchesPath(path)
 }
@@ -68,7 +62,7 @@ func (e *FileEvaluator) WalkDir(dir string) ([]types.FileReader, error) {
 				return err
 			}
 			relPath = strings.TrimPrefix(relPath, "./")
-			list = append(list, &FileInDir{filePath: filepath.ToSlash(relPath), collection: dir})
+			list = append(list, &FileInDir{filePath: filepath.ToSlash(relPath)})
 			return nil
 		}
 		tl.Logger.Println("SKIPFILE", path)

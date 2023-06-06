@@ -1,4 +1,4 @@
-package cmdutil
+package fileevaluator
 
 import (
 	"bufio"

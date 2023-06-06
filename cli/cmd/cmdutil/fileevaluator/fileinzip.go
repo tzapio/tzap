@@ -1,4 +1,4 @@
-package cmdutil
+package fileevaluator
 
 import (
 	"archive/zip"
@@ -14,9 +14,8 @@ import (
 
 // FileInZip represents a file in a zip archive.
 type FileInZip struct {
-	filePath   string
-	zipfile    *zip.File
-	collection string
+	filePath string
+	zipfile  *zip.File
 }
 
 func (f *FileInZip) Filepath() string {
@@ -30,12 +29,7 @@ func (f *FileInZip) Open() (io.ReadCloser, error) {
 func (f *FileInZip) Stat() (fs.FileInfo, error) {
 	return virtualFileInfo{file: f.zipfile}, nil
 }
-func (f *FileInZip) Collection() string {
-	return f.collection
-}
-func (f *FileInZip) CollectionFileString() string {
-	return f.collection + "@" + f.filePath
-}
+
 func (e *FileEvaluator) WalkDirFromURL(url string) ([]types.FileReader, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -60,7 +54,7 @@ func (e *FileEvaluator) WalkDirFromURL(url string) ([]types.FileReader, error) {
 
 		if !file.FileInfo().IsDir() && e.ShouldKeepPath(path) {
 			tl.Logger.Println("KEEPFILE", path)
-			list = append(list, &FileInZip{zipfile: file, filePath: path, collection: url})
+			list = append(list, &FileInZip{zipfile: file, filePath: path})
 		} else {
 			tl.Logger.Println("SKIPFILE", path)
 		}

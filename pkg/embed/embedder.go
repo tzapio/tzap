@@ -3,6 +3,7 @@ package embed
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -14,21 +15,22 @@ import (
 type Embedder struct {
 	t                 *tzap.Tzap
 	filesTimestampsDB *localdb.FileDB[int64]
+	name              types.ProjectName
+	files             []types.FileReader
 	*EmbeddingCache
 }
 
-func NewEmbedder(t *tzap.Tzap) *Embedder {
-	filesTimestampsDB, err := localdb.NewFileDB[int64]("./.tzap-data/filesTimestamps.db")
-	if err != nil {
-		panic(err)
-	}
+func NewFilestampsDB(projectDir types.ProjectDir) (*localdb.FileDB[int64], error) {
+	return localdb.NewFileDB[int64](path.Join(string(projectDir), "filesTimestamps.db"))
+}
+func NewEmbedder(t *tzap.Tzap, name types.ProjectName, filesTimestampsDB *localdb.FileDB[int64], files []types.FileReader) *Embedder {
 	embeddingCache := NewEmbeddingCache(filesTimestampsDB)
-	return &Embedder{t: t, filesTimestampsDB: filesTimestampsDB, EmbeddingCache: embeddingCache}
+	return &Embedder{t: t, filesTimestampsDB: filesTimestampsDB, name: name, files: files, EmbeddingCache: embeddingCache}
 }
 
-func (fe *Embedder) PrepareEmbeddingsFromFiles(files []types.FileReader) types.Embeddings {
-	tl.Logger.Println("Preparing embeddings from files", len(files))
-	changedFiles, unchangedFiles, err := fe.CheckFileCache(files)
+func (fe *Embedder) PrepareEmbeddingsFromFiles() types.Embeddings {
+	tl.Logger.Println("Preparing embeddings from files", len(fe.files))
+	changedFiles, unchangedFiles, err := fe.CheckFileCache()
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +40,7 @@ func (fe *Embedder) PrepareEmbeddingsFromFiles(files []types.FileReader) types.E
 		panic(err)
 	}
 
-	storedEmbeddings, err := fe.t.TG.ListAllEmbeddingsIds(fe.t.C)
+	storedEmbeddings, err := fe.t.TG.ListAllEmbeddingsIds(fe.t.C, string(fe.name))
 	if err != nil {
 		panic(err)
 	}
@@ -102,7 +104,7 @@ func (fe *Embedder) GetDrift(storedEmbeddings types.SearchResults, nowEmbeddings
 	return missingIds, nil
 }
 func (fe *Embedder) RemoveOldEmbeddings(deleteIds []string) error {
-	if err := fe.t.TG.DeleteEmbeddingDocuments(fe.t.C, deleteIds); err != nil {
+	if err := fe.t.TG.DeleteEmbeddingDocuments(fe.t.C, string(fe.name), deleteIds); err != nil {
 		return err
 	}
 	return nil

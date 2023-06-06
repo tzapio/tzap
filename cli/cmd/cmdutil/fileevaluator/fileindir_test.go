@@ -1,4 +1,4 @@
-package cmdutil_test
+package fileevaluator_test
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 )
 
 func TestWalkDir(t *testing.T) {
@@ -44,7 +44,7 @@ func TestWalkDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create test .gitignore file: %v", err)
 	}
-	evaluator, err := cmdutil.NewFileEvaluator()
+	evaluator, err := fileevaluator.New("test")
 	if err != nil {
 		t.Fatalf("error creating FileInDirEvaluator: %v", err)
 	}
@@ -68,7 +68,6 @@ func TestWalkDir(t *testing.T) {
 }
 
 func Test_shouldTraverseDir(t *testing.T) {
-	evaluator := cmdutil.NewFileEvaluatorWithPatterns([]string{"exclude"}, []string{"*.txt"})
 	tests := map[string]bool{
 		"exclude":         false,
 		"include":         true,
@@ -78,13 +77,14 @@ func Test_shouldTraverseDir(t *testing.T) {
 		"exclude/include": false,
 	}
 	for path, expected := range tests {
+		evaluator := fileevaluator.NewWithPatterns("TESTER", []string{"exclude"}, []string{"*.txt"})
+
 		actual := evaluator.ShouldTraverseDir(path)
 		assert.Equal(t, expected, actual, "Path '%s' should have been %t", path, expected)
 	}
 
 }
 func Test_shouldKeepPath(t *testing.T) {
-	evaluator := cmdutil.NewFileEvaluatorWithPatterns([]string{"exclude"}, []string{"*.txt"})
 	tests := map[string]bool{
 		"exclude/file.txt":  false,
 		"include/file.txt":  true,
@@ -93,6 +93,8 @@ func Test_shouldKeepPath(t *testing.T) {
 		"exclude/include":   false,
 	}
 	for path, expected := range tests {
+		evaluator := fileevaluator.NewWithPatterns("TEST", []string{"exclude"}, []string{"*.txt"})
+
 		actual := evaluator.ShouldKeepPath(path)
 		assert.Equal(t, expected, actual, "Path '%s' should have been %t", path, expected)
 	}

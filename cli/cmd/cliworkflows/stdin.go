@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
 	"github.com/tzapio/tzap/pkg/types"
@@ -14,25 +15,29 @@ import (
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
-func IndexZipFilesAndEmbeddings(zipURL string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func IndexZipFilesAndEmbeddings(name types.ProjectName, projectDir types.ProjectDir, zipURL string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "indexFilesAndEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			if disableIndex {
 				return t
 			}
-			fileInDirEvaluator, err := cmdutil.NewFileEvaluator()
+			fileInDirEvaluator, err := fileevaluator.New(name)
 			if err != nil {
 				panic(err)
 			}
-			embedder := embed.NewEmbedder(t)
-			tl.Logger.Println("Indexing files...")
+			fileStampsDB, err := embed.NewFilestampsDB(projectDir)
+			if err != nil {
+				panic(err)
+			}
 			files, err := fileInDirEvaluator.WalkDirFromURL(zipURL)
 			if err != nil {
 				panic(err)
 			}
+			embedder := embed.NewEmbedder(t, name, fileStampsDB, files)
+			tl.Logger.Println("Indexing files...")
 			tl.Logger.Println("Finished index files...")
-			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
+			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(name, files, embedder, disableIndex, yes))
 		},
 	}
 }
@@ -43,19 +48,21 @@ func IndexFilesAndEmbeddings(dir string, disableIndex, yes bool) types.NamedWork
 			if disableIndex {
 				return t
 			}
-			fileInDirEvaluator, err := cmdutil.NewFileEvaluator()
+			fileEvaluator, err := fileevaluator.New(types.LOCALPROJECTNAME)
 			if err != nil {
 				panic(err)
 			}
-			embedder := embed.NewEmbedder(t)
+			filesStampsDB, err := embed.NewFilestampsDB("./.tzap-data")
+
 			tl.Logger.Println("Indexing files...")
-			files, err := fileInDirEvaluator.WalkDir("./")
+			files, err := fileEvaluator.WalkDir("./")
 			if err != nil {
 				panic(err)
 			}
+			embedder := embed.NewEmbedder(t, types.LOCALPROJECTNAME, filesStampsDB, files)
 			tl.Logger.Println("Finished index files...")
 
-			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
+			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(types.LOCALPROJECTNAME, files, embedder, disableIndex, yes))
 		},
 	}
 }

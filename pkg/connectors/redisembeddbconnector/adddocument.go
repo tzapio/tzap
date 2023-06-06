@@ -7,7 +7,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *RedisembedTgenerator) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
+func (idx *RedisembedTgenerator) AddEmbeddingDocument(ctx context.Context, project string, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	doc := redisearch.NewDocument(docID, 1.0).
 		Set("oaiemb", toBytes(embedding))
 
@@ -16,6 +16,6 @@ func (idx *RedisembedTgenerator) AddEmbeddingDocument(ctx context.Context, docID
 
 	return idx.client.IndexOptions(redisearch.IndexingOptions{Replace: true}, []redisearch.Document{doc}...)
 }
-func (idx *RedisembedTgenerator) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
+func (idx *RedisembedTgenerator) DeleteEmbeddingDocument(ctx context.Context, project string, docID string) error {
 	return idx.client.DeleteDocument(docID)
 }

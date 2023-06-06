@@ -38,21 +38,21 @@ func (StubConnector) RawTokens(ctx context.Context, content string) ([]string, e
 func (StubConnector) FetchEmbedding(ctx context.Context, content ...string) ([][1536]float32, error) {
 	return [][1536]float32{{0, 1, 2, 3, 4, 5}}, nil
 }
-func (StubConnector) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+func (StubConnector) SearchWithEmbedding(ctx context.Context, project string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
-func (StubConnector) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
+func (StubConnector) AddEmbeddingDocument(ctx context.Context, project string, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	return nil
 }
-func (StubConnector) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
+func (StubConnector) GetEmbeddingDocument(ctx context.Context, project string, docID string) (types.Vector, bool, error) {
 	return types.Vector{}, false, nil
 }
-func (StubConnector) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
+func (StubConnector) DeleteEmbeddingDocument(ctx context.Context, project string, docID string) error {
 	return nil
 }
-func (StubConnector) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
+func (StubConnector) DeleteEmbeddingDocuments(ctx context.Context, project string, ids []string) error {
 	return nil
 }
-func (StubConnector) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
+func (StubConnector) ListAllEmbeddingsIds(ctx context.Context, project string) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *RedisembedTgenerator) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
+func (idx *RedisembedTgenerator) ListAllEmbeddingsIds(ctx context.Context, project string) (types.SearchResults, error) {
 	res, _, err := idx.client.Search(redisearch.NewQuery("*").Limit(0, 1000000))
 	if err != nil {
 		return types.SearchResults{}, err
@@ -24,7 +24,7 @@ func (idx *RedisembedTgenerator) ListAllEmbeddingsIds(ctx context.Context) (type
 	}
 	return results, nil
 }
-func (idx *RedisembedTgenerator) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+func (idx *RedisembedTgenerator) SearchWithEmbedding(ctx context.Context, project string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	queryStr := "*=>[KNN 10 @oaiemb $embeddingbytes AS __vec_score]"
 	query := redisearch.
 		NewQuery(queryStr).

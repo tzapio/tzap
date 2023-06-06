@@ -1,19 +1,27 @@
 package localdbconnector
 
 import (
+	"path"
+
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed/localdb"
 	"github.com/tzapio/tzap/pkg/types"
 )
 
 type LocalembedTGenerator struct {
 	*types.UnimplementedTGenerator
-	db *localdb.FileDB[types.Vector]
+	dbs map[types.ProjectName]*localdb.FileDB[types.Vector]
 }
 
-func InitiateLocalDB(filePath string) (types.TGenerator, error) {
-	db, err := localdb.NewFileDB[types.Vector](filePath)
-	if err != nil {
-		return nil, err
+func InitiateLocalDB(projectDB types.ProjectDB) (types.TGenerator, error) {
+	dbs := make(map[types.ProjectName]*localdb.FileDB[types.Vector])
+	for projectName, projectDir := range projectDB {
+		tl.Logger.Println("Initiating fileembeddings localDB for project", projectName)
+		db, err := localdb.NewFileDB[types.Vector](path.Join(string(projectDir), "fileembeddings.db"))
+		if err != nil {
+			return nil, err
+		}
+		dbs[projectName] = db
 	}
-	return &LocalembedTGenerator{db: db}, nil
+	return &LocalembedTGenerator{dbs: dbs}, nil
 }

@@ -3,12 +3,14 @@ package localdbconnector
 import (
 	"context"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed/cosine"
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
-	allResults := idx.db.GetAll()
+func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context, project string) (types.SearchResults, error) {
+	tl.Logger.Println("ListAllEmbeddings - Project:", project)
+	allResults := idx.dbs[types.ProjectName(project)].GetAll()
 	listEmbeddings := types.SearchResults{}
 	for _, vector := range allResults {
 		listEmbeddings.Results = append(listEmbeddings.Results, types.SearchResult{
@@ -17,8 +19,8 @@ func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context) (type
 	}
 	return listEmbeddings, nil
 }
-func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
-	res := idx.db.GetAll()
+func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, project string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+	res := idx.dbs[types.ProjectName(project)].GetAll()
 	floatVectors := [][1536]float32{}
 	vectors := []types.Vector{}
 	for _, r := range res {
@@ -39,8 +41,8 @@ func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, embedd
 	}
 	return searchResults, nil
 }
-func (idx *LocalembedTGenerator) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
-	vector, exists := idx.db.Get(docID)
+func (idx *LocalembedTGenerator) GetEmbeddingDocument(ctx context.Context, project string, docID string) (types.Vector, bool, error) {
+	vector, exists := idx.dbs[types.ProjectName(project)].Get(docID)
 
 	if !exists {
 		return vector, exists, nil
