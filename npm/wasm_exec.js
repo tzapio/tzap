@@ -4,6 +4,7 @@
 
 "use strict";
 const fs = require("fs");
+
 (() => {
 	const enosys = () => {
 		const err = new Error("not implemented");
@@ -50,7 +51,6 @@ const fs = require("fs");
 				} catch (err) {
 					callback(err)
 				}
-				//fs.close(fd,callback); 
 			},
 			fchmod(fd, mode, callback) { fs.fchmod(fd,mode,callback) },
 			fchown(fd, uid, gid, callback) { callback(enosys()); },
@@ -60,7 +60,6 @@ const fs = require("fs");
 				} catch (err) {
 					callback(err);
 				}
-				//fs.fstat(fd,callback); 
 			},
 			fsync(fd, callback) { 
 				fs.fsync(fd,callback);
@@ -76,7 +75,6 @@ const fs = require("fs");
 				} catch(err) {
 					callback(err);
 				}
-				//fs.open(path,flags,mode,callback) 
 			},
 			read(fd, buffer, offset, length, position, callback) { 
 				fs.read(fd,buffer,offset,length,position,callback) 
@@ -87,7 +85,6 @@ const fs = require("fs");
 				} catch (err) {
 					callback(err);
 				}
-				//fs.readdir(path,callback);
 			 },
 			readlink(path, callback) { callback(enosys()); },
 			rename(from, to, callback) { callback(enosys()); },
@@ -98,7 +95,6 @@ const fs = require("fs");
 				} catch (err) {
 					callback(err);
 				}
-				//fs.stat(path,callback)
 			 },
 			symlink(path, link, callback) { callback(enosys()); },
 			truncate(path, length, callback) { fs.truncate(path,length,callback) },
