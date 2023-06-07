@@ -14,12 +14,12 @@ clean:
 build: clean
 	mkdir -p ../release
 	GOOS=js GOARCH=wasm go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME).wasm ./wasm/main.go
-	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-amd64 .
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-linux-amd64 .
-	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-amd64.exe .
-	GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-darwin-arm64 .
-	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-linux-arm64 .
-	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-$(VERSION)-windows-arm64.exe .
+	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-darwin-amd64 .
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-linux-amd64 .
+	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-windows-amd64.exe .
+	GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-darwin-arm64 .
+	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-linux-arm64 .
+	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-windows-arm64.exe .
 
 tzapPrepareRelease:
 	git tag -d $(git tag -l);

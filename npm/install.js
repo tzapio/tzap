@@ -12,13 +12,12 @@ if (arch === 'x64') {
 }
 
 let binaryName;
-const version = "v0.8.3"
 if (platform === 'win32') {
-  binaryName = `tzap-${version}-windows-${arch}.exe`;
+  binaryName = `tzap-windows-${arch}.exe`;
 } else if (platform === 'darwin') {
-  binaryName = `tzap-${version}-darwin-${arch}`;
+  binaryName = `tzap-darwin-${arch}`;
 } else if (platform === 'linux') {
-  binaryName = `tzap-${version}-linux-${arch}`;
+  binaryName = `tzap-linux-${arch}`;
 } else {
   console.error(`Unsupported platform: ${platform}`);
   process.exit(1);
