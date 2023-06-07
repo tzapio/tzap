@@ -37,4 +37,9 @@ gomodtidy:
 ts-build:
 	cd ts && npm run build
 
+wasm: 
+	cd cli/wasm && GOOS=js GOARCH=wasm go build -o tzap.wasm
+wasml: 
+	npx live-server cli/wasm
+
 .PHONY: release
