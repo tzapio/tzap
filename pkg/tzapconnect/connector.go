@@ -6,20 +6,14 @@ import (
 
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/connectors/localdbconnector"
+	"github.com/tzapio/tzap/pkg/embed/embedstore"
+
 	"github.com/tzapio/tzap/pkg/connectors/openaiconnector"
-	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func WithConfig(openai_apikey string, libs project.ProjectDB, conf config.Configuration) types.TzapConnector {
-	newLibs := make(project.ProjectDB)
-	newLibs["@LOCAL"] = "./.tzap-data/"
-	for k, v := range libs {
-		newLibs[k] = v
-	}
-
-	tg, err := newBaseconnector(openai_apikey, newLibs)
+func WithConfig(openai_apikey string, conf config.Configuration) types.TzapConnector {
+	tg, err := newBaseconnector(openai_apikey)
 	if err != nil {
 		println(err)
 		os.Exit(1)
@@ -29,12 +23,12 @@ func WithConfig(openai_apikey string, libs project.ProjectDB, conf config.Config
 	}
 }
 
-func newBaseconnector(openai_apikey string, libs project.ProjectDB) (types.TGenerator, error) {
+func newBaseconnector(openai_apikey string) (types.TGenerator, error) {
 	tl.Logger.Println("Initializing tzapConnect")
 	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey)
 
 	tl.Logger.Println("Open AI Client Initialized")
-	embeddingC, err := localdbconnector.InitiateLocalDB(libs)
+	embeddingC, err := embedstore.InitiateLocalDB()
 	if err != nil {
 		return nil, err
 	}
@@ -66,21 +60,21 @@ func (pc PartialComposite) CountTokens(ctx context.Context, content string) (int
 func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error) {
 	return pc.OpenaiTgenerator.OffsetTokens(content, from, to)
 }
-func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, projectName string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
-	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, projectName, embedding, k)
+func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, embedding, k)
 }
-func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, projectName string, docID string, embedding [1536]float32, metadata types.Metadata) error {
-	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, projectName, docID, embedding, metadata)
+func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
+	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, docID, embedding, metadata)
 }
-func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, projectName string, docID string) (types.Vector, bool, error) {
-	return pc.EmbeddingGenerator.GetEmbeddingDocument(ctx, projectName, docID)
+func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
+	return pc.EmbeddingGenerator.GetEmbeddingDocument(ctx, docID)
 }
-func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, projectName string, docID string) error {
-	return pc.EmbeddingGenerator.DeleteEmbeddingDocument(ctx, projectName, docID)
+func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
+	return pc.EmbeddingGenerator.DeleteEmbeddingDocument(ctx, docID)
 }
-func (pc PartialComposite) DeleteEmbeddingDocuments(ctx context.Context, projectName string, ids []string) error {
-	return pc.EmbeddingGenerator.DeleteEmbeddingDocuments(ctx, projectName, ids)
+func (pc PartialComposite) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
+	return pc.EmbeddingGenerator.DeleteEmbeddingDocuments(ctx, ids)
 }
-func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context, projectName string) (types.SearchResults, error) {
-	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx, projectName)
+func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
+	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx)
 }

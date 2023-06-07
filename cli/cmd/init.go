@@ -78,7 +78,7 @@ func touchTzapignore() {
 	}
 	tzapIgnoreContent := `# Tzap ignore file. Add extra files like test folders, or other files that interfere with search (embeddings) quality. 
 node_modules
-\n\n	
+	
 # copied from .gitignore
 ` + gitignoreContent
 

@@ -1,4 +1,4 @@
-package fileevaluator_test
+package localwalker_test
 
 import (
 	"os"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/localwalker"
 )
 
 func TestWalkDir(t *testing.T) {
@@ -44,14 +45,14 @@ func TestWalkDir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create test .gitignore file: %v", err)
 	}
-	evaluator, err := fileevaluator.New(dir)
+	evaluator, err := fileevaluator.New(".")
 	if err != nil {
 		t.Fatalf("error creating FileInDirEvaluator: %v", err)
 	}
-
+	localWalker := localwalker.New(evaluator, dir, dir)
 	expected := []string{"qe.go"}
 
-	result, err := evaluator.WalkDir(dir)
+	result, err := localWalker.GetFiles()
 	if err != nil {
 		t.Fatalf("error walking directory: %v", err)
 	}

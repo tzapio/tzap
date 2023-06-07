@@ -5,13 +5,12 @@ import (
 	"os"
 
 	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
-func LoadAndFetchEmbeddings(name project.ProjectName, files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndFetchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -19,10 +18,10 @@ func LoadAndFetchEmbeddings(name project.ProjectName, files []types.FileReader, 
 				if !disableIndex {
 					println("Checking for file changes. (use -d to disable this check)...\n")
 					return t.
-						ApplyWorkflow(PrepareEmbedFilesWorkflow(name, files, embedder)).
+						ApplyWorkflow(PrepareEmbedFilesWorkflow(files, embedder)).
 						ApplyWorkflow(ConfirmEmbeddingSearch(yes)).
 						ApplyWorkflow(FetchOrCachedEmbeddingForFilesWorkflow(files)).
-						ApplyWorkflow(SaveAndLoadEmbeddingsToDB(name))
+						ApplyWorkflow(SaveAndLoadEmbeddingsToDB())
 				}
 				return t
 			})

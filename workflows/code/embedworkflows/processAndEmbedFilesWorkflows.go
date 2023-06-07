@@ -4,16 +4,15 @@ import (
 	"fmt"
 
 	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
-func PrepareEmbedFilesWorkflow(name project.ProjectName, files []types.FileReader, embedder *embed.Embedder) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func PrepareEmbedFilesWorkflow(files []types.FileReader, embedder *embed.Embedder) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "prepareEmbedFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles()
+			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(t)
 			uncachedEmbeddings := embedder.GetUncachedEmbeddings(rawFileEmbeddings)
 			data := types.MappedInterface{"rawFileEmbeddings": rawFileEmbeddings, "uncachedEmbeddings": uncachedEmbeddings, "embedder": embedder}
 			return t.AddTzap(&tzap.Tzap{Name: "prepareEmbedFilesTzap", Data: data})
@@ -51,7 +50,7 @@ func FetchOrCachedEmbeddingForFilesWorkflow(files []types.FileReader) types.Name
 		},
 	}
 }
-func SaveAndLoadEmbeddingsToDB(name project.ProjectName) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func SaveAndLoadEmbeddingsToDB() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "saveAndLoadEmbeddingsToDB",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -60,7 +59,7 @@ func SaveAndLoadEmbeddingsToDB(name project.ProjectName) types.NamedWorkflow[*tz
 				panic("Loading embeddings went wrong")
 			}
 			for _, vector := range embeddings.Vectors {
-				err := t.TG.AddEmbeddingDocument(t.C, string(name), vector.ID, vector.Values, vector.Metadata)
+				err := t.TG.AddEmbeddingDocument(t.C, vector.ID, vector.Values, vector.Metadata)
 				if err != nil {
 					panic(err)
 				}

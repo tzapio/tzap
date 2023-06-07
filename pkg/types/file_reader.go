@@ -13,3 +13,6 @@ type FileReader interface {
 	Filepath() string
 	Stat() (fs.FileInfo, error)
 }
+type FileWalker interface {
+	GetFiles() ([]FileReader, error)
+}

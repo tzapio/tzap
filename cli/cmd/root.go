@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"os"
-	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/cmdinstance"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
 	"github.com/tzapio/tzap/pkg/project"
@@ -48,40 +48,53 @@ var RootCmd = &cobra.Command{
 		if cmd.Name() == "init" || cmd.Name() == "help" || cmd.Name() == "install" {
 			return nil
 		}
-		projectDB := project.ProjectDB{}
-		libs, err := os.ReadDir("./.tzap-data")
+
+		baseDir, err := cmdutil.SearchForTzapincludeAndGetRootDir()
 		if err != nil {
 			return err
 		}
-
-		for _, lib := range libs {
-			if lib.IsDir() {
-				if lib.Name() != "logs" {
-					var name project.ProjectName = project.ProjectName(lib.Name())
-					var projectDir project.ProjectDir = project.ProjectDir(path.Join("./.tzap-data/", string(name)))
-					projectDB[name] = projectDir
-					tl.Logger.Println("Loaded lib ProjectDB:", name, projectDir)
-				}
-			}
-		}
-		t, err := initializeTzap(projectDB)
+		os.Chdir(baseDir)
+		tl.Logger.Println("Current working directory:", baseDir)
+		t, err := initializeTzap()
 		if err != nil {
 			return err
 		}
 
 		tl.Logger.Println("Tzap initialized")
+
+		var projectP project.Project
+		if lib != "" {
+			var name project.ProjectName = project.ProjectName(lib)
+			libProject, err := cmdinstance.NewLocalLibProject(baseDir, name)
+			if err != nil {
+				return err
+			}
+			tl.Logger.Println("Loaded lib ProjectDB:", name, libProject)
+			projectP = libProject
+		} else {
+			cwd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			localProject, err := cmdinstance.NewLocalProject(cwd)
+			if err != nil {
+				return err
+			}
+			projectP = localProject
+		}
+		t = t.
+			AddTzap(&tzap.Tzap{Name: "loadAndSearchEmbeddings"}).
+			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+				t.C = project.SetProjectInContext(t.C, projectP)
+				return t
+			})
 		cmd.SetContext(cmdutil.SetTzapInContext(cmd.Context(), t))
 		return nil
 	},
 }
 
-func initializeTzap(projectDB project.ProjectDB) (*tzap.Tzap, error) {
-	root, err := cmdutil.SearchForTzapincludeAndGetRootDir()
-	if err != nil {
-		return nil, err
-	}
-	tl.Logger.Println("Current working directory:", root)
-	os.Chdir(root)
+func initializeTzap() (*tzap.Tzap, error) {
+
 	config := config.Configuration{
 		OpenAIModel:   modelMap[settings.Model],
 		AutoMode:      settings.AutoMode,
@@ -91,6 +104,7 @@ func initializeTzap(projectDB project.ProjectDB) (*tzap.Tzap, error) {
 		LoggerOutput:  settings.LoggerOutput,
 		Temperature:   settings.Temperature,
 	}
+
 	var connector types.TzapConnector
 	if settings.Stub {
 		connector = stubconnector.StubWithConfig(config)
@@ -99,10 +113,11 @@ func initializeTzap(projectDB project.ProjectDB) (*tzap.Tzap, error) {
 		if err != nil {
 			return nil, err
 		}
-		connector = tzapconnect.WithConfig(apikey, projectDB, config)
+		connector = tzapconnect.WithConfig(apikey, config)
 	}
+	t := tzap.NewWithConnector(connector)
 
-	return tzap.NewWithConnector(connector), nil
+	return t, nil
 }
 func Execute() {
 	err := RootCmd.Execute()

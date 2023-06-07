@@ -13,35 +13,53 @@ import (
 	"github.com/tzapio/tzap/pkg/util/reflectutil"
 )
 
+type FileDBState int
+
+const (
+	FileDBStateNotStarted FileDBState = iota
+	FileDBStateNotReady
+	FileDBStateReady
+)
+
 type FileDB[T any] struct {
 	filePath    string
 	data        map[string]T
 	scanKeyList []types.KeyValue[T]
 	lock        sync.RWMutex
+	state       FileDBState
 	ready       chan struct{} // signal when the data is ready
+
 }
 
-func NewFileDB[T any](filePath string) (*FileDB[T], error) {
+func NewFileDB[T any](filePath string) (types.DBCollectionInterface[T], error) {
 	tl.Logger.Printf("NewFileDB: %s\n", filePath)
 	db := &FileDB[T]{
 		filePath: filePath,
 		data:     make(map[string]T),
 		ready:    make(chan struct{}),
 	}
+	return db, nil
+}
+func (db *FileDB[T]) StartInit() {
+	if db.state != FileDBStateNotStarted {
+		return
+	}
+	db.state = FileDBStateNotReady
 	go func() {
 		// close the channel to signal we're done
 		defer close(db.ready)
-
+		tl.Logger.Println("NewFileDB - Loading data from ", db.filePath)
 		if err := db.load(); err != nil {
 			tl.Logger.Printf("error loading data: %v", err)
-			// handle error, you may want to pass it out to the caller
-			// or store it in the FileDB structure and check it before usage
 		}
+		db.state = FileDBStateReady
 	}()
-
-	return db, nil
 }
+
 func (db *FileDB[T]) waitReady() {
+	if db.state == FileDBStateNotStarted {
+		db.StartInit()
+	}
 	<-db.ready
 }
 func (db *FileDB[T]) load() error {

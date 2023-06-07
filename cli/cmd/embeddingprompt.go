@@ -36,6 +36,7 @@ func init() {
 	embeddingPromptCmd.Flags().StringVarP(&searchQuery, "search", "s", "",
 		"The search query to start the embedding prompt with. Default (<prompt>)")
 	embeddingPromptCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
+	embeddingPromptCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 
 var embeddingPromptCmd = &cobra.Command{
@@ -71,11 +72,13 @@ var embeddingPromptCmd = &cobra.Command{
 				searchQuery = content
 			}
 		}
+
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 
 			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+
 			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
 				ExcludeFiles: inspirationFiles,
 				SearchQuery:  searchQuery,

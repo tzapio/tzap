@@ -47,7 +47,7 @@ func loadAndSearchEmbeddingsWorkflow(args LoadAndSearchEmbeddingsArgs) types.Nam
 			})
 
 			return t.
-				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings("./", args.DisableIndex, args.Yes)).
+				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings(args.DisableIndex, args.Yes)).
 				ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), args.ExcludeFiles, args.K, args.N))
 		},
 	}

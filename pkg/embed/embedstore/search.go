@@ -1,4 +1,4 @@
-package localdbconnector
+package embedstore
 
 import (
 	"context"
@@ -9,9 +9,10 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context, projectName string) (types.SearchResults, error) {
-	tl.Logger.Println("ListAllEmbeddings - Project:", projectName)
-	allResults := idx.dbs[project.ProjectName(projectName)].GetAll()
+func (idx *EmbedStore) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
+	tl.Logger.Println("ListAllEmbeddings")
+	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
+	allResults := embeddingCollection.GetAll()
 	listEmbeddings := types.SearchResults{}
 	for _, vector := range allResults {
 		listEmbeddings.Results = append(listEmbeddings.Results, types.SearchResult{
@@ -20,8 +21,10 @@ func (idx *LocalembedTGenerator) ListAllEmbeddingsIds(ctx context.Context, proje
 	}
 	return listEmbeddings, nil
 }
-func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, projectName string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
-	res := idx.dbs[project.ProjectName(projectName)].GetAll()
+func (idx *EmbedStore) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+	tl.Logger.Println("SearchWithEmbedding")
+	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
+	res := embeddingCollection.GetAll()
 	floatVectors := [][1536]float32{}
 	vectors := []types.Vector{}
 	for _, r := range res {
@@ -42,8 +45,9 @@ func (idx *LocalembedTGenerator) SearchWithEmbedding(ctx context.Context, projec
 	}
 	return searchResults, nil
 }
-func (idx *LocalembedTGenerator) GetEmbeddingDocument(ctx context.Context, projectName string, docID string) (types.Vector, bool, error) {
-	vector, exists := idx.dbs[project.ProjectName(projectName)].Get(docID)
+func (idx *EmbedStore) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
+	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
+	vector, exists := embeddingCollection.Get(docID)
 
 	if !exists {
 		return vector, exists, nil

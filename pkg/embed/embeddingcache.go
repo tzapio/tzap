@@ -4,22 +4,17 @@ import (
 	"encoding/json"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/embed/localdb"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/util/reflectutil"
 )
 
 type EmbeddingCache struct {
-	embeddingCacheDB  *localdb.FileDB[string]
-	filesTimestampsDB *localdb.FileDB[int64]
+	embeddingCacheDB  types.DBCollectionInterface[string]
+	filesTimestampsDB types.DBCollectionInterface[int64]
 }
 
-func NewEmbeddingCache(filesTimestampsDB *localdb.FileDB[int64]) *EmbeddingCache {
-	embeddingCacheDB, err := localdb.NewFileDB[string]("./.tzap-data/embeddingsCache.db")
-	if err != nil {
-		panic(err)
-	}
+func NewEmbeddingCache(embeddingCacheDB types.DBCollectionInterface[string], filesTimestampsDB types.DBCollectionInterface[int64]) *EmbeddingCache {
 	return &EmbeddingCache{embeddingCacheDB, filesTimestampsDB}
 }
 func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddings types.Embeddings) (types.Embeddings, error) {

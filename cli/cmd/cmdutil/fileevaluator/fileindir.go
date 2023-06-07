@@ -28,10 +28,6 @@ func (f *FileInDir) Stat() (fs.FileInfo, error) {
 	return os.Stat(f.filePath)
 }
 
-func (e *FileEvaluator) ShouldTraverseDir(path string) bool {
-	return !e.excludeMatcher.MatchesPath(path)
-}
-
 func (e *FileEvaluator) WalkDir(dir string) ([]types.FileReader, error) {
 	var list []types.FileReader
 	cwd, err := os.Getwd()

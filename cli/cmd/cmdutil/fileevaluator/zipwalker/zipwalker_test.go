@@ -1,4 +1,4 @@
-package fileevaluator_test
+package zipwalker_test
 
 import (
 	"archive/zip"

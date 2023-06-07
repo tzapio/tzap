@@ -8,7 +8,7 @@ import (
 	"github.com/tzapio/tzap/internal/logging/tl"
 )
 
-func (fe *Embedder) CheckFileCache() (changedFiles map[string]string, unchangedFiles map[string]int64, err error) {
+func (fe *Embedder) checkFileCache() (changedFiles map[string]string, unchangedFiles map[string]int64, err error) {
 	tl.Logger.Println("Checking file cache. Files:", len(fe.files))
 	changedFiles = map[string]string{}
 	unchangedFiles = map[string]int64{}
@@ -26,7 +26,6 @@ func (fe *Embedder) CheckFileCache() (changedFiles map[string]string, unchangedF
 		cachedEditTime, exists := fe.filesTimestampsDB.Get(fileName)
 		if exists && !isTimePassedSignificant(currentEditTime, cachedEditTime) {
 			tl.Logger.Printf("NO CHANGE %s. Old Edittime: %d, New Edittime: %d, TimeDiff: %d", fileName, cachedEditTime, currentEditTime, cachedEditTime-currentEditTime)
-
 			unchangedFiles[fileName] = cachedEditTime
 			continue
 		}

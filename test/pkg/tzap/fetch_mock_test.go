@@ -48,21 +48,21 @@ func (tg *mockTG) RawTokens(ctx context.Context, content string) ([]string, erro
 func (tg *mockTG) FetchEmbedding(ctx context.Context, content ...string) ([][1536]float32, error) {
 	return [][1536]float32{}, nil
 }
-func (tg *mockTG) SearchWithEmbedding(ctx context.Context, projectName string, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+func (tg *mockTG) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
-func (tg *mockTG) AddEmbeddingDocument(ctx context.Context, projectName string, docID string, embedding [1536]float32, metadata types.Metadata) error {
+func (tg *mockTG) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	return nil
 }
-func (tg *mockTG) GetEmbeddingDocument(ctx context.Context, projectName string, docID string) (types.Vector, bool, error) {
+func (tg *mockTG) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
 	return types.Vector{}, false, nil
 }
-func (tg *mockTG) DeleteEmbeddingDocument(ctx context.Context, projectName string, docID string) error {
+func (tg *mockTG) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
 	return nil
 }
-func (tg *mockTG) DeleteEmbeddingDocuments(ctx context.Context, projectName string, ids []string) error {
+func (tg *mockTG) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
 	return nil
 }
-func (tg *mockTG) ListAllEmbeddingsIds(ctx context.Context, projectName string) (types.SearchResults, error) {
+func (tg *mockTG) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
 	return types.SearchResults{}, nil
 }
