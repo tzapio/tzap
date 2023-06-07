@@ -20,3 +20,6 @@ cli/cmd/embeddingpromptv2.go
 mermaid
 *wasm*
 *prompt*
+*compiled*
+*bundle*
+*test*
