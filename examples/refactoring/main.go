@@ -58,6 +58,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	tzap.
 		NewWithConnector(
 			tzapconnect.WithConfig(openai_apikey, config.Configuration{
