@@ -37,12 +37,13 @@ func (fe *Embedder) PrepareEmbeddingsFromFiles(t *tzap.Tzap, files []types.FileR
 		panic(err)
 	}
 
-	idsToDelete, err := fe.getDrift(storedEmbeddings, rawFileEmbeddings, unchangedFileTimestamps)
+	idsToDelete, err := fe.getNoLongerPresentEmbeddings(storedEmbeddings, rawFileEmbeddings, unchangedFileTimestamps)
 	if err != nil {
 		panic(err)
 	}
+
 	tl.Logger.Println("Removing old embeddings", len(idsToDelete))
-	if err := fe.removeOldEmbeddings(t, idsToDelete); err != nil {
+	if err := fe.removeNoLongerPresentEmbeddings(t, idsToDelete); err != nil {
 		panic(err)
 	}
 	return rawFileEmbeddings
@@ -75,7 +76,7 @@ func (fe *Embedder) processFileContents(t *tzap.Tzap, changedFiles map[string]st
 	return embeddings, nil
 }
 
-func (fe *Embedder) getDrift(storedEmbeddings types.SearchResults, nowEmbeddings *types.Embeddings, unchangedFiles map[string]int64) ([]string, error) {
+func (fe *Embedder) getNoLongerPresentEmbeddings(storedEmbeddings types.SearchResults, nowEmbeddings *types.Embeddings, unchangedFiles map[string]int64) ([]string, error) {
 	nowEmbeddingsIds := make(map[string]struct{})
 	for _, vectorID := range nowEmbeddings.Vectors {
 		nowEmbeddingsIds[vectorID.ID] = struct{}{}
@@ -95,7 +96,7 @@ func (fe *Embedder) getDrift(storedEmbeddings types.SearchResults, nowEmbeddings
 	tl.Logger.Println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
 	return missingIds, nil
 }
-func (fe *Embedder) removeOldEmbeddings(t *tzap.Tzap, deleteIds []string) error {
+func (fe *Embedder) removeNoLongerPresentEmbeddings(t *tzap.Tzap, deleteIds []string) error {
 	if err := t.TG.DeleteEmbeddingDocuments(t.C, deleteIds); err != nil {
 		return err
 	}

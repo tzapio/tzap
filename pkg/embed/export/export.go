@@ -73,10 +73,10 @@ func GetEmbeddingsFromFile(filePath string) (*types.Embeddings, error) {
 	if err != nil {
 		return &types.Embeddings{}, err
 	}
-	var embeddings *types.Embeddings
-
-	if err := json.Unmarshal(filecontent, embeddings); err != nil {
+	var embeddings types.Embeddings
+	println(filecontent)
+	if err := json.Unmarshal(filecontent, &embeddings); err != nil {
 		return &types.Embeddings{}, err
 	}
-	return embeddings, nil
+	return &embeddings, nil
 }
