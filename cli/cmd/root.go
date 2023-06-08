@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -83,10 +84,8 @@ var RootCmd = &cobra.Command{
 			projectP = localProject
 		}
 		t = t.
-			AddTzap(&tzap.Tzap{Name: "loadAndSearchEmbeddings"}).
-			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-				t.C = project.SetProjectInContext(t.C, projectP)
-				return t
+			AddContextChange(func(c context.Context) context.Context {
+				return project.SetProjectInContext(c, projectP)
 			})
 		cmd.SetContext(cmdutil.SetTzapInContext(cmd.Context(), t))
 		return nil

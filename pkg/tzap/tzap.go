@@ -75,7 +75,7 @@ func (t *Tzap) New() *Tzap {
 }
 
 // AppendParentContext assigns the parent's context to the Tzap object, if present.
-func (t *Tzap) AppendParentContext() *Tzap {
+func (t *Tzap) appendParentContext() *Tzap {
 	if t.Parent != nil {
 		t.C = t.Parent.C
 		t.TG = t.Parent.TG
@@ -84,56 +84,63 @@ func (t *Tzap) AppendParentContext() *Tzap {
 }
 
 // onNewTzap is a helper method that appends the parent's context to the Tzap object.
-func (t *Tzap) AddContext() *Tzap {
+func (t *Tzap) onNewTzap() *Tzap {
 	addId(t)
-	return t.AppendParentContext()
+	return t.appendParentContext()
+}
+
+// AddContextChange replaces the current Tzap's context with the provided context.
+func (t *Tzap) AddContextChange(fn func(context.Context) context.Context) *Tzap {
+	newTzap := t.AddTzap(&Tzap{Name: "MutateContext"})
+	newTzap.C = fn(newTzap.C)
+	return newTzap
 }
 
 // AddTzap (mostly internal use) initializes and adds a new Tzap child to the current Tzap object.
 func (t *Tzap) AddTzap(tc *Tzap) *Tzap {
 	Logf(t, "Add tzap (%s)", tc.Name)
 	tc.Parent = t
-	return tc.AddContext()
+	return tc.onNewTzap()
 }
 
 // CloneTzap (mostly internal use) clones a Tzap object and assigns values based on the provided Tzap object.
-func (t *Tzap) CloneTzap(tc *Tzap) *Tzap {
-	Logf(t, "Clone tzap (%s)", tc.Name)
-	tz := &Tzap{
-		Parent:               t,
-		Name:                 t.Name,
-		InitialSystemContent: t.InitialSystemContent,
-		Message:              t.Message,
-		Data:                 t.Data,
+func (previousTzap *Tzap) CloneTzap(suggestedTzap *Tzap) *Tzap {
+	Logf(previousTzap, "Clone tzap (%s)", suggestedTzap.Name)
+	baseTzap := &Tzap{
+		Parent:               previousTzap,
+		Name:                 previousTzap.Name,
+		InitialSystemContent: previousTzap.InitialSystemContent,
+		Message:              previousTzap.Message,
+		Data:                 previousTzap.Data,
 	}
 
-	if tc.Parent != nil {
-		tz.Parent = tc.Parent
+	if suggestedTzap.Parent != nil {
+		baseTzap.Parent = suggestedTzap.Parent
 	}
-	if tc.Name != "" {
-		tz.Name = tc.Name
+	if suggestedTzap.Name != "" {
+		baseTzap.Name = suggestedTzap.Name
 	}
-	if tc.InitialSystemContent != "" {
-		tz.InitialSystemContent = tc.InitialSystemContent
+	if suggestedTzap.InitialSystemContent != "" {
+		baseTzap.InitialSystemContent = suggestedTzap.InitialSystemContent
 	}
-	if tc.Message.Role != "" {
-		tz.Message.Role = tc.Message.Role
+	if suggestedTzap.Message.Role != "" {
+		baseTzap.Message.Role = suggestedTzap.Message.Role
 	}
-	if tc.Message.Content != "" {
-		tz.Message.Content = tc.Message.Content
-	}
-
-	if len(tc.Data) > 0 {
-		tz.Data = tc.Data
+	if suggestedTzap.Message.Content != "" {
+		baseTzap.Message.Content = suggestedTzap.Message.Content
 	}
 
-	return tz.AddContext()
+	if len(suggestedTzap.Data) > 0 {
+		baseTzap.Data = suggestedTzap.Data
+	}
+
+	return baseTzap.onNewTzap()
 }
 
 // HijackTzap (mostly internal use) effectively de-attaches from previous Tzap by changing the own parent to parents parent.
 // This can be used AddUserMessage("H").LoadTaskOrRequestNewTask().Hijack() .() Tzap replaces the current Tzap's context and parent with the provided Tzap's context and parent.
-func (t *Tzap) HijackTzap(tc *Tzap) *Tzap {
-	Logf(t, "Hijack tzap (%s)", tc.Name)
-	tc.Parent = t.Parent
-	return tc.AddContext()
+func (previousTzap *Tzap) HijackTzap(bypassWith *Tzap) *Tzap {
+	Logf(previousTzap, "Hijack tzap (%s)", bypassWith.Name)
+	bypassWith.Parent = previousTzap.Parent
+	return bypassWith.onNewTzap()
 }
