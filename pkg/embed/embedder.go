@@ -12,38 +12,20 @@ import (
 type Embedder struct {
 	*EmbeddingCache
 	*FilestampCache
+	EmbedCleaner
 }
 
-func NewEmbedder(t *tzap.Tzap, embeddingCacheDB types.DBCollectionInterface[string], filesTimestampsDB types.DBCollectionInterface[int64], files []types.FileReader) *Embedder {
-	embeddingCache := NewEmbeddingCache(embeddingCacheDB, filesTimestampsDB)
+func NewEmbedder(embeddingCacheDB types.DBCollectionInterface[string], filesTimestampsDB types.DBCollectionInterface[int64]) *Embedder {
+	embeddingCache := NewEmbeddingCache(embeddingCacheDB)
 	filestampCache := NewFilestampCache(filesTimestampsDB)
-	return &Embedder{EmbeddingCache: embeddingCache, FilestampCache: filestampCache}
+	return &Embedder{EmbeddingCache: embeddingCache, EmbedCleaner: EmbedCleaner{}, FilestampCache: filestampCache}
 }
 
-func (fe *Embedder) PrepareEmbeddingsFromFiles(t *tzap.Tzap, files []types.FileReader) *types.Embeddings {
-	tl.Logger.Println("Preparing embeddings from files", len(files))
-	changedFileContents, unchangedFileTimestamps, err := fe.checkFileCache(files)
-	if err != nil {
-		panic(err)
-	}
+func (fe *Embedder) PrepareEmbeddingsFromFiles(t *tzap.Tzap, changedFileContents map[string]string) *types.Embeddings {
+	tl.Logger.Println("Preparing embeddings from files", len(changedFileContents))
 
 	rawFileEmbeddings, err := fe.processFileContents(t, changedFileContents)
 	if err != nil {
-		panic(err)
-	}
-
-	storedEmbeddings, err := t.TG.ListAllEmbeddingsIds(t.C)
-	if err != nil {
-		panic(err)
-	}
-
-	idsToDelete, err := fe.getNoLongerPresentEmbeddings(storedEmbeddings, rawFileEmbeddings, unchangedFileTimestamps)
-	if err != nil {
-		panic(err)
-	}
-
-	tl.Logger.Println("Removing old embeddings", len(idsToDelete))
-	if err := fe.removeNoLongerPresentEmbeddings(t, idsToDelete); err != nil {
 		panic(err)
 	}
 	return rawFileEmbeddings
@@ -76,32 +58,6 @@ func (fe *Embedder) processFileContents(t *tzap.Tzap, changedFiles map[string]st
 	return embeddings, nil
 }
 
-func (fe *Embedder) getNoLongerPresentEmbeddings(storedEmbeddings types.SearchResults, nowEmbeddings *types.Embeddings, unchangedFiles map[string]int64) ([]string, error) {
-	nowEmbeddingsIds := make(map[string]struct{})
-	for _, vectorID := range nowEmbeddings.Vectors {
-		nowEmbeddingsIds[vectorID.ID] = struct{}{}
-	}
-	missingIds := []string{}
-	for _, storedVector := range storedEmbeddings.Results {
-		filename := storedVector.Vector.Metadata.Filename
-		if _, exists := unchangedFiles[filename]; exists {
-			continue
-		}
-		if _, exists := nowEmbeddingsIds[storedVector.Vector.ID]; !exists {
-
-			missingIds = append(missingIds, storedVector.Vector.ID)
-			tl.Logger.Println("Drift: ", storedVector)
-		}
-	}
-	tl.Logger.Println("Drift Check: ", len(storedEmbeddings.Results), len(nowEmbeddings.Vectors), len(missingIds))
-	return missingIds, nil
-}
-func (fe *Embedder) removeNoLongerPresentEmbeddings(t *tzap.Tzap, deleteIds []string) error {
-	if err := t.TG.DeleteEmbeddingDocuments(t.C, deleteIds); err != nil {
-		return err
-	}
-	return nil
-}
 func (fe *Embedder) processFileOffsets(t *tzap.Tzap, file string, content string, fileTokens int) (*types.Embeddings, error) {
 	vectors := []*types.Vector{}
 	baseStep := 200

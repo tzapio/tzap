@@ -10,12 +10,11 @@ import (
 )
 
 type EmbeddingCache struct {
-	embeddingCacheDB  types.DBCollectionInterface[string]
-	filesTimestampsDB types.DBCollectionInterface[int64]
+	embeddingCacheDB types.DBCollectionInterface[string]
 }
 
-func NewEmbeddingCache(embeddingCacheDB types.DBCollectionInterface[string], filesTimestampsDB types.DBCollectionInterface[int64]) *EmbeddingCache {
-	return &EmbeddingCache{embeddingCacheDB, filesTimestampsDB}
+func NewEmbeddingCache(embeddingCacheDB types.DBCollectionInterface[string]) *EmbeddingCache {
+	return &EmbeddingCache{embeddingCacheDB}
 }
 func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddings *types.Embeddings) (*types.Embeddings, error) {
 	tl.Logger.Println("Getting cached embeddings", len(embeddings.Vectors))

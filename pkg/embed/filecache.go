@@ -16,7 +16,7 @@ type FilestampCache struct {
 func NewFilestampCache(filesTimestampsDB types.DBCollectionInterface[int64]) *FilestampCache {
 	return &FilestampCache{filesTimestampsDB: filesTimestampsDB}
 }
-func (fc *FilestampCache) checkFileCache(files []types.FileReader) (changedFiles map[string]string, unchangedFiles map[string]int64, err error) {
+func (fc *FilestampCache) CheckFileCache(files []types.FileReader) (changedFiles map[string]string, unchangedFiles map[string]int64) {
 	tl.Logger.Println("Checking file cache. Files:", len(files))
 	changedFiles = map[string]string{}
 	unchangedFiles = map[string]int64{}
@@ -52,7 +52,7 @@ func (fc *FilestampCache) checkFileCache(files []types.FileReader) (changedFiles
 		changedFiles[fileName] = fileContentStr
 	}
 	tl.Logger.Println("Finished checking file cache. Changed files:", len(changedFiles), "Unchanged files:", len(unchangedFiles))
-	return changedFiles, unchangedFiles, nil
+	return changedFiles, unchangedFiles
 }
 
 func (fc *FilestampCache) CacheFilestamps(embeddings *types.Embeddings, files []types.FileReader) error {

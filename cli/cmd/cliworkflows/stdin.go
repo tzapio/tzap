@@ -30,7 +30,7 @@ func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.Pro
 				panic(err)
 			}
 			projectP.GetEmbeddingCollection().StartInit()
-			embedder := embed.NewEmbedder(t, projectP.GetEmbeddingsCache(), projectP.GetTimestampCache(), files)
+			embedder := embed.NewEmbedder(projectP.GetEmbeddingsCache(), projectP.GetTimestampCache())
 			tl.Logger.Println("Indexing files...")
 			tl.Logger.Println("Finished index files...")
 			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
@@ -59,7 +59,7 @@ func IndexFilesAndEmbeddings(disableIndex, yes bool) types.NamedWorkflow[*tzap.T
 				panic(err)
 			}
 			projectP.GetEmbeddingCollection().StartInit()
-			embedder := embed.NewEmbedder(t, embeddingCacheDB, filesStampsDB, files)
+			embedder := embed.NewEmbedder(embeddingCacheDB, filesStampsDB)
 			tl.Logger.Println("Finished index files...")
 
 			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))

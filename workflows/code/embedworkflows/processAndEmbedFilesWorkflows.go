@@ -3,6 +3,7 @@ package embedworkflows
 import (
 	"fmt"
 
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -12,7 +13,10 @@ func PrepareEmbedFilesWorkflow(files []types.FileReader, embedder *embed.Embedde
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "prepareEmbedFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(t, files)
+			tl.Logger.Println("Preparing embeddings from files", len(files))
+			changedFileContents, unchangedFileTimestamps := embedder.CheckFileCache(files)
+			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(t, changedFileContents)
+			embedder.CleanOldEmbeddings(t, rawFileEmbeddings, unchangedFileTimestamps)
 			uncachedEmbeddings := embedder.GetUncachedEmbeddings(rawFileEmbeddings)
 			data := types.MappedInterface{"rawFileEmbeddings": rawFileEmbeddings, "uncachedEmbeddings": uncachedEmbeddings, "embedder": embedder}
 			return t.AddTzap(&tzap.Tzap{Name: "prepareEmbedFilesTzap", Data: data})
