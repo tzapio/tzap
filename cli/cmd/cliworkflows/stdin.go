@@ -53,12 +53,13 @@ func IndexFilesAndEmbeddings(disableIndex, yes bool) types.NamedWorkflow[*tzap.T
 			embeddingCacheDB := projectP.GetEmbeddingsCache()
 			embeddingCacheDB.StartInit()
 
+			projectP.GetEmbeddingCollection().StartInit()
 			tl.Logger.Println("Indexing files...")
 			files, err := projectP.GetFiles()
 			if err != nil {
 				panic(err)
 			}
-			projectP.GetEmbeddingCollection().StartInit()
+
 			embedder := embed.NewEmbedder(embeddingCacheDB, filesStampsDB)
 			tl.Logger.Println("Finished index files...")
 
