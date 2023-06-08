@@ -15,6 +15,31 @@
             "program": "cli/main.go",
             "args": ["search", "--verbose", "hello"],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Search With Lib",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "env": {
+            
+            },
+            "program": "cli/main.go",
+            "args": ["search", "hello","-v"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Install debug",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "env": {
+            
+            },
+            "program": "cli/main.go",
+            "args": ["install", "alex", "https://github.com/tzapio/tokenizer/archive/refs/heads/main.zip"],
+            "cwd": "${workspaceFolder}"
         }
+
     ]
 }
