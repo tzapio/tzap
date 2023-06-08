@@ -6,11 +6,8 @@ import (
 	"strings"
 
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/cmdinstance"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/embed/localdb"
 	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -25,28 +22,15 @@ func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.Pro
 			if disableIndex {
 				return t
 			}
-			cwd, err := os.Getwd()
+			projectP := project.GetProjectFromContext(t.C)
+			projectP.GetTimestampCache().StartInit()
+			projectP.GetEmbeddingsCache().StartInit()
+			files, err := projectP.GetFiles()
 			if err != nil {
 				panic(err)
 			}
-			fileInDirEvaluator, err := fileevaluator.New(cwd)
-			if err != nil {
-				panic(err)
-			}
-			fileStampsDB, err := cmdinstance.NewFilestampsDB(projectDir)
-			if err != nil {
-				panic(err)
-			}
-
-			files, err := fileInDirEvaluator.WalkDirFromURL(zipURL)
-			if err != nil {
-				panic(err)
-			}
-			embeddingCacheDB, err := localdb.NewFileDB[string]("./.tzap-data/embeddingsCache.db")
-			if err != nil {
-				panic(err)
-			}
-			embedder := embed.NewEmbedder(t, embeddingCacheDB, fileStampsDB, files)
+			projectP.GetEmbeddingCollection().StartInit()
+			embedder := embed.NewEmbedder(t, projectP.GetEmbeddingsCache(), projectP.GetTimestampCache(), files)
 			tl.Logger.Println("Indexing files...")
 			tl.Logger.Println("Finished index files...")
 			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
@@ -59,6 +43,7 @@ func IndexFilesAndEmbeddings(disableIndex, yes bool) types.NamedWorkflow[*tzap.T
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			projectP := project.GetProjectFromContext(t.C)
 			if disableIndex || !projectP.CanIndex() {
+				projectP.GetEmbeddingCollection().StartInit()
 				return t
 			}
 

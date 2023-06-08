@@ -1,10 +1,6 @@
 package embed
 
 import (
-	"context"
-	"encoding/json"
-	"os"
-
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
@@ -20,7 +16,7 @@ func NewQuery(t *tzap.Tzap, input string) (types.QueryRequest, error) {
 }
 
 func getEmbeddings(t *tzap.Tzap, input string) ([][1536]float32, error) {
-	embeddings, err := t.TG.FetchEmbedding(context.Background(), input)
+	embeddings, err := t.TG.FetchEmbedding(t.C, input)
 	if err != nil {
 		return nil, err
 	}
@@ -45,16 +41,4 @@ func BuildQuery(queryFilters []types.QueryFilter) types.QueryRequest {
 		Namespace:       "",   // Set the appropriate namespace
 		Queries:         queryFilters,
 	}
-}
-
-func SaveQueryAsJSON(query types.QueryRequest, filename string) error {
-	queryJSON, err := json.Marshal(query)
-	if err != nil {
-		return err
-	}
-
-	if err := os.WriteFile(filename, queryJSON, 0644); err != nil {
-		return err
-	}
-	return nil
 }

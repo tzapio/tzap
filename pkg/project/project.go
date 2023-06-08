@@ -34,11 +34,11 @@ type EmbedStore interface {
 var projectKey = struct{ projectKey string }{}
 
 func SetProjectInContext(ctx context.Context, project Project) context.Context {
-	tl.Logger.Println("SetProjectInContext:", project.GetProjectName())
+	tl.DeepLogger.Println("SetProjectInContext:", project.GetProjectName())
 	return context.WithValue(ctx, projectKey, project)
 }
 func GetProjectFromContext(ctx context.Context) Project {
 	project := ctx.Value(projectKey).(Project)
-	tl.Logger.Println("GetProjectFromContext:", project.GetProjectName())
+	tl.DeepLogger.Println("GetProjectFromContext:", project.GetProjectName())
 	return project
 }

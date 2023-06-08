@@ -62,7 +62,7 @@ func TestWalkDir(t *testing.T) {
 	}
 
 	for i, file := range expected {
-		if file != result[i].Filepath() {
+		if file != result[i].FilePath() {
 			t.Fatalf("expected %s, but got %s", file, result[i])
 		}
 	}

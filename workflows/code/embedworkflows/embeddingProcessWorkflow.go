@@ -32,7 +32,7 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "confirmEmbeddingSearch",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
+			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(*types.Embeddings)
 			if !ok {
 				panic("Loading embeddings went wrong")
 			}

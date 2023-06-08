@@ -48,7 +48,7 @@ func (z *ZipWalker) GetFiles() ([]types.FileReader, error) {
 			tl.Logger.Println("KEEPFILE", path)
 			list = append(list, &FileInZip{zipfile: file, filePath: path})
 		} else {
-			tl.Logger.Println("SKIPFILE", path)
+			tl.DeepLogger.Println("SKIPFILE", path)
 		}
 	}
 	return list, nil

@@ -17,11 +17,9 @@ type EmbeddingCache struct {
 func NewEmbeddingCache(embeddingCacheDB types.DBCollectionInterface[string], filesTimestampsDB types.DBCollectionInterface[int64]) *EmbeddingCache {
 	return &EmbeddingCache{embeddingCacheDB, filesTimestampsDB}
 }
-func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddings types.Embeddings) (types.Embeddings, error) {
-	var storedFiles map[string]struct{} = map[string]struct{}{}
-
+func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddings *types.Embeddings) (*types.Embeddings, error) {
 	tl.Logger.Println("Getting cached embeddings", len(embeddings.Vectors))
-	var cachedEmbeddings []types.Vector
+	var cachedEmbeddings []*types.Vector
 
 	for _, vector := range embeddings.Vectors {
 		splitPart := vector.Metadata.SplitPart
@@ -31,7 +29,7 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddin
 				var float32Vector = [1536]float32(make([]float32, 1536))
 				json.Unmarshal([]byte(kv.Value), &float32Vector)
 				if len(float32Vector) == 1536 {
-					vector := types.Vector{
+					vector := &types.Vector{
 						ID:        vector.ID,
 						TimeStamp: 0,
 						Metadata:  vector.Metadata,
@@ -39,40 +37,21 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddin
 					}
 
 					cachedEmbeddings = append(cachedEmbeddings, vector)
-					storedFiles[vector.Metadata.Filename] = struct{}{}
 					continue
 				} else {
 					println("invalid vector length", splitPart)
-					continue
+					return &types.Embeddings{}, nil
 				}
 			}
 		}
 		println("Warning: %s is uncached.", vector.ID)
 	}
-	if len(storedFiles) > 0 {
-		var keyvals []types.KeyValue[int64]
-		for file := range storedFiles {
-			for _, fileReader := range files {
-				if fileReader.Filepath() == file {
-					fileStat, err := fileReader.Stat()
-					if err != nil {
-						return types.Embeddings{}, err
-					}
-					keyvals = append(keyvals, types.KeyValue[int64]{Key: file, Value: fileStat.ModTime().UnixNano()})
-				}
-			}
-		}
-		added, err := ec.filesTimestampsDB.BatchSet(keyvals)
-		if err != nil {
-			panic("failing to store changed files should not happend and has probably caused some kind of corruption")
-		}
-		tl.Logger.Printf("Added %d files to file cache. Total: %d", added, len(storedFiles))
-	}
-	return types.Embeddings{Vectors: cachedEmbeddings}, nil
+
+	return &types.Embeddings{Vectors: cachedEmbeddings}, nil
 }
 
-func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings types.Embeddings) types.Embeddings {
-	var uncachedEmbeddings []types.Vector
+func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings *types.Embeddings) *types.Embeddings {
+	var uncachedEmbeddings []*types.Vector
 
 	for _, vector := range embeddings.Vectors {
 		splitPart := vector.Metadata.SplitPart
@@ -82,10 +61,10 @@ func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings types.Embeddings) typ
 		}
 
 	}
-	return types.Embeddings{Vectors: uncachedEmbeddings}
+	return &types.Embeddings{Vectors: uncachedEmbeddings}
 }
 
-func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []types.FileReader, uncachedEmbeddings types.Embeddings) error {
+func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []types.FileReader, uncachedEmbeddings *types.Embeddings) error {
 	var storedFiles map[string]struct{} = map[string]struct{}{}
 
 	if len(uncachedEmbeddings.Vectors) > 0 {
@@ -123,25 +102,6 @@ func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []type
 				return err
 			}
 			tl.UILogger.Println("Added", added, "embeddings to cache")
-		}
-		if len(storedFiles) > 0 {
-			var keyvals []types.KeyValue[int64]
-			for file := range storedFiles {
-				for _, fileReader := range files {
-					if fileReader.Filepath() == file {
-						fileStat, err := fileReader.Stat()
-						if err != nil {
-							return err
-						}
-						keyvals = append(keyvals, types.KeyValue[int64]{Key: file, Value: fileStat.ModTime().UnixNano()})
-					}
-				}
-			}
-			added, err := ec.filesTimestampsDB.BatchSet(keyvals)
-			if err != nil {
-				panic("failing to store changed files should not happend and has probably caused some kind of corruption")
-			}
-			tl.Logger.Printf("Added %d files to md5 cache", added)
 		}
 
 	}

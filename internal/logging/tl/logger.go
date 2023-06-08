@@ -28,7 +28,6 @@ func EnableUILogger() {
 func EnableUICompletionLogger() {
 	UICompletionLogger.SetOutput(io.Writer(os.Stderr))
 }
-
 func EnableDeepLogger() {
 	DeepLogger.SetOutput(io.Writer(os.Stderr))
 }

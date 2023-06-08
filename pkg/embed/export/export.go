@@ -9,7 +9,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func ExportEmbeddingToFile(e types.Embeddings) {
+func ExportEmbeddingToFile(e *types.Embeddings) {
 	if err := BatchEmbeddings(e); err != nil {
 		panic(err)
 	}
@@ -17,7 +17,7 @@ func ExportEmbeddingToFile(e types.Embeddings) {
 		panic(err)
 	}
 }
-func ExportVectorsToFile(e types.Embeddings, filePath string) error {
+func ExportVectorsToFile(e *types.Embeddings, filePath string) error {
 	embeddingJSON, err := json.Marshal(e)
 	if err != nil {
 		return err
@@ -30,17 +30,17 @@ func ExportVectorsToFile(e types.Embeddings, filePath string) error {
 	return nil
 }
 
-func BatchEmbeddings(e types.Embeddings) error {
+func BatchEmbeddings(e *types.Embeddings) error {
 	batchSize := 100
 	batchNumber := 1
-	var batch []types.Vector
+	var batch []*types.Vector
 
 	for i, vector := range e.Vectors {
 		batch = append(batch, vector)
 		deletePreviousBatch()
 		if (i+1)%batchSize == 0 || i == len(e.Vectors)-1 {
 			filePath := fmt.Sprintf("./.tzap-data/files-%d.json", batchNumber)
-			batchEmbeddingJson := types.Embeddings{
+			batchEmbeddingJson := &types.Embeddings{
 				Vectors: batch,
 			}
 			err := ExportVectorsToFile(batchEmbeddingJson, filePath)
@@ -67,16 +67,16 @@ func deletePreviousBatch() error {
 	return nil
 }
 
-func GetEmbeddingsFromFile(filePath string) (types.Embeddings, error) {
+func GetEmbeddingsFromFile(filePath string) (*types.Embeddings, error) {
 	tl.Logger.Println("Getting embeddings from file", filePath)
 	filecontent, err := os.ReadFile(filePath)
 	if err != nil {
-		return types.Embeddings{}, err
+		return &types.Embeddings{}, err
 	}
-	var embeddings types.Embeddings
+	var embeddings *types.Embeddings
 
-	if err := json.Unmarshal(filecontent, &embeddings); err != nil {
-		return types.Embeddings{}, err
+	if err := json.Unmarshal(filecontent, embeddings); err != nil {
+		return &types.Embeddings{}, err
 	}
 	return embeddings, nil
 }

@@ -20,22 +20,22 @@ type LocalProject struct {
 	*localwalker.LocalWalker //GetFiles() @TODO: Refactor to FS interface?
 }
 
-func NewFilestampsDB(projectDir project.ProjectDir) (types.DBCollectionInterface[int64], error) {
+func NewFilestampCache(projectDir project.ProjectDir) (types.DBCollectionInterface[int64], error) {
 	return localdb.NewFileDB[int64](path.Join(string(projectDir), "filesTimestamps.db"))
 }
-func NewEmbeddingsCacheDB(projectDir project.ProjectDir) (types.DBCollectionInterface[string], error) {
+func NewEmbeddingsCache(projectDir project.ProjectDir) (types.DBCollectionInterface[string], error) {
 	return localdb.NewFileDB[string](path.Join(string(projectDir), "embeddingsCache.db"))
 }
-func NewEmbeddingsDB(projectDir project.ProjectDir) (types.DBCollectionInterface[types.Vector], error) {
+func NewEmbeddingsCollection(projectDir project.ProjectDir) (types.DBCollectionInterface[types.Vector], error) {
 	return localdb.NewFileDB[types.Vector](path.Join(string(projectDir), "fileembeddings.db"))
 }
 func NewLocalProject(baseDir string) (project.Project, error) {
-	filesStampsDB, err := NewFilestampsDB("./.tzap-data")
+	filesStampsDB, err := NewFilestampCache("./.tzap-data")
 	if err != nil {
 		panic(err)
 	}
 
-	embeddingCacheDB, err := NewEmbeddingsCacheDB("./.tzap-data")
+	embeddingCacheDB, err := NewEmbeddingsCache("./.tzap-data")
 	if err != nil {
 		panic(err)
 	}

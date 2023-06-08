@@ -12,7 +12,7 @@ func PrepareEmbedFilesWorkflow(files []types.FileReader, embedder *embed.Embedde
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "prepareEmbedFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(t)
+			rawFileEmbeddings := embedder.PrepareEmbeddingsFromFiles(t, files)
 			uncachedEmbeddings := embedder.GetUncachedEmbeddings(rawFileEmbeddings)
 			data := types.MappedInterface{"rawFileEmbeddings": rawFileEmbeddings, "uncachedEmbeddings": uncachedEmbeddings, "embedder": embedder}
 			return t.AddTzap(&tzap.Tzap{Name: "prepareEmbedFilesTzap", Data: data})
@@ -28,22 +28,30 @@ func FetchOrCachedEmbeddingForFilesWorkflow(files []types.FileReader) types.Name
 			if !ok {
 				panic(fmt.Errorf("loading embedder went wrong"))
 			}
-			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(types.Embeddings)
+			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(*types.Embeddings)
 			if !ok {
-				panic("Loading embeddings went wrong")
+				panic(fmt.Errorf("Loading embeddings went wrong"))
 			}
 			if len(uncachedEmbeddings.Vectors) > 0 {
 				if err := embedder.FetchThenCacheNewEmbeddings(t, files, uncachedEmbeddings); err != nil {
 					panic(err)
 				}
+				if err := embedder.CacheFilestamps(uncachedEmbeddings, files); err != nil {
+					panic(err)
+				}
 			}
-			rawFileEmbeddings, ok := t.Data["rawFileEmbeddings"].(types.Embeddings)
+			rawFileEmbeddings, ok := t.Data["rawFileEmbeddings"].(*types.Embeddings)
 			if !ok {
 				panic("Loading embeddings went wrong")
 			}
 			cachedEmbeddings, err := embedder.GetCachedEmbeddings(files, rawFileEmbeddings)
 			if err != nil {
 				panic(err)
+			}
+			if len(cachedEmbeddings.Vectors) == 0 {
+				if err := embedder.CacheFilestamps(uncachedEmbeddings, files); err != nil {
+					panic(err)
+				}
 			}
 			data := types.MappedInterface{"embeddings": cachedEmbeddings}
 			return t.AddTzap(&tzap.Tzap{Name: "fetchOrCachedEmbeddingForFilesTzap", Data: data})
@@ -54,7 +62,7 @@ func SaveAndLoadEmbeddingsToDB() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "saveAndLoadEmbeddingsToDB",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			embeddings, ok := t.Data["embeddings"].(types.Embeddings)
+			embeddings, ok := t.Data["embeddings"].(*types.Embeddings)
 			if !ok {
 				panic("Loading embeddings went wrong")
 			}

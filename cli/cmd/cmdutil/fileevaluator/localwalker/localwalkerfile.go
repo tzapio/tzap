@@ -17,7 +17,7 @@ func NewLocalfile(filePath string) types.FileReader {
 	return &LocalFile{filePath: filePath}
 }
 
-func (f *LocalFile) Filepath() string {
+func (f *LocalFile) FilePath() string {
 	return f.filePath
 }
 func (f *LocalFile) getFile() (*os.File, error) {

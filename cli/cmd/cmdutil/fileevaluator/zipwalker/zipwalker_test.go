@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/zipwalker"
 )
 
 func TestWalkDirFromURL(t *testing.T) {
@@ -27,16 +28,16 @@ func TestWalkDirFromURL(t *testing.T) {
 
 	// Instantiate a FileInDirEvaluator
 	evaluator := fileevaluator.NewWithPatterns([]string{}, []string{"*.txt"})
-
+	zipwalker := zipwalker.New(evaluator, "/", ts.URL)
 	// Call WalkDirFromURL with the test server URL
-	result, err := evaluator.WalkDirFromURL(ts.URL)
+	result, err := zipwalker.GetFiles()
 	if err != nil {
 		t.Fatalf("error walking directory from URL: %v", err)
 	}
 
 	expected := []string{"file1.txt", "file2.txt"}
 	for i, file := range expected {
-		assert.Equal(t, file, result[i].Filepath())
+		assert.Equal(t, file, result[i].FilePath())
 	}
 
 }

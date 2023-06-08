@@ -6,6 +6,6 @@ type EmbedStore struct {
 	types.UnimplementedTGenerator
 }
 
-func InitiateLocalDB() (*EmbedStore, error) {
+func NewEmbedStore() (*EmbedStore, error) {
 	return &EmbedStore{}, nil
 }

@@ -17,7 +17,7 @@ type Metadata struct {
 	RealSplitPart string `json:"realSplitPart"`
 }
 type Embeddings struct {
-	Vectors []Vector `json:"vectors"`
+	Vectors []*Vector `json:"vectors"`
 }
 
 type Query struct {

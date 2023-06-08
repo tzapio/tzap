@@ -28,7 +28,7 @@ func newBaseconnector(openai_apikey string) (types.TGenerator, error) {
 	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey)
 
 	tl.Logger.Println("Open AI Client Initialized")
-	embeddingC, err := embedstore.InitiateLocalDB()
+	embeddingC, err := embedstore.NewEmbedStore()
 	if err != nil {
 		return nil, err
 	}

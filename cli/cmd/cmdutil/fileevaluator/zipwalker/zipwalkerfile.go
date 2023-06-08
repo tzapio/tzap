@@ -13,7 +13,7 @@ type FileInZip struct {
 	zipfile  *zip.File
 }
 
-func (f *FileInZip) Filepath() string {
+func (f *FileInZip) FilePath() string {
 	return f.filePath
 }
 

@@ -14,6 +14,8 @@ type ZipProject struct {
 	projectDir           project.ProjectDir
 	baseDir              string
 	embeddingCollection  types.DBCollectionInterface[types.Vector]
+	embeddingsCache      types.DBCollectionInterface[string]
+	filestampsCache      types.DBCollectionInterface[int64]
 	*zipwalker.ZipWalker //GetFiles() @TODO: Refactor to FS interface?
 }
 
@@ -22,7 +24,15 @@ func NewLocalZipProject(name, relativeDirInZip, url string, excludePatterns, inc
 	projectDir := project.ProjectDir(path.Join("./.tzap-data", name))
 	zipwalker := zipwalker.New(fileevaluator, relativeDirInZip, url)
 
-	embeddingCollection, err := NewEmbeddingsDB(projectDir)
+	embeddingCollection, err := NewEmbeddingsCollection(projectDir)
+	if err != nil {
+		return nil, err
+	}
+	embeddingsCache, err := NewEmbeddingsCache(projectDir)
+	if err != nil {
+		return nil, err
+	}
+	filestampCache, err := NewFilestampCache(projectDir)
 	if err != nil {
 		return nil, err
 	}
@@ -31,6 +41,8 @@ func NewLocalZipProject(name, relativeDirInZip, url string, excludePatterns, inc
 		baseDir:             relativeDirInZip,
 		projectDir:          projectDir,
 		embeddingCollection: embeddingCollection,
+		embeddingsCache:     embeddingsCache,
+		filestampsCache:     filestampCache,
 		ZipWalker:           zipwalker,
 	}
 	return zipProject, nil
@@ -40,13 +52,13 @@ func (l *ZipProject) CanIndex() bool {
 }
 
 // GetEmbeddingsCache implements project.Project
-func (*ZipProject) GetEmbeddingsCache() types.DBCollectionInterface[string] {
-	panic("unimplemented")
+func (l *ZipProject) GetEmbeddingsCache() types.DBCollectionInterface[string] {
+	return l.embeddingsCache
 }
 
 // GetTimestampCache implements project.Project
-func (*ZipProject) GetTimestampCache() types.DBCollectionInterface[int64] {
-	panic("unimplemented")
+func (l *ZipProject) GetTimestampCache() types.DBCollectionInterface[int64] {
+	return l.filestampsCache
 }
 
 // GetEmbedding implements project.Project

@@ -16,23 +16,22 @@ type LocalWalker struct {
 }
 
 func New(e *fileevaluator.FileEvaluator, basePath string, dir string) *LocalWalker {
-	f := &LocalWalker{dir: dir, e: e}
-	return f
+	return &LocalWalker{dir: dir, e: e}
 }
 
 func (f *LocalWalker) GetFiles() ([]types.FileReader, error) {
 	var list []types.FileReader
 	err := filepath.WalkDir(f.dir, func(path string, d fs.DirEntry, err error) error {
-		tl.Logger.Println("WALKDIR", f.dir, path, d.Name())
+		tl.DeepLogger.Println("WALKDIR", f.dir, path, d.Name())
 		if err != nil {
 			return err
 		}
 		if d.IsDir() {
 			if f.e.ShouldTraverseDir(path) || d.Name() == "." {
-				tl.Logger.Println("KEEPDIR", path)
+				tl.DeepLogger.Println("KEEPDIR", path)
 				return nil
 			} else {
-				tl.Logger.Println("SKIPDIR", path)
+				tl.DeepLogger.Println("SKIPDIR", path)
 				return filepath.SkipDir
 			}
 		} else if f.e.ShouldKeepPath(path) {
@@ -45,7 +44,7 @@ func (f *LocalWalker) GetFiles() ([]types.FileReader, error) {
 			list = append(list, NewLocalfile(filepath.ToSlash(relPath)))
 			return nil
 		}
-		tl.Logger.Println("SKIPFILE", path)
+		tl.DeepLogger.Println("SKIPFILE", path)
 		return nil
 	})
 	if err != nil {
