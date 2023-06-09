@@ -38,8 +38,9 @@ type QueryRequest struct {
 	Queries         []QueryFilter `json:"queries"`
 }
 type SearchResult struct {
-	Vector     Vector  `json:"vector"`
-	Similarity float32 `json:"score"`
+	Vector     Vector    `json:"vector"`
+	PCA        []float32 `json:"pca"`
+	Similarity float32   `json:"score"`
 }
 type SearchResults struct {
 	Results []SearchResult

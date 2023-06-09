@@ -28,6 +28,7 @@ func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int,
 			filteredResults := filterSearchResults(searchResults, excludeFiles, k)
 
 			data := types.MappedInterface{
+				"queryResult":   query,
 				"searchResults": filteredResults,
 			}
 			tl.Logger.Println("searchFilesWorkflow ending")
@@ -50,7 +51,7 @@ func filterSearchResults(searchResults types.SearchResults, excludedFiles []stri
 		if !isExcluded {
 			filteredResults = append(filteredResults, result)
 		}
-		if len(filteredResults) >= k {
+		if len(filteredResults) >= k && k > -1 {
 			break
 		}
 	}

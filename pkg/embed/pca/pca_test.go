@@ -37,9 +37,9 @@ func TestEmbeddingsTo3D(t *testing.T) {
 		t.Fatalf("error writing pca.txt: %s", err)
 	}
 	println("writing pca.txt")
-	/*
-		if len(pcaResult.Points) == 0 {
-			t.Fatalf("PCA result has no points")
-		}
-	*/
+
+	if len(pcaResult) == 0 {
+		t.Fatalf("PCA result has no points")
+	}
+
 }
