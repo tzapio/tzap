@@ -10,6 +10,7 @@ replace github.com/tzapio/tzap/pkg/connectors/openaiconnector => ../pkg/connecto
 
 require (
 	github.com/fatih/color v1.15.0
+	github.com/fsnotify/fsnotify v1.6.0
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
