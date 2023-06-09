@@ -26,13 +26,19 @@ func (gr *GobReader) Read(p interface{}) error {
 		return err
 	}
 	buf := make([]byte, length)
-	_, err = io.ReadFull(gr.reader, buf)
-	if err != nil {
+
+	if _, err = io.ReadFull(gr.reader, buf); err != nil {
+		println("Warning - Binary file reader crashed. Run `tzap reset` or submit a bug report if error persists.")
 		return err
 	}
 	bReader := bytes.NewReader(buf)
 	decoder := gob.NewDecoder(bReader)
-	return decoder.Decode(p)
+
+	if err := decoder.Decode(p); err != nil {
+		println("Warning - Binary file reader crashed. Run `tzap reset` or submit a bug report if error persists.")
+		return err
+	}
+	return nil
 }
 
 func NewGobWriterIO(w io.Writer) *GobWriter {
