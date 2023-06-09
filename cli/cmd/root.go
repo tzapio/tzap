@@ -154,5 +154,5 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "ALPHA: Enable clean stdout outputs. Also turns off editor mode.")
 	RootCmd.PersistentFlags().BoolVarP(&settings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
-	RootCmd.PersistentFlags().StringVarP(&settings.Editor, "editor", "e", "stdin", "ALPHA: Select editor mode (stdin, editor, vscode, vim, nano, api).")
+	RootCmd.PersistentFlags().StringVarP(&settings.Editor, "editor", "e", "vscode", "ALPHA: Select editor mode (stdin, editor, vscode, vim, nano).")
 }
