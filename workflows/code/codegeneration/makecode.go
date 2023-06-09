@@ -38,8 +38,8 @@ func MakeCodeExtReplacer(language, extensionIn, extensionOut, mission, task stri
 }
 
 type BasicRefactoringConfig struct {
-	FileIn           string   `json:"inputs_extension,omitempty"`
-	FileOut          string   `json:"outputs_extension,omitempty"`
+	FileIn           string   `json:"filein,omitempty"`
+	FileOut          string   `json:"fileout,omitempty"`
 	Mission          string   `json:"mission,omitempty"`
 	Task             string   `json:"task,omitempty"`
 	Plan             string   `json:"plan,omitempty"`
