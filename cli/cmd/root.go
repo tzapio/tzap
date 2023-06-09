@@ -65,6 +65,9 @@ var RootCmd = &cobra.Command{
 					settings.Editor = editor
 				}
 			}
+		} else {
+			tl.Logger.Println("No config.json found")
+			os.WriteFile(".tzap-data/config.json", []byte(`{"editor":"code"}`), 0644)
 		}
 		tl.Logger.Println("Current working directory:", baseDir)
 		t, err := initializeTzap()
@@ -151,5 +154,5 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "ALPHA: Enable clean stdout outputs. Also turns off editor mode.")
 	RootCmd.PersistentFlags().BoolVarP(&settings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
-	RootCmd.PersistentFlags().StringVarP(&settings.Editor, "editor", "e", "editor", "ALPHA: Select editor mode (stdin, editor, vscode, vim, nano, api).")
+	RootCmd.PersistentFlags().StringVarP(&settings.Editor, "editor", "e", "stdin", "ALPHA: Select editor mode (stdin, editor, vscode, vim, nano, api).")
 }
