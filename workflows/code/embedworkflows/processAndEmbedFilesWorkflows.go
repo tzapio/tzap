@@ -53,7 +53,7 @@ func FetchOrCachedEmbeddingForFilesWorkflow(files []types.FileReader) types.Name
 				panic(err)
 			}
 			if len(cachedEmbeddings.Vectors) == 0 {
-				if err := embedder.CacheFilestamps(uncachedEmbeddings, files); err != nil {
+				if err := embedder.CacheFilestamps(cachedEmbeddings, files); err != nil {
 					panic(err)
 				}
 			}
