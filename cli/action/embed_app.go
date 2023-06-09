@@ -21,14 +21,17 @@ type LoadAndSearchEmbeddingsArgs struct {
 
 type LoadAndSearchEmbeddingsOutput struct {
 	SearchResults types.SearchResults `json:"searchResults"`
+	QueryResult   types.QueryRequest  `json:"queryResult"`
 }
 
 func LoadAndSearchEmbeddings(t *tzap.Tzap, args LoadAndSearchEmbeddingsArgs) *LoadAndSearchEmbeddingsOutput {
 	resultT := t.
 		ApplyWorkflow(loadAndSearchEmbeddingsWorkflow(args))
 	searchResult := resultT.Data["searchResults"].(types.SearchResults)
+	queryResult := resultT.Data["queryResult"].(types.QueryRequest)
 	return &LoadAndSearchEmbeddingsOutput{
 		SearchResults: searchResult,
+		QueryResult:   queryResult,
 	}
 }
 

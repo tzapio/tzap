@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -31,6 +32,7 @@ var settings struct {
 	Verbose       bool
 	ApiMode       bool
 	Yes           bool
+	Editor        string
 }
 
 var RootCmd = &cobra.Command{
@@ -55,6 +57,15 @@ var RootCmd = &cobra.Command{
 			return err
 		}
 		os.Chdir(baseDir)
+		data, err := os.ReadFile(".tzap-data/config.json")
+		if err == nil {
+			var cfg map[string]interface{}
+			if err := json.Unmarshal(data, &cfg); err == nil {
+				if editor, ok := cfg["editor"].(string); ok {
+					settings.Editor = editor
+				}
+			}
+		}
 		tl.Logger.Println("Current working directory:", baseDir)
 		t, err := initializeTzap()
 		if err != nil {
@@ -138,6 +149,7 @@ func init() {
 	RootCmd.PersistentFlags().BoolVar(&settings.Stub, "stub", false, "Test non-live mode")
 	RootCmd.PersistentFlags().Float32VarP(&settings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
 	RootCmd.PersistentFlags().BoolVarP(&settings.Verbose, "verbose", "v", false, "Enable verbose logging")
-	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "INTERNAL: Enable clean stdout outputs")
+	RootCmd.PersistentFlags().BoolVar(&settings.ApiMode, "api", false, "ALPHA: Enable clean stdout outputs. Also turns off editor mode.")
 	RootCmd.PersistentFlags().BoolVarP(&settings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
+	RootCmd.PersistentFlags().StringVarP(&settings.Editor, "editor", "e", "editor", "ALPHA: Select editor mode (stdin, editor, vscode, vim, nano, api).")
 }
