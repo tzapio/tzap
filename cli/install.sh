@@ -17,7 +17,7 @@ fi
 VERSION=$(curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
 if [ "$OS" == "darwin" ] || [ "$OS" == "linux" ]; then
-    FILENAME="tzap-${VERSION}-${OS}-${ARCH}"
+    FILENAME="tzap-${OS}-${ARCH}"
     URL="https://github.com/${GITHUB_USER}/${GITHUB_REPO}/releases/download/${VERSION}/${FILENAME}"
     echo "Downloading Tzap ${VERSION} for ${OS}-${ARCH}..."
     curl -L -o tzap "${URL}"
@@ -25,7 +25,7 @@ if [ "$OS" == "darwin" ] || [ "$OS" == "linux" ]; then
     sudo mv tzap /usr/local/bin/
     echo "Tzap ${VERSION} installed successfully."
 elif [ "$OS" == "windows" ]; then
-    FILENAME="tzap-${VERSION}-windows-${ARCH}.exe"
+    FILENAME="tzap-windows-${ARCH}.exe"
     URL="https://github.com/${GITHUB_USER}/${GITHUB_REPO}/releases/download/${VERSION}/${FILENAME}"
     echo "Downloading Tzap ${VERSION} for ${OS}-${ARCH}..."
     curl -L -o tzap.exe "${URL}"
