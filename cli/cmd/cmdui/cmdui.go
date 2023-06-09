@@ -7,11 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/util/stdin"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 type CMDUI struct {
@@ -89,15 +86,15 @@ func (ui *CMDUI) RunEditor() {
 func (ui *CMDUI) AddPromptTextWithStdinUI(thread []types.Message) []types.Message {
 	println("\n\nFile: ", ui.filePath)
 	println("")
-	err := ui.SaveThread(thread)
+	err := ui.SaveMessageThreadToFile(thread)
 	if err != nil {
 		panic(err)
 	}
 	ui.RunEditor()
-	return ui.DeserializeThread()
+	return ui.ReadMessageThreadFromFile()
 }
 
-func (ui *CMDUI) DeserializeThread() []types.Message {
+func (ui *CMDUI) ReadMessageThreadFromFile() []types.Message {
 	bytes, err := os.ReadFile(ui.filePath)
 	if err != nil {
 		panic(err)
@@ -129,11 +126,11 @@ func (ui *CMDUI) DeserializeThread() []types.Message {
 	return reverseMessages
 }
 
-// SaveThread saves the thread to a file
+// SaveMessageThreadToFile saves the thread to a file
 // The file is saved in reverse order, so that the last message is the first line in the file
 // The first line may skip role and defaults to user
-func (ui *CMDUI) SaveThread(messages []types.Message) error {
-	text, err := ui.SerializeThread(messages)
+func (ui *CMDUI) SaveMessageThreadToFile(messages []types.Message) error {
+	text, err := ui.SerializeMessageThread(messages)
 	if err != nil {
 		return err
 	}
@@ -144,7 +141,7 @@ func (ui *CMDUI) SaveThread(messages []types.Message) error {
 	return nil
 }
 
-func (ui *CMDUI) SerializeThread(messages []types.Message) (string, error) {
+func (ui *CMDUI) SerializeMessageThread(messages []types.Message) (string, error) {
 	reversedMessages := []types.Message{}
 	for i := len(messages) - 1; i >= 0; i-- {
 		if strings.TrimSpace(messages[i].Content) == "" || strings.TrimSpace(messages[i].Role) == "" {
@@ -163,56 +160,4 @@ func (ui *CMDUI) SerializeThread(messages []types.Message) (string, error) {
 		}
 	}
 	return s.String(), nil
-}
-
-func (ui *CMDUI) WatchSavesToFile(changedWithin time.Duration, times int) error {
-
-	// Watch for file changes
-	var lastChangeTime time.Time
-	var changes int
-
-	// Create a new file watcher to monitor changes to the file
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		return err
-	}
-
-	// Start watching the file
-	err = watcher.Add(ui.filePath)
-	if err != nil {
-		return err
-	}
-	defer watcher.Remove(ui.filePath)
-
-	for {
-		select {
-		case event := <-watcher.Events:
-			// If the file was modified, check how long ago the last modification was
-			if event.Op.Has(fsnotify.Write) {
-				now := time.Now()
-				passed := now.Sub(lastChangeTime)
-				if passed < time.Millisecond*50 {
-					continue
-				}
-				if passed <= changedWithin {
-					changes++
-					tl.Logger.Println("file saved - incrementing changes", changes)
-				} else {
-					tl.Logger.Println("file saved - resetting changes")
-					changes = 1
-				}
-				lastChangeTime = now
-
-				// If we've seen multiple changes within the time window, call the callback
-				if changes >= times {
-					tl.Logger.Printf("saved %d times in 2 seconds", times)
-					changes = 0
-					return nil
-				}
-			}
-		case err := <-watcher.Errors:
-			println("error:", err)
-			return err
-		}
-	}
 }
