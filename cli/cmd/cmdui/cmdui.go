@@ -42,7 +42,7 @@ func (ui *CMDUI) Init() {
 	}
 }
 func (ui *CMDUI) RunEditor() {
-	if ui.editor == "vscode" {
+	if ui.editor == "vscode" || ui.editor == "code" {
 		println("Write at top of file and hit save 3 times in 1 seconds to trigger re-prompt. ")
 		exec.Command("code", "-r", "--goto", ui.filePath+":-1").Run()
 		ui.WatchSavesToFile(time.Second*1, 3)
