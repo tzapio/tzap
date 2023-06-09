@@ -78,7 +78,7 @@ func (t *Tzap) OffsetTokens(content string, from int, to int) (string, int, erro
 func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 	config := config.FromContext(t.C)
 
-	thread := TruncateToMaxWords(GetThread(t), config.TruncateLimit)
+	thread := TruncateToMaxTokens(t.TG, GetThread(t), config.TruncateLimit)
 
 	filelog.LogData(t.C, t, filelog.TzapLog)
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
