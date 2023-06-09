@@ -55,9 +55,8 @@ var installCmd = &cobra.Command{
 
 		zipURL, err := GetZipUrlFromGithubUrl(args[1])
 		if err != nil {
-			panic(err)
+			zipURL = args[1]
 		}
-
 		err = tzap.HandlePanic(func() {
 			zipProject, err := cmdinstance.NewLocalZipProject(string(name), "/", zipURL, []string{}, []string{})
 			if err != nil {
