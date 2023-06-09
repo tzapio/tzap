@@ -1,10 +1,10 @@
 package tzap
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
-	"regexp"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -112,10 +112,9 @@ func (t *Tzap) storeThread(messages []types.Message) *Tzap {
 	return t
 }
 
-// Not accurate way of counting tokens, but an approximation.
-func TruncateToMaxWords(messages []types.Message, wordLimit int) []types.Message {
+func TruncateToMaxTokens(tg types.TGenerator, messages []types.Message, wordLimit int) []types.Message {
 	var result []types.Message
-	wordCount := 0
+	tokenCount := 0
 	if wordLimit < 0 {
 		panic(fmt.Sprintf("TruncateToMaxWords wordlimit is %d, set above 1, or 0 to allow unlimited until model fails", wordLimit))
 	}
@@ -123,29 +122,20 @@ func TruncateToMaxWords(messages []types.Message, wordLimit int) []types.Message
 		return messages
 	}
 
-	wordSplitter := regexp.MustCompile(`[\s,./()\-_]+`)
 	for i := len(messages) - 1; i >= 0; i-- {
 		message := messages[i]
-		words := wordSplitter.Split(message.Content, -1)
-		words = removeEmptyStrings(words)
-		if wordCount+len(words) <= wordLimit {
+		tokens, err := tg.CountTokens(context.Background(), message.Content)
+		if err != nil {
+			panic(fmt.Errorf("TruncateToMaxWords: error counting tokens: %w", err))
+		}
 
-			wordCount += len(words)
+		if tokenCount+tokens <= wordLimit {
+			tokenCount += tokens
 			result = append([]types.Message{message}, result...)
 		} else {
 			break
 		}
 	}
 
-	return result
-}
-
-func removeEmptyStrings(strings []string) []string {
-	var result []string
-	for _, s := range strings {
-		if s != "" {
-			result = append(result, s)
-		}
-	}
 	return result
 }

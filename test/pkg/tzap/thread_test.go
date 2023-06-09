@@ -9,22 +9,22 @@ import (
 
 func TestGetThreadWithinLimit(t *testing.T) {
 	thread := []types.Message{
-		{Role: "", Content: "a The truncated thread should match..."},     // 3 words
-		{Role: "", Content: "b The truncated thread should match..."},     // 3 words
-		{Role: "", Content: "c The truncated thread should match..."},     // 3 words
-		{Role: "", Content: "d The truncated thread should match qeq..."}, // 3 words
-		{Role: "", Content: "The truncated thread should match"},          // 3 words
-		{Role: "", Content: "f The truncated thread should match"},        // 3 words
+		{Role: "", Content: "a The truncated thread should match..."},     // 50 words mock
+		{Role: "", Content: "b The truncated thread should match..."},     // 50 words mock
+		{Role: "", Content: "c The truncated thread should match..."},     // 50 words mock
+		{Role: "", Content: "d The truncated thread should match qeq..."}, // 50 words mock
+		{Role: "", Content: "The truncated thread should match"},          // 50 words mock
+		{Role: "", Content: "f The truncated thread should match"},        // 50 words mock
 	}
 
 	expectedResult := []types.Message{
-		{Role: "", Content: "The truncated thread should match"},   // 3 words
-		{Role: "", Content: "f The truncated thread should match"}, // 3 words
+		{Role: "", Content: "The truncated thread should match"},   // 3 words mock
+		{Role: "", Content: "f The truncated thread should match"}, // 3 words mock
 	}
 
-	wordLimit := 12
+	wordLimit := 120
 
-	result := tzap.TruncateToMaxWords(thread, wordLimit)
+	result := tzap.TruncateToMaxTokens(&mockTG{}, thread, wordLimit)
 	if len(result) != len(expectedResult) {
 		t.Errorf("Expected %d thread, but got %d", len(expectedResult), len(result))
 		return
