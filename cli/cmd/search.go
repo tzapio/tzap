@@ -46,9 +46,9 @@ var searchCmd = &cobra.Command{
 				K:            embedsCountFlag,
 				N:            nCountFlag,
 				DisableIndex: disableIndex,
-				Yes:          settings.Yes,
+				Yes:          tzapCliSettings.Yes,
 			})
-			if settings.ApiMode {
+			if tzapCliSettings.ApiMode {
 				var metadatas []types.Metadata
 				for _, result := range output.SearchResults.Results {
 					metadatas = append(metadatas, result.Vector.Metadata)

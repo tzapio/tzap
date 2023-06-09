@@ -12,6 +12,7 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/workflows/code/fileworkflows"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -26,24 +27,24 @@ var disableIndex bool
 var searchQuery string
 
 func init() {
-	RootCmd.AddCommand(embeddingPromptCmd)
-	embeddingPromptCmd.Flags().StringSliceVarP(&inspirationFiles,
+	RootCmd.AddCommand(promptCmd)
+	promptCmd.Flags().StringSliceVarP(&inspirationFiles,
 		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
-	embeddingPromptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10,
+	promptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10,
 		"Number of embeddings to use for the prompt generation")
-	embeddingPromptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15,
+	promptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15,
 		"Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
-	embeddingPromptCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
+	promptCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
 		"For large projects disabling indexing speeds up the process.")
-	embeddingPromptCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
-	embeddingPromptCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
+	promptCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
+	promptCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 
-var embeddingPromptCmd = &cobra.Command{
+var promptCmd = &cobra.Command{
 	Aliases: []string{"p", "prompt"},
-	Use:     "embeddingprompt <prompt>",
-	Short:   "Generate code or document content using code-search",
-	Long: `The 'embeddingprompt' command generates content based on code-searching existing files.
+	Use:     "prompt <prompt>",
+	Short:   "Generate code by combining prompt and code-search",
+	Long: `The 'prompt' command generates content based on code-searching existing files.
 	This enables GPT to be able to generate code with depth. To add breadth, the user can recommend 
 	needed Inspiration files like interfaces and types to enhance GPTs general understanding.
 	The inspiration files should be a comma-separated list of file paths.`,
@@ -59,51 +60,34 @@ var embeddingPromptCmd = &cobra.Command{
 
 		err := tzap.HandlePanic(func() {
 			defer t.HandleShutdown()
-			if settings.ApiMode {
-				settings.Editor = "api"
+			if tzapCliSettings.ApiMode {
+				tzapCliSettings.Editor = "api"
 			}
-			cmdUI := cmdui.NewCMDUI(promptFile, settings.Editor)
-			thread := []types.Message{}
-			var lastUserMessage *types.Message
+			cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
+			messageThread := cmdui.MessageThread{}
+
 			if promptFile != "" {
-				thread = cmdUI.DeserializeThread()
-				if len(thread) > 0 {
-					lastMessage := thread[len(thread)-1]
-					if lastMessage.Role == openai.ChatMessageRoleUser {
-						lastUserMessage = &lastMessage
-					}
+				messageThread.SetMessageThread(cmdUI.ReadMessageThreadFromFile())
+			}
+			if len(args) > 0 {
+				userMessage := types.Message{
+					Content: strings.Join(args[0:], " "),
+					Role:    openai.ChatMessageRoleUser,
 				}
-				if len(args) > 0 {
-					content := strings.Join(args[0:], " ")
-					userMessage := types.Message{
-						Content: content,
-						Role:    openai.ChatMessageRoleUser,
-					}
-					thread = append(thread, userMessage)
-					lastUserMessage = &userMessage
-				}
-			} else {
-				if len(args) > 0 {
-					content := strings.Join(args[0:], " ")
-					userMessage := types.Message{
-						Content: content,
-						Role:    openai.ChatMessageRoleUser,
-					}
-					thread = append(thread, userMessage)
-					lastUserMessage = &userMessage
-				}
+				messageThread.Append(userMessage)
 			}
 			cmdUI.Init()
 			for {
-				if lastUserMessage == nil {
-					thread = cmdUI.AddPromptTextWithStdinUI(thread)
-					currentMessage := &thread[len(thread)-1]
-					if currentMessage.Content == "" || currentMessage.Role != openai.ChatMessageRoleUser {
-						continue
-					}
-					lastUserMessage = currentMessage
+				if !messageThread.IsLastMessageFromUser() {
+					messageThread.SetMessageThread(
+						cmdUI.AddPromptTextWithStdinUI(
+							messageThread.GetMessageThread(),
+						),
+					)
+					continue
 				}
-				searchQuery = lastUserMessage.Content
+				searchQuery = messageThread.LastMessage().Content
+
 				cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 
 				output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
@@ -112,12 +96,13 @@ var embeddingPromptCmd = &cobra.Command{
 					K:            embedsCount,
 					N:            nCount,
 					DisableIndex: disableIndex,
-					Yes:          settings.Yes,
+					Yes:          tzapCliSettings.Yes,
 				})
 
 				t.
 					ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
 					ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults)).
+					ApplyWorkflow(fileworkflows.InspirationWorkflow(inspirationFiles)).
 					MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 						searchResults := output.SearchResults
 						if len(searchResults.Results) > 0 {
@@ -132,16 +117,14 @@ var embeddingPromptCmd = &cobra.Command{
 					}).
 					MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 						cmd.Println(cmdutil.Bold("--- Completion"))
-						truncThread := tzap.TruncateToMaxTokens(t.TG, thread, 1000)
+						truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessageThread(), 1000)
 						t = t.LoadThread(truncThread).RequestChatCompletion().AsAssistantMessage()
 						cmd.Println(cmdutil.Bold("\n---"))
-						thread = append(thread, types.Message{
-							Content: t.Message.Content,
-							Role:    t.Message.Role,
-						})
-						if settings.ApiMode {
-							cmdUI.SaveThread(thread)
-							threadText, err := cmdUI.SerializeThread(thread)
+						messageThread.Append(t.Message)
+
+						if tzapCliSettings.ApiMode {
+							cmdUI.SaveMessageThreadToFile(messageThread.GetMessageThread())
+							threadText, err := cmdUI.SerializeMessageThread(messageThread.GetMessageThread())
 							if err != nil {
 								panic(err)
 							}
@@ -149,7 +132,7 @@ var embeddingPromptCmd = &cobra.Command{
 							os.Exit(0)
 							return t
 						}
-						lastUserMessage = nil
+
 						return t
 					})
 			}

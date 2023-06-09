@@ -35,9 +35,9 @@ var pcaCMD = &cobra.Command{
 				K:            -1,
 				N:            -1,
 				DisableIndex: disableIndex,
-				Yes:          settings.Yes,
+				Yes:          tzapCliSettings.Yes,
 			})
-			if settings.ApiMode {
+			if tzapCliSettings.ApiMode {
 				byte, err := json.MarshalIndent(output, "", "  ")
 				if err != nil {
 					panic(err)
