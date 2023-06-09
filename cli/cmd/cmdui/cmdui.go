@@ -77,7 +77,10 @@ func (ui *CMDUI) RunEditor() {
 		}
 		return
 	}
-	if ui.editor == "stdin" {
+	if ui.editor == "api" {
+		return
+	}
+	if ui.editor == "stdin" || ui.editor != "api" {
 		println("Write at top of file.\n")
 		stdin.GetStdinInput("- Then press enter to continue")
 		return

@@ -59,7 +59,9 @@ var embeddingPromptCmd = &cobra.Command{
 
 		err := tzap.HandlePanic(func() {
 			defer t.HandleShutdown()
-
+			if settings.ApiMode {
+				settings.Editor = "api"
+			}
 			cmdUI := cmdui.NewCMDUI(promptFile, settings.Editor)
 			thread := []types.Message{}
 			var lastUserMessage *types.Message
