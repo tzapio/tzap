@@ -60,7 +60,7 @@ var embeddingPromptCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			defer t.HandleShutdown()
 
-			cmdUI := cmdui.NewCMDUI(promptFile, "vscode")
+			cmdUI := cmdui.NewCMDUI(promptFile, settings.Editor)
 			thread := []types.Message{}
 			var lastUserMessage *types.Message
 			if promptFile != "" {
