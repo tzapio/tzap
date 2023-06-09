@@ -15,7 +15,7 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := os.Stat(".tzapconfig"); os.IsExist(err) {
 			cmd.Println("Tzap is already initialized.")
-			return
+			stdin.ConfirmPrompt("Continue anyway?")
 		}
 
 		cmd.Println("Initializing Tzap...")
@@ -26,7 +26,7 @@ var initCmd = &cobra.Command{
 			}
 		}
 
-		if b := stdin.ConfirmPrompt("Tzap is in Beta. Would you like some general information about Tzap? (y/n)"); b {
+		if b := stdin.ConfirmPrompt("Tzap is in Beta. Would you like some general information about Tzap?"); b {
 			cmd.Println("\n\nTzap is a code cli tool that is designed to be easy to use.")
 			stdin.GetStdinInput("Press enter to continue.")
 			cmd.Println("\n\nYou ask tzap to finish a prompt using: tzap prompt \"How do I use X library to enable my backend to do Y\" ")
