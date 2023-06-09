@@ -7,7 +7,6 @@ import (
 )
 
 var tzapContextKey = struct{ tzapContextKey string }{}
-var projectContextKey = struct{ projectContextKey string }{}
 
 func SetTzapInContext(ctx context.Context, t *tzap.Tzap) context.Context {
 	return context.WithValue(ctx, tzapContextKey, t)
