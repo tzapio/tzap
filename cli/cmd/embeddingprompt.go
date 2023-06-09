@@ -2,18 +2,20 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/tzapio/tzap/cli/action"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
+	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 
+	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/util"
-	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
 var inspirationFiles []string
@@ -33,8 +35,6 @@ func init() {
 		"Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
 	embeddingPromptCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
 		"For large projects disabling indexing speeds up the process.")
-	embeddingPromptCmd.Flags().StringVarP(&searchQuery, "search", "s", "",
-		"The search query to start the embedding prompt with. Default (<prompt>)")
 	embeddingPromptCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
 	embeddingPromptCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
@@ -49,86 +49,108 @@ var embeddingPromptCmd = &cobra.Command{
 	The inspiration files should be a comma-separated list of file paths.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		tl.EnableUICompletionLogger()
+		t := cmdutil.GetTzapFromContext(cmd.Context())
+
 		embedsCount := embedsCountFlag
 		nCount := nCountFlag
 		if embedsCountFlag > nCountFlag {
 			nCount = embedsCountFlag + 5
 		}
-		var content string
-		if promptFile != "" {
-			content = util.ReadFileP(promptFile)
-		} else {
-			if len(args) > 0 {
-				content = strings.Join(args[0:], " ")
-			}
-		}
-		if searchQuery == "" {
-			if content == "" {
-				if settings.ApiMode {
-					panic("search query required in ApiMode")
-				}
-				searchQuery = stdin.GetStdinInput("Enter your task/embedding search? (also available as -s <query>): ")
-			} else {
-				searchQuery = content
-			}
-		}
 
 		err := tzap.HandlePanic(func() {
-			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 
-			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
-
-			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
-				ExcludeFiles: inspirationFiles,
-				SearchQuery:  searchQuery,
-				K:            embedsCount,
-				N:            nCount,
-				DisableIndex: disableIndex,
-				Yes:          settings.Yes,
-			})
-
-			t.
-				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-				ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults)).
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					searchResults := output.SearchResults
-					if len(searchResults.Results) > 0 {
-						t = t.AddSystemMessage(
-							"The following file contents are embeddings for the user input:",
-						)
-						for _, result := range searchResults.Results {
-							t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
-						}
+			cmdUI := cmdui.NewCMDUI(promptFile, "vscode")
+			thread := []types.Message{}
+			var lastUserMessage *types.Message
+			if promptFile != "" {
+				thread = cmdUI.DeserializeThread()
+				if len(thread) > 0 {
+					lastMessage := thread[len(thread)-1]
+					if lastMessage.Role == openai.ChatMessageRoleUser {
+						lastUserMessage = &lastMessage
 					}
-					return t
-				}).
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					if content != "" {
+				}
+				if len(args) > 0 {
+					content := strings.Join(args[0:], " ")
+					userMessage := types.Message{
+						Content: content,
+						Role:    openai.ChatMessageRoleUser,
+					}
+					thread = append(thread, userMessage)
+					lastUserMessage = &userMessage
+				}
+			} else {
+				if len(args) > 0 {
+					content := strings.Join(args[0:], " ")
+					userMessage := types.Message{
+						Content: content,
+						Role:    openai.ChatMessageRoleUser,
+					}
+					thread = append(thread, userMessage)
+					lastUserMessage = &userMessage
+				}
+			}
+			cmdUI.Init()
+			for {
+				if lastUserMessage == nil {
+					thread = cmdUI.AddPromptTextWithStdinUI(thread)
+					currentMessage := &thread[len(thread)-1]
+					if currentMessage.Content == "" || currentMessage.Role != openai.ChatMessageRoleUser {
+						continue
+					}
+					lastUserMessage = currentMessage
+				}
+				searchQuery = lastUserMessage.Content
+				cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+
+				output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
+					ExcludeFiles: inspirationFiles,
+					SearchQuery:  searchQuery,
+					K:            embedsCount,
+					N:            nCount,
+					DisableIndex: disableIndex,
+					Yes:          settings.Yes,
+				})
+
+				t.
+					ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
+					ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults)).
+					MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+						searchResults := output.SearchResults
+						if len(searchResults.Results) > 0 {
+							t = t.AddSystemMessage(
+								"The following file contents are embeddings for the user input:",
+							)
+							for _, result := range searchResults.Results {
+								t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
+							}
+						}
+						return t
+					}).
+					MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 						cmd.Println(cmdutil.Bold("--- Completion"))
-						t = t.AddUserMessage(content).RequestChatCompletion()
+						truncThread := tzap.TruncateToMaxTokens(t.TG, thread, 1000)
+						t = t.LoadThread(truncThread).RequestChatCompletion().AsAssistantMessage()
 						cmd.Println(cmdutil.Bold("\n---"))
+						thread = append(thread, types.Message{
+							Content: t.Message.Content,
+							Role:    t.Message.Role,
+						})
 						if settings.ApiMode {
-							t = t.AsAssistantMessage()
-							jsonString, err := t.GetThreadAsJSON()
+							cmdUI.SaveThread(thread)
+							threadText, err := cmdUI.SerializeThread(thread)
 							if err != nil {
 								panic(err)
 							}
-							fmt.Print(jsonString)
+							fmt.Print(threadText)
+							os.Exit(0)
 							return t
 						}
-						t = t.AsAssistantMessage()
-
-					}
-					for {
-						input := stdin.GetStdinInput("\n\nAsk follow up question (or use ctrl+c to exit): ")
-						t = t.AddUserMessage(input)
-						cmd.Println(cmdutil.Bold("--- Completion:"))
-						t = t.RequestChatCompletion()
-						cmd.Println(cmdutil.Bold("\n---"))
-						t = t.AsAssistantMessage()
-					}
-				})
+						lastUserMessage = nil
+						return t
+					})
+			}
 		})
 		if err != nil {
 			panic(err)
