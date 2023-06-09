@@ -40,7 +40,7 @@ func BeforeProceeding(changes string) string {
 			// open code
 			exec.Command("code", file.Name()).Run()
 		}
-		if key == "" {
+		if key == "" || key == "y" {
 			bytes, err := os.ReadFile(file.Name())
 			if err != nil {
 				panic(err)
