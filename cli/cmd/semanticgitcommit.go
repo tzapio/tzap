@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -44,6 +45,10 @@ var semanticGitcommitCmd = &cobra.Command{
 					}
 				}).
 				ApplyErrorWorkflow(git.ValidateDiff(), func(et *tzap.ErrorTzap) error {
+					if et.Err != nil {
+						println("There were no changes: ", et.Err.Error())
+						os.Exit(1)
+					}
 					return et.Err
 				}).
 				ApplyWorkflow(truncate.SetContextSize()).
