@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/tzapio/tzap/pkg/embed/localdb/gobber"
+	"github.com/tzapio/tzap/pkg/util/gobber"
 )
 
 func TestGobWriterAndReader(t *testing.T) {

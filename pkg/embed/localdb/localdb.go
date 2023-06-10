@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/embed/localdb/gobber"
 	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/util/gobber"
 	"github.com/tzapio/tzap/pkg/util/reflectutil"
 )
 

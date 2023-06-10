@@ -7,7 +7,7 @@ import (
 	"github.com/tzapio/tokenizer/codec"
 	enc "github.com/tzapio/tokenizer/codec/cl100k_base"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
+	"github.com/tzapio/tzap/pkg/util/singlewait"
 )
 
 type Tokenizer struct {
