@@ -12,6 +12,7 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 	"github.com/tzapio/tzap/workflows/code/fileworkflows"
 
 	"github.com/tzapio/tzap/pkg/types"
@@ -41,105 +42,100 @@ func init() {
 }
 
 var promptCmd = &cobra.Command{
-	Aliases: []string{"p", "prompt"},
+	Aliases: []string{"p"},
 	Use:     "prompt <prompt>",
 	Short:   "Generate code by combining prompt and code-search",
 	Long: `The 'prompt' command generates content based on code-searching existing files.
 	This enables GPT to be able to generate code with depth. To add breadth, the user can recommend 
 	needed Inspiration files like interfaces and types to enhance GPTs general understanding.
 	The inspiration files should be a comma-separated list of file paths.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		tl.EnableUICompletionLogger()
-		t := cmdutil.GetTzapFromContext(cmd.Context())
+	Run: promptFunc,
+}
 
-		embedsCount := embedsCountFlag
-		nCount := nCountFlag
-		if embedsCountFlag > nCountFlag {
-			nCount = embedsCountFlag + 5
+func promptFunc(cmd *cobra.Command, args []string) {
+	tl.EnableUICompletionLogger()
+	t := cmdutil.GetTzapFromContext(cmd.Context())
+
+	embedsCount := embedsCountFlag
+	nCount := nCountFlag
+	if embedsCountFlag > nCountFlag {
+		nCount = embedsCountFlag + 5
+	}
+
+	err := tzap.HandlePanic(func() {
+		defer t.HandleShutdown()
+		if tzapCliSettings.ApiMode {
+			tzapCliSettings.Editor = "api"
 		}
+		cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
+		messageThread := cmdui.MessageThread{}
 
-		err := tzap.HandlePanic(func() {
-			defer t.HandleShutdown()
-			if tzapCliSettings.ApiMode {
-				tzapCliSettings.Editor = "api"
+		if promptFile != "" {
+			messageThread.SetMessageThread(cmdUI.ReadMessageThreadFromFile())
+		}
+		if len(args) > 0 {
+			userMessage := types.Message{
+				Content: strings.Join(args[0:], " "),
+				Role:    openai.ChatMessageRoleUser,
 			}
-			cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
-			messageThread := cmdui.MessageThread{}
-
-			if promptFile != "" {
-				messageThread.SetMessageThread(cmdUI.ReadMessageThreadFromFile())
+			messageThread.Append(userMessage)
+		}
+		cmdUI.Init()
+		for {
+			if !messageThread.IsLastMessageFromUser() {
+				messageThread.SetMessageThread(
+					cmdUI.AddPromptTextWithStdinUI(
+						messageThread.GetMessageThread(),
+					),
+				)
+				continue
 			}
-			if len(args) > 0 {
-				userMessage := types.Message{
-					Content: strings.Join(args[0:], " "),
-					Role:    openai.ChatMessageRoleUser,
-				}
-				messageThread.Append(userMessage)
+			searchQuery = messageThread.LastMessage().Content
+
+			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+			actionArgs := action.LoadAndSearchEmbeddingsArgs{
+				ExcludeFiles: inspirationFiles,
+				SearchQuery:  searchQuery,
+				K:            embedsCount,
+				N:            nCount,
+				DisableIndex: disableIndex,
+				Yes:          tzapCliSettings.Yes,
 			}
-			cmdUI.Init()
-			for {
-				if !messageThread.IsLastMessageFromUser() {
-					messageThread.SetMessageThread(
-						cmdUI.AddPromptTextWithStdinUI(
-							messageThread.GetMessageThread(),
-						),
-					)
-					continue
-				}
-				searchQuery = messageThread.LastMessage().Content
 
-				cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+			t.
+				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
+				ApplyWorkflow(fileworkflows.InspirationWorkflow(inspirationFiles)).
+				ApplyWorkflow(action.LoadAndSearchEmbeddingsWorkflow(actionArgs)).
+				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+					searchResult := t.Data["searchResults"].(types.SearchResults)
+					return t.
+						ApplyWorkflow(cliworkflows.PrintSearchResults(searchResult)).
+						ApplyWorkflow(embedworkflows.EmbedWorkflow(searchResult))
+				}).
+				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+					cmd.Println(cmdutil.Bold("--- Completion"))
+					truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessageThread(), 1000)
+					t = t.LoadThread(truncThread).RequestChatCompletion().AsAssistantMessage()
+					cmd.Println(cmdutil.Bold("\n---"))
+					messageThread.Append(t.Message)
 
-				output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
-					ExcludeFiles: inspirationFiles,
-					SearchQuery:  searchQuery,
-					K:            embedsCount,
-					N:            nCount,
-					DisableIndex: disableIndex,
-					Yes:          tzapCliSettings.Yes,
+					if tzapCliSettings.ApiMode {
+						cmdUI.SaveMessageThreadToFile(messageThread.GetMessageThread())
+						threadText, err := cmdUI.SerializeMessageThread(messageThread.GetMessageThread())
+						if err != nil {
+							panic(err)
+						}
+						fmt.Print(threadText)
+						os.Exit(0)
+						return t
+					}
+
+					return t
 				})
-
-				t.
-					ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-					ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults)).
-					ApplyWorkflow(fileworkflows.InspirationWorkflow(inspirationFiles)).
-					MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-						searchResults := output.SearchResults
-						if len(searchResults.Results) > 0 {
-							t = t.AddSystemMessage(
-								"The following file contents are embeddings for the user input:",
-							)
-							for _, result := range searchResults.Results {
-								t = t.AddSystemMessage(result.Vector.Metadata.SplitPart)
-							}
-						}
-						return t
-					}).
-					MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-						cmd.Println(cmdutil.Bold("--- Completion"))
-						truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessageThread(), 1000)
-						t = t.LoadThread(truncThread).RequestChatCompletion().AsAssistantMessage()
-						cmd.Println(cmdutil.Bold("\n---"))
-						messageThread.Append(t.Message)
-
-						if tzapCliSettings.ApiMode {
-							cmdUI.SaveMessageThreadToFile(messageThread.GetMessageThread())
-							threadText, err := cmdUI.SerializeMessageThread(messageThread.GetMessageThread())
-							if err != nil {
-								panic(err)
-							}
-							fmt.Print(threadText)
-							os.Exit(0)
-							return t
-						}
-
-						return t
-					})
-			}
-		})
-		if err != nil {
-			panic(err)
 		}
+	})
+	if err != nil {
+		panic(err)
+	}
 
-	},
 }
