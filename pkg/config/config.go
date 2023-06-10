@@ -60,5 +60,6 @@ func withDefaults(userConfig Configuration) Configuration {
 		MD5IncludeList: userConfig.MD5IncludeList,
 		EnableLogs:     userConfig.EnableLogs || defaults.EnableLogs,
 		LoggerOutput:   userConfig.LoggerOutput,
+		Temperature:    userConfig.Temperature,
 	}
 }
