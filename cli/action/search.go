@@ -4,9 +4,9 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
-	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/pkg/util/singlewait"
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
@@ -26,7 +26,7 @@ type LoadAndSearchEmbeddingsOutput struct {
 
 func LoadAndSearchEmbeddings(t *tzap.Tzap, args LoadAndSearchEmbeddingsArgs) *LoadAndSearchEmbeddingsOutput {
 	resultT := t.
-		ApplyWorkflow(loadAndSearchEmbeddingsWorkflow(args))
+		ApplyWorkflow(LoadAndSearchEmbeddingsWorkflow(args))
 	searchResult := resultT.Data["searchResults"].(types.SearchResults)
 	queryResult := resultT.Data["queryResult"].(types.QueryRequest)
 	return &LoadAndSearchEmbeddingsOutput{
@@ -35,7 +35,7 @@ func LoadAndSearchEmbeddings(t *tzap.Tzap, args LoadAndSearchEmbeddingsArgs) *Lo
 	}
 }
 
-func loadAndSearchEmbeddingsWorkflow(args LoadAndSearchEmbeddingsArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndSearchEmbeddingsWorkflow(args LoadAndSearchEmbeddingsArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndSearchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
