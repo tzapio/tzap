@@ -5,7 +5,6 @@ import (
 
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed/cosine"
-	"github.com/tzapio/tzap/pkg/embed/pca"
 	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 )
@@ -39,11 +38,11 @@ func (idx *EmbedStore) SearchWithEmbedding(ctx context.Context, embedding types.
 	if len(results) < k || k <= -1 {
 		k = len(results)
 	}
-	pcaResult := pca.EmbeddingsTo3D(floatVectors)
+	//pcaResult := pca.EmbeddingsTo3D(floatVectors)
 	for _, r := range results[:k] {
 		searchResults.Results = append(searchResults.Results, types.SearchResult{
-			Vector:     vectors[r.Index],
-			PCA:        pcaResult[r.Index],
+			Vector: vectors[r.Index],
+			//PCA:        pcaResult[r.Index],
 			Similarity: r.Similarity,
 		})
 	}
