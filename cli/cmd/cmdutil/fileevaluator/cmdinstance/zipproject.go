@@ -5,6 +5,7 @@ import (
 
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/zipwalker"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"
 )
@@ -20,6 +21,7 @@ type ZipProject struct {
 }
 
 func NewLocalZipProject(name, relativeDirInZip, url string, excludePatterns, includePatterns []string) (project.Project, error) {
+	tl.Logger.Println("URL: ", url)
 	fileevaluator := fileevaluator.NewWithPatterns(excludePatterns, includePatterns)
 	projectDir := project.ProjectDir(path.Join("./.tzap-data", name))
 	zipwalker := zipwalker.New(fileevaluator, relativeDirInZip, url)

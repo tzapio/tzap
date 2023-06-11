@@ -57,7 +57,7 @@ var findCmd = &cobra.Command{
 					}
 					//t = t.AddSystemMessage("These are files that exist:\n" + tmp)
 					shortenedSearchResults := types.SearchResults{
-						Results: embedstore.TightenSearchResults(original.Results[:embedsCountFlag]),
+						Results: embedstore.TightenSearchResults(original.Results[:embedsCountFlag]).Results,
 					}
 
 					return t.

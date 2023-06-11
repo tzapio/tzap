@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
@@ -67,20 +68,15 @@ func touchTzapignore() {
 
 	if _, err := os.Stat(".gitignore"); os.IsExist(err) {
 		println("Warning: .gitignore does not exist.")
-		content, err := os.ReadFile(".gitignore")
-		if err != nil {
-			println("Error:", err)
+		content, _ := os.ReadFile(".gitignore")
+		if len(content) > 0 {
+			gitignoreContent = string(content)
 		}
-		gitignoreContent = string(content)
 	} else if err != nil {
 		println("Warning: did not copy for .tzapignore. .gitignore error: ", err)
 		time.Sleep(time.Millisecond * 500)
 	}
-	tzapIgnoreContent := `# Tzap ignore file. Add extra files like test folders, or other files that interfere with search (embeddings) quality. 
-node_modules
-	
-# copied from .gitignore
-` + gitignoreContent
+	tzapIgnoreContent := fileevaluator.BaseTzapIgnore + "\n" + gitignoreContent
 
 	if err := os.WriteFile(".tzapignore", []byte(tzapIgnoreContent), 0644); err != nil {
 		println("Error:", err)
@@ -88,6 +84,7 @@ node_modules
 	println("Created file .tzapignore")
 	time.Sleep(time.Millisecond * 500)
 }
+
 func touchTzapinclude() {
 
 	//if not exist, copy .gitignore to .tzapignore
@@ -97,20 +94,7 @@ func touchTzapinclude() {
 		return
 	}
 
-	commonLanguage := `# Common languages. Example, remove .js if .js files are only compiled bundles.
-*.js
-*.tsx
-*.ts
-*.py
-*.go
-*.java
-*.c
-*.cpp
-*.h
-*.hpp
-*.rb
-*.php
-`
+	commonLanguage := fileevaluator.BaseTzapInclude
 
 	if err := os.WriteFile(".tzapinclude", []byte(commonLanguage), 0644); err != nil {
 		println("Error:", err)

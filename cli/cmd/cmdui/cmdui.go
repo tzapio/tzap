@@ -17,10 +17,18 @@ type CMDUI struct {
 }
 
 func NewCMDUI(promptFile string, editor string) *CMDUI {
+	if editor == "stdin" {
+		if promptFile == "" {
+			return &CMDUI{filePath: promptFile, editor: editor}
+		}
+		println("stdin editor does not support promptFile. change .tzap-data/config.json to editor: editor, vscode, vim, nano. {\"editor\":\"choice\"}")
+		os.Exit(1)
+	}
 	if promptFile != "" {
 		editorUI := CMDUI{filePath: promptFile, editor: editor}
 		return &editorUI
 	}
+
 	err := os.MkdirAll(".tzap-data/chats", 0755)
 	if err != nil {
 		panic(err)
@@ -78,12 +86,14 @@ func (ui *CMDUI) RunEditor() {
 		return
 	}
 	if ui.editor == "stdin" || ui.editor != "api" {
-		println("Write at top of file.\n")
-		stdin.GetStdinInput("- Then press enter to continue")
 		return
 	}
 }
 func (ui *CMDUI) AddPromptTextWithStdinUI(thread []types.Message) []types.Message {
+	if ui.editor == "stdin" {
+		prompt := stdin.GetStdinInput("Follow up prompt: ")
+		return append(thread, types.Message{Role: "user", Content: prompt})
+	}
 	println("\n\nFile: ", ui.filePath)
 	println("")
 	err := ui.SaveMessageThreadToFile(thread)
@@ -100,6 +110,9 @@ func (ui *CMDUI) ReadMessagesFromFile() []types.Message {
 		panic(err)
 	}
 	content := string(bytes)
+	return ui.DeserializeMessageThread(content)
+}
+func (ui *CMDUI) DeserializeMessageThread(content string) []types.Message {
 	var messages []types.Message
 	messageLines := strings.Split(content, "---")
 	for _, messageLine := range messageLines {

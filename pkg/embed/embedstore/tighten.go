@@ -10,7 +10,7 @@ import (
 )
 
 // Sorts search results in a way that preserves original order based on filenames
-func TightenSearchResults(searchResults []types.SearchResult) []types.SearchResult {
+func TightenSearchResults(searchResults []types.SearchResult) types.SearchResults {
 	// group search results by filename
 	searchResultsByFilename := make(map[string][]types.SearchResult)
 	for _, sr := range searchResults {
@@ -28,7 +28,7 @@ func TightenSearchResults(searchResults []types.SearchResult) []types.SearchResu
 		sortedResults = append(sortedResults, consecutiveResults...)
 	}
 
-	return sortedResults
+	return types.SearchResults{Results: sortedResults}
 }
 
 // Groups consecutive metadata together from sorted search results
@@ -96,21 +96,4 @@ func concatSplitPart(filename string, searchResults []types.SearchResult) string
 		}
 	}
 	return embed.AddEmbedHeader(filename, splitPart.String())
-}
-
-// Returns true if there are any consecutive metadata in the search results
-func hasConsecutiveMetadata(searchResults []types.SearchResult) bool {
-	var start int
-	var hasConsecutive bool
-
-	for _, sr := range searchResults {
-		if start == 0 {
-			start = sr.Vector.Metadata.Start
-		} else if sr.Vector.Metadata.Start == start+200 {
-			hasConsecutive = true
-			break
-		}
-	}
-
-	return hasConsecutive
 }

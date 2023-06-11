@@ -23,6 +23,7 @@ func New(e *fileevaluator.FileEvaluator, relativeDirInZip string, url string) *Z
 }
 
 func (z *ZipWalker) GetFiles() ([]types.FileReader, error) {
+	tl.Logger.Println("Getting files: ", z.url)
 	resp, err := http.Get(z.url)
 	if err != nil {
 		return nil, err
@@ -33,13 +34,11 @@ func (z *ZipWalker) GetFiles() ([]types.FileReader, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	readerAt := bytes.NewReader(content)
 	zipReader, err := zip.NewReader(readerAt, int64(len(content)))
 	if err != nil {
 		return nil, err
 	}
-
 	var list []types.FileReader
 	for _, file := range zipReader.File {
 		path := file.Name
@@ -48,7 +47,7 @@ func (z *ZipWalker) GetFiles() ([]types.FileReader, error) {
 			tl.Logger.Println("KEEPFILE", path)
 			list = append(list, &FileInZip{zipfile: file, filePath: path})
 		} else {
-			tl.DeepLogger.Println("SKIPFILE", path)
+			tl.Logger.Println("SKIPFILE", path)
 		}
 	}
 	return list, nil

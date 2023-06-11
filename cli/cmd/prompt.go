@@ -101,8 +101,8 @@ func promptFunc(cmd *cobra.Command, args []string) {
 			}
 			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 			t.WorkTzap(func(t *tzap.Tzap) {
-				t = t.ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs))
-				messageThread.Append(t.AsAssistantMessage().Message)
+				t = t.ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs)).AsAssistantMessage()
+				messageThread.Append(t.Message)
 
 				if tzapCliSettings.ApiMode {
 					cmdUI.SaveMessageThreadToFile(messageThread.GetMessages())

@@ -1,6 +1,7 @@
 package cmdutil
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -22,7 +23,7 @@ func SearchForTzapincludeAndGetRootDir() (string, error) {
 		}
 
 		if cur == filepath.Dir(cur) {
-			panic("Reached the top of the directory tree. Did not find .tzapinclude in any parent directory. Did you run 'tzap init'?")
+			return cwd, errors.New("reached the top of the directory tree. Did not find .tzapinclude in any parent directory. Did you run 'tzap init'?")
 		}
 		println("Did not find .tzapinclude in: " + cur)
 		cur = filepath.Dir(cur)

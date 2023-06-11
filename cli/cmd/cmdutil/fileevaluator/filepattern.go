@@ -19,14 +19,15 @@ func ReadFilterPatternFiles(patternFilePath ...string) ([]string, error) {
 	return mergedPatterns, nil
 }
 func readPatternFile(patternFilePath string) ([]string, error) {
-	file, err := os.Open(patternFilePath)
+	content, err := os.ReadFile(patternFilePath)
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-
+	return ReadPatternString(string(content))
+}
+func ReadPatternString(content string) ([]string, error) {
 	filterPatterns := []string{}
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(strings.NewReader(content))
 	for scanner.Scan() {
 		line := scanner.Text()
 		line = strings.TrimSpace(line)
@@ -34,10 +35,8 @@ func readPatternFile(patternFilePath string) ([]string, error) {
 			filterPatterns = append(filterPatterns, line)
 		}
 	}
-
 	return filterPatterns, scanner.Err()
 }
-
 func mergeFilterPatterns(patternGroups ...[]string) []string {
 	mergedPatterns := make([]string, 0)
 	existing := make(map[string]bool)

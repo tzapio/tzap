@@ -54,9 +54,10 @@ var RootCmd = &cobra.Command{
 
 		baseDir, err := cmdutil.SearchForTzapincludeAndGetRootDir()
 		if err != nil {
-			return err
+			println("Warning: No .tzapinclude file found. Run 'tzap init' Using current directory as root.", err)
+		} else {
+			os.Chdir(baseDir)
 		}
-		os.Chdir(baseDir)
 		data, err := os.ReadFile(".tzap-data/config.json")
 		if err == nil {
 			var cfg map[string]interface{}
@@ -67,7 +68,7 @@ var RootCmd = &cobra.Command{
 			}
 		} else {
 			tl.Logger.Println("No config.json found")
-			os.WriteFile(".tzap-data/config.json", []byte(`{"editor":"vscode"}`), 0644)
+			os.WriteFile(".tzap-data/config.json", []byte(`{"editor":"stdin"}`), 0644)
 		}
 		tl.Logger.Println("Current working directory:", baseDir)
 		t, err := initializeTzap()
@@ -107,7 +108,6 @@ var RootCmd = &cobra.Command{
 }
 
 func initializeTzap() (*tzap.Tzap, error) {
-
 	config := config.Configuration{
 		OpenAIModel:   modelMap[tzapCliSettings.Model],
 		AutoMode:      tzapCliSettings.AutoMode,

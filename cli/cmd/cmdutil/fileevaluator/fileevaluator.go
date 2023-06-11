@@ -13,6 +13,27 @@ type FileEvaluator struct {
 	excludeMatcher *ignore.GitIgnore
 }
 
+const BaseTzapIgnore = `# Tzap ignore file. Add extra files like test folders, or other files that interfere with search (embeddings) quality. 
+node_modules
+.env
+
+`
+const BaseTzapInclude = `# Common languages. Example, remove .js if .js files are only compiled bundles.
+*.js
+*.tsx
+*.ts
+*.py
+*.go
+*.java
+*.c
+*.cpp
+*.h
+*.hpp
+*.rb
+*.rs
+*.php
+`
+
 var baseExcludePatterns = []string{".git", ".DS_Store", "desktop.ini"}
 
 func New(baseDir string) (*FileEvaluator, error) {
@@ -26,18 +47,25 @@ func New(baseDir string) (*FileEvaluator, error) {
 	if _, err := os.Stat(gitIgnorePath); err == nil {
 		ignoreFiles = append(ignoreFiles, gitIgnorePath)
 	}
+	var excludePatterns []string
 	excludePatternsFromFile, err := ReadFilterPatternFiles(ignoreFiles...)
 	if err != nil {
-		return nil, err
+		baseTzapIgnore, _ := ReadPatternString(BaseTzapIgnore)
+		excludePatterns = append(baseExcludePatterns, baseTzapIgnore...)
+		println("Using base tzapignore")
+	} else {
+		excludePatterns = append(baseExcludePatterns, excludePatternsFromFile...)
 	}
-	excludePatterns := append(baseExcludePatterns, excludePatternsFromFile...)
-
+	var includePatterns []string
 	includePatternsFromFile, err := ReadFilterPatternFiles(tzapIncludePath)
 	if err != nil {
-		return nil, err
+		baseTzapIgnore, _ := ReadPatternString(BaseTzapIgnore)
+		excludePatterns = append(baseExcludePatterns, baseTzapIgnore...)
+		println("Using base tzapinclude")
+	} else {
+		includePatterns = append(includePatterns, includePatternsFromFile...)
 	}
-
-	return NewWithPatterns(excludePatterns, includePatternsFromFile), nil
+	return NewWithPatterns(excludePatterns, includePatterns), nil
 }
 func NewWithPatterns(excludePatterns []string, includePatterns []string) *FileEvaluator {
 	excludeMatcher := ignore.CompileIgnoreLines(excludePatterns...)

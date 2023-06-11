@@ -3,6 +3,7 @@ package action
 import (
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/pkg/embed/embedstore"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
@@ -43,7 +44,7 @@ func PromptWorkflow(promptWorkflowArgs PromptWorkflowArgs) types.NamedWorkflow[*
 				// Find all embeddings search them, returning the top results.
 				ApplyWorkflow(LoadAndSearchEmbeddingsWorkflow(loadAndSearchEmbeddingsArgs)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					searchResult := t.Data["searchResults"].(types.SearchResults)
+					searchResult := embedstore.TightenSearchResults(t.Data["searchResults"].(types.SearchResults).Results)
 					return t.
 						ApplyWorkflow(cliworkflows.PrintEmbeddings(searchResult)).
 						ApplyWorkflow(embedworkflows.EmbedWorkflow(searchResult))
