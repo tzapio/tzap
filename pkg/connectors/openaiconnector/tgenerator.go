@@ -11,8 +11,8 @@ import (
 type openaiconnectorKey struct{}
 
 type OpenaiTgenerator struct {
-	client    *openai.Client
-	tokenizer *tokenizer.Tokenizer
+	client *openai.Client
+	*tokenizer.Tokenizer
 }
 
 func NewContext(ctx context.Context, openaiTgenerator OpenaiTgenerator) context.Context {
