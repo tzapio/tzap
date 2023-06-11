@@ -43,8 +43,8 @@ var searchCmd = &cobra.Command{
 			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  searchQuery,
-				K:            embedsCountFlag,
-				N:            nCountFlag,
+				EmbedsCount:  embedsCountFlag,
+				NCount:       nCountFlag,
 				DisableIndex: disableIndex,
 				Yes:          tzapCliSettings.Yes,
 			})
@@ -60,7 +60,7 @@ var searchCmd = &cobra.Command{
 				embeddingJson := string(byte)
 				fmt.Println(embeddingJson)
 			} else {
-				t.ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults))
+				t.ApplyWorkflow(cliworkflows.PrintEmbeddings(output.SearchResults))
 			}
 		})
 

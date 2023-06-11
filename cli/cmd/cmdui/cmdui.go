@@ -33,7 +33,7 @@ func NewCMDUI(promptFile string, editor string) *CMDUI {
 	return &CMDUI{filePath: file.Name(), editor: editor}
 }
 func (ui *CMDUI) Init() {
-	if ui.editor == "vscode" {
+	if ui.editor == "vscode" || ui.editor == "code" {
 		exec.Command("code", "-r", "--goto", ui.filePath+":-1").Run()
 		return
 	}
@@ -91,10 +91,10 @@ func (ui *CMDUI) AddPromptTextWithStdinUI(thread []types.Message) []types.Messag
 		panic(err)
 	}
 	ui.RunEditor()
-	return ui.ReadMessageThreadFromFile()
+	return ui.ReadMessagesFromFile()
 }
 
-func (ui *CMDUI) ReadMessageThreadFromFile() []types.Message {
+func (ui *CMDUI) ReadMessagesFromFile() []types.Message {
 	bytes, err := os.ReadFile(ui.filePath)
 	if err != nil {
 		panic(err)

@@ -5,7 +5,7 @@ type SingleWait[T any] struct {
 	done chan bool
 }
 
-// New creates a new instance of SimpleStruct and initiates the Done channel.
+// New creates a new instance of SingleWait struct and initiates the Done channel.
 func New[T any](fn func() T) *SingleWait[T] {
 	s := &SingleWait[T]{
 		done: make(chan bool),

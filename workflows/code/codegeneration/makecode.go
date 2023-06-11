@@ -26,11 +26,10 @@ func MakeCodeExtReplacer(language, extensionIn, extensionOut, mission, task stri
 				"OUTFILE: "+fileout,
 				"OUTPUT: "+language,
 				"### EXAMPLE:",
-				"EXAMPLE:",
 				"{"+language+" code}").
 			AddSystemMessage(
-				"###",
-				"###file: "+filein+"\n",
+				"####",
+				"####file: "+filein+"\n",
 				t.Data["content"].(string),
 			).
 			LoadCompletionOrRequestCompletionMD5(fileout)
@@ -49,21 +48,24 @@ type BasicRefactoringConfig struct {
 }
 
 func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
+
+	systemMessage := ""
+	if config.Mission != "" {
+		systemMessage = "#### The overall mission: " + config.Mission
+	}
+
 	inspirationString := ""
 	if len(config.InspirationFiles) > 0 {
-		inspirationString = "\n### The following files have been chosen as inspiration files\n"
+		inspirationString = "\n#### The following files have been chosen as inspiration files\n"
 		for _, v := range config.InspirationFiles {
 			if v != "" {
-				inspirationString += "\n###file: " + v + "\n"
+				inspirationString += "\n####file: " + v + "\n"
 				inspirationString += util.ReadFileP(v) + "\n"
 			}
 		}
 	}
-	initialSystemMessage := ""
-	if config.Mission != "" {
-		initialSystemMessage = "### The overall mission: " + config.Mission
-	}
-	initialSystemMessage += inspirationString
+
+	systemMessage += inspirationString
 
 	outputStr := ""
 	if config.OutputFormat != "" {
@@ -71,23 +73,23 @@ func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
 	}
 	exampleStr := ""
 	if config.Example != "" {
-		exampleStr = "###EXAMPLE: \n" + config.Example
+		exampleStr = "#### EXAMPLE:\n" + config.Example
 	}
 	planStr := ""
 	if config.Plan != "" {
-		planStr = "PLAN: " + config.Plan
+		planStr = config.Plan
 	} else {
-		planStr = "PLAN: Do not write any text because this file will be saved directly to " + config.FileOut
+		planStr = "Do not write any text because this file will be saved directly to " + config.FileOut
 	}
 
 	return func(t *tzap.Tzap) *tzap.Tzap {
 		return t.
 			HijackTzap(&tzap.Tzap{Name: "MakeCodeGO"}).
-			AddSystemMessage(initialSystemMessage).
+			AddSystemMessage(systemMessage).
 			AddUserMessage(
-				"###",
+				"####",
 				"TASK: "+config.Task,
-				planStr,
+				"PLAN: "+planStr,
 				"TASKFILE: "+config.FileIn,
 				"OUTFILE: "+config.FileOut,
 				outputStr,

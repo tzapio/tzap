@@ -28,6 +28,7 @@ func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, 
 		},
 	}
 }
+
 func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "confirmEmbeddingSearch",
@@ -41,7 +42,9 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 				if !yes {
 					ok := stdin.ConfirmPrompt(fmt.Sprintf(
 						"Embeddings - You are about to fetch %d embeddings. Proceed? Estimation tokens: %d. Price is: $0.0004 per 1000 tokens. Estimating %.4f USD",
-						len(uncachedEmbeddings.Vectors), len(uncachedEmbeddings.Vectors)*400, price))
+						len(uncachedEmbeddings.Vectors),
+						len(uncachedEmbeddings.Vectors)*400,
+						price))
 					if !ok {
 						println("Fetching embeddings aborted by user")
 						os.Exit(0)

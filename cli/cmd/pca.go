@@ -32,8 +32,8 @@ var pcaCMD = &cobra.Command{
 			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  searchQuery,
-				K:            -1,
-				N:            -1,
+				EmbedsCount:  -1,
+				NCount:       -1,
 				DisableIndex: disableIndex,
 				Yes:          tzapCliSettings.Yes,
 			})
@@ -45,7 +45,7 @@ var pcaCMD = &cobra.Command{
 				embeddingJson := string(byte)
 				fmt.Println(embeddingJson)
 			} else {
-				t.ApplyWorkflow(cliworkflows.PrintSearchResults(output.SearchResults))
+				t.ApplyWorkflow(cliworkflows.PrintEmbeddings(output.SearchResults))
 			}
 		})
 

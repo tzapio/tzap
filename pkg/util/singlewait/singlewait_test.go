@@ -3,7 +3,7 @@ package singlewait_test
 import (
 	"testing"
 
-	"github.com/tzapio/tzap/pkg/embed/localdb/singlewait"
+	"github.com/tzapio/tzap/pkg/util/singlewait"
 )
 
 func TestSingleWait(t *testing.T) {

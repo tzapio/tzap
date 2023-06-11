@@ -13,8 +13,8 @@ import (
 type LoadAndSearchEmbeddingsArgs struct {
 	ExcludeFiles []string `json:"exclude_files"`
 	SearchQuery  string   `json:"search_query"`
-	K            int      `json:"k"`
-	N            int      `json:"n"`
+	EmbedsCount  int      `json:"k"`
+	NCount       int      `json:"n"`
 	DisableIndex bool     `json:"disable_index"`
 	Yes          bool     `json:"yes"`
 }
@@ -51,7 +51,7 @@ func LoadAndSearchEmbeddingsWorkflow(args LoadAndSearchEmbeddingsArgs) types.Nam
 
 			return t.
 				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings(args.DisableIndex, args.Yes)).
-				ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), args.ExcludeFiles, args.K, args.N))
+				ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), args.ExcludeFiles, args.EmbedsCount, args.NCount))
 		},
 	}
 }

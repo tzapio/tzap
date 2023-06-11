@@ -90,7 +90,7 @@ func PrintInspirationFiles(inspirationFiles []string) types.NamedWorkflow[*tzap.
 		},
 	}
 }
-func PrintSearchResults(searchResults types.SearchResults) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func PrintEmbeddings(searchResults types.SearchResults) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "listInspirationFiles",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {

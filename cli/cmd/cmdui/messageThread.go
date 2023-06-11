@@ -9,6 +9,9 @@ type MessageThread struct {
 	messageThread []types.Message
 }
 
+func NewMessageThread() *MessageThread {
+	return &MessageThread{}
+}
 func (m *MessageThread) Append(message types.Message) {
 	m.messageThread = append(m.messageThread, message)
 }
@@ -30,10 +33,10 @@ func (m *MessageThread) LastMessage() *types.Message {
 	}
 	return nil
 }
-func (m *MessageThread) SetMessageThread(messageThread []types.Message) {
+func (m *MessageThread) SetMessages(messageThread []types.Message) {
 	m.messageThread = messageThread
 }
-func (m *MessageThread) GetMessageThread() []types.Message {
+func (m *MessageThread) GetMessages() []types.Message {
 	return m.messageThread
 
 }
