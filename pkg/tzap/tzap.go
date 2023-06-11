@@ -110,7 +110,6 @@ func (previousTzap *Tzap) CloneTzap(suggestedTzap *Tzap) *Tzap {
 		Parent:               previousTzap,
 		Name:                 previousTzap.Name,
 		InitialSystemContent: previousTzap.InitialSystemContent,
-		Message:              previousTzap.Message,
 		Data:                 previousTzap.Data,
 	}
 

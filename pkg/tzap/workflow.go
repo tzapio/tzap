@@ -23,7 +23,6 @@ func (t *Tzap) ApplyWorkflow(nt types.NamedWorkflow[*Tzap, *Tzap]) *Tzap {
 	Log(t, "Applying workflow")
 	workflowResult := nt.Workflow(t.CloneTzap(&Tzap{Name: "ApplyWorkflow (" + nt.Name + ") Start"}))
 	endWorkflow := workflowResult.CloneTzap(&Tzap{Name: "ApplyWorkflow (" + nt.Name + ") End"})
-	endWorkflow.Message = types.Message{}
 	return endWorkflow
 }
 
