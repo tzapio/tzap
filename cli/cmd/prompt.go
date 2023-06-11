@@ -8,12 +8,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/tzapio/tzap/cli/action"
-	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/workflows/code/embedworkflows"
-	"github.com/tzapio/tzap/workflows/code/fileworkflows"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -61,77 +58,63 @@ func promptFunc(cmd *cobra.Command, args []string) {
 	if embedsCountFlag > nCountFlag {
 		nCount = embedsCountFlag + 5
 	}
+	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
+	messageThread := cmdui.NewMessageThread()
+	if tzapCliSettings.ApiMode {
+		tzapCliSettings.Editor = "api"
+	}
+	if promptFile != "" {
+		messageThread.SetMessages(cmdUI.ReadMessagesFromFile())
+	}
 
+	if len(args) > 0 {
+		userMessage := types.Message{
+			Content: strings.Join(args[0:], " "),
+			Role:    openai.ChatMessageRoleUser,
+		}
+		messageThread.Append(userMessage)
+	}
+	cmdUI.Init()
 	err := tzap.HandlePanic(func() {
 		defer t.HandleShutdown()
-		if tzapCliSettings.ApiMode {
-			tzapCliSettings.Editor = "api"
-		}
-		cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
-		messageThread := cmdui.MessageThread{}
 
-		if promptFile != "" {
-			messageThread.SetMessageThread(cmdUI.ReadMessageThreadFromFile())
-		}
-		if len(args) > 0 {
-			userMessage := types.Message{
-				Content: strings.Join(args[0:], " "),
-				Role:    openai.ChatMessageRoleUser,
-			}
-			messageThread.Append(userMessage)
-		}
-		cmdUI.Init()
 		for {
 			if !messageThread.IsLastMessageFromUser() {
-				messageThread.SetMessageThread(
+				messageThread.SetMessages(
 					cmdUI.AddPromptTextWithStdinUI(
-						messageThread.GetMessageThread(),
+						messageThread.GetMessages(),
 					),
 				)
 				continue
 			}
 			searchQuery = messageThread.LastMessage().Content
+			truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessages(), 1000)
 
-			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
-			actionArgs := action.LoadAndSearchEmbeddingsArgs{
-				ExcludeFiles: inspirationFiles,
-				SearchQuery:  searchQuery,
-				K:            embedsCount,
-				N:            nCount,
-				DisableIndex: disableIndex,
-				Yes:          tzapCliSettings.Yes,
+			promptWorkflowArgs := action.PromptWorkflowArgs{
+				InspirationFiles: inspirationFiles,
+				SearchQuery:      searchQuery,
+				EmbedsCount:      embedsCount,
+				NCount:           nCount,
+				DisableIndex:     disableIndex,
+				Yes:              tzapCliSettings.Yes,
+				MessageThread:    truncThread,
 			}
+			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+			t.WorkTzap(func(t *tzap.Tzap) {
+				t = t.ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs))
+				messageThread.Append(t.AsAssistantMessage().Message)
 
-			t.
-				ApplyWorkflow(cliworkflows.PrintInspirationFiles(inspirationFiles)).
-				ApplyWorkflow(fileworkflows.InspirationWorkflow(inspirationFiles)).
-				ApplyWorkflow(action.LoadAndSearchEmbeddingsWorkflow(actionArgs)).
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					searchResult := t.Data["searchResults"].(types.SearchResults)
-					return t.
-						ApplyWorkflow(cliworkflows.PrintSearchResults(searchResult)).
-						ApplyWorkflow(embedworkflows.EmbedWorkflow(searchResult))
-				}).
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					cmd.Println(cmdutil.Bold("--- Completion"))
-					truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessageThread(), 1000)
-					t = t.LoadThread(truncThread).RequestChatCompletion().AsAssistantMessage()
-					cmd.Println(cmdutil.Bold("\n---"))
-					messageThread.Append(t.Message)
-
-					if tzapCliSettings.ApiMode {
-						cmdUI.SaveMessageThreadToFile(messageThread.GetMessageThread())
-						threadText, err := cmdUI.SerializeMessageThread(messageThread.GetMessageThread())
-						if err != nil {
-							panic(err)
-						}
-						fmt.Print(threadText)
-						os.Exit(0)
-						return t
+				if tzapCliSettings.ApiMode {
+					cmdUI.SaveMessageThreadToFile(messageThread.GetMessages())
+					threadText, err := cmdUI.SerializeMessageThread(messageThread.GetMessages())
+					if err != nil {
+						panic(err)
 					}
-
-					return t
-				})
+					fmt.Print(threadText)
+					os.Exit(0)
+					return
+				}
+			})
 		}
 	})
 	if err != nil {
