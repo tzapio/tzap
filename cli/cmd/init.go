@@ -87,17 +87,17 @@ func writeEditorToConfigFile(selected string) error {
 	return nil
 }
 func askForEditor() string {
-	options := []string{"vscode", "code", "vim", "nano", "editor"}
+	options := []string{"vscode", "code", "vim", "nano", "editor", "stdin"}
 	prompt := fmt.Sprintf("Choose your preferred text editor:\n- %s (alias: code): Edit prompts directly from file and have them automatically open using /usr/bin/code vscode command\n- %s: Opens the file in vim when prompting\n- %s:Opens the file in vim when prompting\n- %s: allows for editing files directly but does not connect to any specific UI.\n- stdin: default, asks for input in CLI.\n\n code is recommended and stdin is the easiest to get started with.", options[0], options[1], options[2], options[3])
 	fmt.Print(prompt)
 
 	text := stdin.GetStdinInput("\nEnter your choice (press enter to chose: stdin): ")
 	text = strings.TrimSpace(text)
 	for _, e := range options {
-		if e == text {
+		if text == e {
 			return e
 		}
-		if e == "" {
+		if text == "" {
 			return "stdin"
 		}
 	}

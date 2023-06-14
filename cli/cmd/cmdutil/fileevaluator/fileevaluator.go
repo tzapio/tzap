@@ -59,8 +59,8 @@ func New(baseDir string) (*FileEvaluator, error) {
 	var includePatterns []string
 	includePatternsFromFile, err := ReadFilterPatternFiles(tzapIncludePath)
 	if err != nil {
-		baseTzapIgnore, _ := ReadPatternString(BaseTzapIgnore)
-		excludePatterns = append(baseExcludePatterns, baseTzapIgnore...)
+		baseTzapInclude, _ := ReadPatternString(BaseTzapInclude)
+		includePatterns = append(baseExcludePatterns, baseTzapInclude...)
 		println("Using base tzapinclude")
 	} else {
 		includePatterns = append(includePatterns, includePatternsFromFile...)
