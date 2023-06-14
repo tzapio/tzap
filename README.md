@@ -101,26 +101,26 @@ Once you have installed Tzap, you can start using it immediately by typing `tzap
 
 ## Tzap Embedding Prompt CLI
 
-The `tzap embeddingprompt` command allows you to generate code or content based on embedding search from your existing code. This enables GPT to incorporate your code knowledge and provide more relevant and accurate outputs. By providing additional context, GPT can generate even more accurate code snippets or content based on the provided files.
+The `tzap prompt` command allows you to generate code or content based on embedding search from your existing code. This enables GPT to incorporate your code knowledge and provide more relevant and accurate outputs. By providing additional context, GPT can generate even more accurate code snippets or content based on the provided files.
 
 1. Use the `tzap embeddingprompt` command with the following syntax:
- ```
- tzap embeddingprompt "<prompt>" [--inspiration=filepath1,filepath2,...]
- ```
+```
+tzap prompt "<prompt>" [--inspiration=filepath1,filepath2,...]
+```
 
- - `<prompt>`: The text prompt you want to provide to GPT. Make your prompt as clear as possible and enclose it in double quotes.
- - `--inspiration`: (Optional) A flag followed by a comma-separated list of file paths, which are used as inspiration files to enhance GPT's general understanding.
- - `--temperature`: fine tune the temperature.
- - `-s searchQuery`: split the search and the prompt
- - `-f promptFile`: use file as prompt
+- `<prompt>`: The text prompt you want to provide to GPT. Make your prompt as clear as possible and enclose it in double quotes.
+- `-i`: (Optional) A flag followed by a comma-separated list of file paths, which are used as inspiration files to enhance GPT's general understanding.
+- `--temperature`: Fine-tune the temperature.
+- `-s searchQuery`: Split the search and the prompt.
+- `-f promptFile`: Use a file as a prompt.
 
-For example, this text was generated using:
+For example, you can run the following command to generate code based on a prompt:
 
 ```
-npx tzap embeddingprompt -m gpt4 README.md2 "Add to the README.md an explanation on how to use the cli command tzap embeddingprompt" -i README.md 
-``` 
+tzap prompt "Generate a function that calculates the sum of two numbers" --inspiration=myFile.js,anotherFile.js
+```
 
-Feel free to customize `<prompt>` according to your desired outcomes.
+Feel free to customize `<prompt>` and provide your own inspiration files to get more accurate code snippets or content.
 
 ## Cost Estimation
 
