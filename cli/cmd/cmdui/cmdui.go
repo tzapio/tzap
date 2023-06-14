@@ -1,13 +1,12 @@
 package cmdui
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/tzapfile"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
@@ -110,40 +109,14 @@ func (ui *CMDUI) ReadMessagesFromFile() []types.Message {
 		panic(err)
 	}
 	content := string(bytes)
-	return ui.DeserializeMessageThread(content)
-}
-func (ui *CMDUI) DeserializeMessageThread(content string) []types.Message {
-	var messages []types.Message
-	messageLines := strings.Split(content, "---")
-	for _, messageLine := range messageLines {
-		message := types.Message{}
-		lines := strings.Split(strings.TrimSpace(messageLine), "\n")
-		if len(lines) > 0 {
-			if strings.HasPrefix(lines[0], "@role:") {
-				message.Role = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(lines[0]), "@role:"))
-				message.Content = strings.TrimSpace(strings.Join(lines[1:], "\n"))
-			} else {
-				message.Role = "user"
-				message.Content = strings.TrimSpace(strings.Join(lines, "\n"))
-			}
-		}
-		messages = append(messages, message)
-	}
-	reverseMessages := []types.Message{}
-	for i := len(messages) - 1; i >= 0; i-- {
-		if strings.TrimSpace(messages[i].Content) == "" || strings.TrimSpace(messages[i].Role) == "" {
-			continue
-		}
-		reverseMessages = append(reverseMessages, messages[i])
-	}
-	return reverseMessages
+	return tzapfile.DeserializeMessageThread(content)
 }
 
 // SaveMessageThreadToFile saves the thread to a file
 // The file is saved in reverse order, so that the last message is the first line in the file
 // The first line may skip role and defaults to user
 func (ui *CMDUI) SaveMessageThreadToFile(messages []types.Message) error {
-	text, err := ui.SerializeMessageThread(messages)
+	text, err := tzapfile.SerializeMessageThread(messages)
 	if err != nil {
 		return err
 	}
@@ -152,25 +125,4 @@ func (ui *CMDUI) SaveMessageThreadToFile(messages []types.Message) error {
 		return err
 	}
 	return nil
-}
-
-func (ui *CMDUI) SerializeMessageThread(messages []types.Message) (string, error) {
-	reversedMessages := []types.Message{}
-	for i := len(messages) - 1; i >= 0; i-- {
-		if strings.TrimSpace(messages[i].Content) == "" || strings.TrimSpace(messages[i].Role) == "" {
-			continue
-		}
-		reversedMessages = append(reversedMessages, messages[i])
-	}
-	s := strings.Builder{}
-	if len(reversedMessages) > 0 {
-		s.WriteString("\n\n")
-	}
-
-	for _, msg := range reversedMessages {
-		if _, err := s.WriteString(fmt.Sprintf("---\n@role:%s\n%s\n", msg.Role, msg.Content)); err != nil {
-			return "", err
-		}
-	}
-	return s.String(), nil
 }

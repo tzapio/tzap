@@ -25,13 +25,15 @@ func (ot *OpenaiTgenerator) FetchEmbedding(ctx context.Context, content ...strin
 				case 401:
 					panic("invalid open ai api key")
 				case 429:
-					// rate limiting or engine overload (wait and retry)
+					println(err.Error())
 				case 500:
 					// openai server error (retry)
 				default:
+					println("unknown error", e.HTTPStatusCode, err.Error())
 					return nil, errors.New("embedding failed")
 				}
 			}
+			println("Fetching embedding failed. Retry in 2 seconds.", err.Error())
 			time.Sleep(2 * time.Second)
 			continue
 		}

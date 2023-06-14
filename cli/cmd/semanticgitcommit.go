@@ -33,7 +33,7 @@ var semanticGitcommitCmd = &cobra.Command{
 					diff := t.Data["git-diff"].(string)
 					cmd.Print("Reading staged git commit diffs")
 					if !showDiff {
-						cmd.Println(" (Use --show-diff to show the git diff)\n\n")
+						cmd.Println(" (Use --show-diff to show the git diff)")
 					} else {
 						cmd.Println(":")
 					}
@@ -41,7 +41,8 @@ var semanticGitcommitCmd = &cobra.Command{
 					if showDiff {
 						cmd.Println()
 						cmd.Println(diff)
-						cmd.Println("\n\n")
+						cmd.Println()
+						cmd.Println()
 					}
 				}).
 				ApplyErrorWorkflow(git.ValidateDiff(), func(et *tzap.ErrorTzap) error {

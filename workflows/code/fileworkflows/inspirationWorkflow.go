@@ -13,6 +13,7 @@ func InspirationWorkflow(inspirationFiles []string) types.NamedWorkflow[*tzap.Tz
 				return t
 			}
 			return t.
+				AddSystemMessage("####The following files are explictily included by the user for relevance: ").
 				LoadFiles(inspirationFiles).
 				Reduce(func(t *tzap.Tzap, child *tzap.Tzap) *tzap.Tzap {
 					return t.AddSystemMessage(

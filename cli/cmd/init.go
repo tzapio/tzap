@@ -1,7 +1,10 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -49,7 +52,13 @@ var initCmd = &cobra.Command{
 			cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include .")
 			stdin.GetStdinInput("Press enter to continue.")
 		}
+		// Ask which text editor the user wants to use
+		editor := askForEditor()
 
+		// Write editor to the config file
+		if err := writeEditorToConfigFile(editor); err != nil {
+			panic(err)
+		}
 		touchTzapignore()
 		touchTzapinclude()
 		generateViperConfig()
@@ -58,6 +67,44 @@ var initCmd = &cobra.Command{
 	},
 }
 
+func writeEditorToConfigFile(selected string) error {
+	cfg := map[string]string{
+		"editor": selected,
+	}
+
+	cfgJSON, err := json.Marshal(cfg)
+	if err != nil {
+		return fmt.Errorf("error parsing json for config: %w", err)
+	}
+	if err := os.MkdirAll(".tzap-data", 0755); err != nil {
+		return fmt.Errorf("error creating .tzap-data folder: %w", err)
+	}
+
+	if err := os.WriteFile(".tzap-data/config.json", cfgJSON, 0644); err != nil {
+		return fmt.Errorf("error writing to config.json: %w", err)
+	}
+
+	return nil
+}
+func askForEditor() string {
+	options := []string{"vscode", "code", "vim", "nano", "editor"}
+	prompt := fmt.Sprintf("Choose your preferred text editor:\n- %s (alias: code): Edit prompts directly from file and have them automatically open using /usr/bin/code vscode command\n- %s: Opens the file in vim when prompting\n- %s:Opens the file in vim when prompting\n- %s: allows for editing files directly but does not connect to any specific UI.\n- stdin: default, asks for input in CLI.\n\n code is recommended and stdin is the easiest to get started with.", options[0], options[1], options[2], options[3])
+	fmt.Print(prompt)
+
+	text := stdin.GetStdinInput("\nEnter your choice (press enter to chose: stdin): ")
+	text = strings.TrimSpace(text)
+	for _, e := range options {
+		if e == text {
+			return e
+		}
+		if e == "" {
+			return "stdin"
+		}
+	}
+
+	fmt.Println("Invalid input. Please choose a valid text editor.")
+	return askForEditor()
+}
 func touchTzapignore() {
 	if _, err := os.Stat(".tzapignore"); err == nil {
 		println("Warning: .tzapignore already exists.")

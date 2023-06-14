@@ -15,6 +15,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/pkg/tzapfile"
 )
 
 var inspirationFiles []string
@@ -39,7 +40,7 @@ func init() {
 }
 
 var promptCmd = &cobra.Command{
-	Aliases: []string{"p"},
+	Aliases: []string{"p", "embeddingprompt"},
 	Use:     "prompt <prompt>",
 	Short:   "Generate code by combining prompt and code-search",
 	Long: `The 'prompt' command generates content based on code-searching existing files.
@@ -106,7 +107,7 @@ func promptFunc(cmd *cobra.Command, args []string) {
 
 				if tzapCliSettings.ApiMode {
 					cmdUI.SaveMessageThreadToFile(messageThread.GetMessages())
-					threadText, err := cmdUI.SerializeMessageThread(messageThread.GetMessages())
+					threadText, err := tzapfile.SerializeMessageThread(messageThread.GetMessages())
 					if err != nil {
 						panic(err)
 					}
