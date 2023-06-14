@@ -139,10 +139,17 @@ func Execute() {
 	}
 }
 
-var modelMap map[string]string = map[string]string{"gpt35": openai.GPT3Dot5Turbo, "gpt4": openai.GPT4}
+var modelMap map[string]string = map[string]string{
+	"gpt35":    openai.GPT3Dot5Turbo,
+	"gpt356":   openai.GPT3Dot5Turbo0613,
+	"gpt3516":  openai.GPT16,
+	"gpt3516k": openai.GPT16,
+	"gpt16":    openai.GPT16,
+	"gpt4":     openai.GPT4,
+}
 
 func init() {
-	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt4).")
+	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt356 (june model) gpt3516 (alias gpt16) gpt4).")
 	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.AutoMode, "automode", false, "Some but not all functions prompt if you want to overwrite an existing file. Putting automode to true enaled overwriting for those cases. Setting this to false does not disable anything.")
 	RootCmd.PersistentFlags().IntVar(&tzapCliSettings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
 	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
