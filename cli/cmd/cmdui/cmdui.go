@@ -3,6 +3,7 @@ package cmdui
 import (
 	"os"
 	"os/exec"
+	"strconv"
 	"time"
 
 	"github.com/tzapio/tzap/pkg/types"
@@ -32,12 +33,20 @@ func NewCMDUI(promptFile string, editor string) *CMDUI {
 	if err != nil {
 		panic(err)
 	}
-	file, err := os.CreateTemp(".tzap-data/chats", "tzapchange*.txt")
-	if err != nil {
-		panic(err)
+	// Start the file number from 10000
+	fileNumber := 10000
+	var filename string
+
+	for {
+		fileNumber--
+		filename = ".tzap-data/chats/tzapchange" + strconv.Itoa(fileNumber) + ".md"
+		if _, err := os.Stat(filename); os.IsNotExist(err) {
+			break
+		}
+
 	}
-	file.Close()
-	return &CMDUI{filePath: file.Name(), editor: editor}
+
+	return &CMDUI{filePath: filename, editor: editor}
 }
 func (ui *CMDUI) Init() {
 	if ui.editor == "vscode" || ui.editor == "code" {
