@@ -28,21 +28,17 @@ func newBaseconnector(openai_apikey string) (types.TGenerator, error) {
 	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey)
 
 	tl.Logger.Println("Open AI Client Initialized")
-	embeddingC, err := embedstore.NewEmbedStore()
-	if err != nil {
-		return nil, err
-	}
+
 	tl.Logger.Println("Local DB Client Initialized")
-	partialComposite := PartialComposite{OpenaiTgenerator: openaiC, EmbeddingGenerator: embeddingC}
+	partialComposite := PartialComposite{OpenaiTgenerator: openaiC}
 	var myInterface types.TGenerator = partialComposite
 	return myInterface, nil
 }
 
 type PartialComposite struct {
 	*types.UnimplementedTGenerator
-	OpenaiTgenerator   *openaiconnector.OpenaiTgenerator
-	VoiceGenerator     types.TGenerator
-	EmbeddingGenerator types.TGenerator
+	OpenaiTgenerator *openaiconnector.OpenaiTgenerator
+	VoiceGenerator   types.TGenerator
 }
 
 func (pc PartialComposite) TextToSpeech(ctx context.Context, content, language, voice string) (*[]byte, error) {
@@ -61,20 +57,20 @@ func (pc PartialComposite) OffsetTokens(ctx context.Context, content string, fro
 	return pc.OpenaiTgenerator.OffsetTokens(content, from, to)
 }
 func (pc PartialComposite) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
-	return pc.EmbeddingGenerator.SearchWithEmbedding(ctx, embedding, k)
+	return embedstore.EmbedStore.SearchWithEmbedding(ctx, embedding, k)
 }
 func (pc PartialComposite) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
-	return pc.EmbeddingGenerator.AddEmbeddingDocument(ctx, docID, embedding, metadata)
+	return embedstore.EmbedStore.AddEmbeddingDocument(ctx, docID, embedding, metadata)
 }
 func (pc PartialComposite) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
-	return pc.EmbeddingGenerator.GetEmbeddingDocument(ctx, docID)
+	return embedstore.EmbedStore.GetEmbeddingDocument(ctx, docID)
 }
 func (pc PartialComposite) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
-	return pc.EmbeddingGenerator.DeleteEmbeddingDocument(ctx, docID)
+	return embedstore.EmbedStore.DeleteEmbeddingDocument(ctx, docID)
 }
 func (pc PartialComposite) DeleteEmbeddingDocuments(ctx context.Context, ids []string) error {
-	return pc.EmbeddingGenerator.DeleteEmbeddingDocuments(ctx, ids)
+	return embedstore.EmbedStore.DeleteEmbeddingDocuments(ctx, ids)
 }
 func (pc PartialComposite) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
-	return pc.EmbeddingGenerator.ListAllEmbeddingsIds(ctx)
+	return embedstore.EmbedStore.ListAllEmbeddingsIds(ctx)
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/action"
+	"github.com/tzapio/tzap/cli/actionpb"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -16,8 +17,8 @@ import (
 
 func init() {
 	RootCmd.AddCommand(findCmd)
-	findCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
-	findCmd.Flags().IntVarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
+	findCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
+	findCmd.Flags().Int32VarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
 	findCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
 	findCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
 	findCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
@@ -34,7 +35,7 @@ var findCmd = &cobra.Command{
 		err := tzap.HandlePanic(func() {
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
-			actionArgs := action.LoadAndSearchEmbeddingsArgs{
+			actionArgs := &actionpb.SearchArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  findQuery,
 				EmbedsCount:  -1,
@@ -55,7 +56,6 @@ var findCmd = &cobra.Command{
 					for filename := range filenames {
 						tmp += filename + "\n"
 					}
-					//t = t.AddSystemMessage("These are files that exist:\n" + tmp)
 					shortenedSearchResults := types.SearchResults{
 						Results: embedstore.TightenSearchResults(original.Results[:embedsCountFlag]).Results,
 					}

@@ -14,10 +14,14 @@ type Tokenizer struct {
 	tokenizer *singlewait.SingleWait[*codec.Codec]
 }
 
+var tokenizer *codec.Codec
+
 func NewTokenizer() *Tokenizer {
 	waitTokenizer := singlewait.New(func() *codec.Codec {
 		tl.Logger.Println("Initiating Tokenizer Client")
-		tokenizer := enc.NewCl100kBase()
+		if tokenizer == nil {
+			tokenizer = enc.NewCl100kBase()
+		}
 		tl.Logger.Println("Done - Initializing Tokenizer Client")
 		return tokenizer
 	})

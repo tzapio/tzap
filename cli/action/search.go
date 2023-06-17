@@ -1,6 +1,7 @@
 package action
 
 import (
+	"github.com/tzapio/tzap/cli/actionpb"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
@@ -24,7 +25,7 @@ type LoadAndSearchEmbeddingsOutput struct {
 	QueryResult   types.QueryRequest  `json:"queryResult"`
 }
 
-func LoadAndSearchEmbeddings(t *tzap.Tzap, args LoadAndSearchEmbeddingsArgs) *LoadAndSearchEmbeddingsOutput {
+func LoadAndSearchEmbeddings(t *tzap.Tzap, args *actionpb.SearchArgs) *LoadAndSearchEmbeddingsOutput {
 	resultT := t.
 		ApplyWorkflow(LoadAndSearchEmbeddingsWorkflow(args))
 	searchResult := resultT.Data["searchResults"].(types.SearchResults)
@@ -35,7 +36,7 @@ func LoadAndSearchEmbeddings(t *tzap.Tzap, args LoadAndSearchEmbeddingsArgs) *Lo
 	}
 }
 
-func LoadAndSearchEmbeddingsWorkflow(args LoadAndSearchEmbeddingsArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndSearchEmbeddingsWorkflow(args *actionpb.SearchArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndSearchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -51,7 +52,7 @@ func LoadAndSearchEmbeddingsWorkflow(args LoadAndSearchEmbeddingsArgs) types.Nam
 
 			return t.
 				ApplyWorkflow(cliworkflows.IndexFilesAndEmbeddings(args.DisableIndex, args.Yes)).
-				ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), args.ExcludeFiles, args.EmbedsCount, args.NCount))
+				ApplyWorkflow(embedworkflows.SearchFilesWorkflow(queryWait.GetData(), args.ExcludeFiles, int(args.EmbedsCount), int(args.NCount)))
 		},
 	}
 }

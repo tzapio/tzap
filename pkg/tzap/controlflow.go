@@ -31,7 +31,7 @@ func (t *Tzap) WorkTzap(fn func(*Tzap)) *Tzap {
 // It does not modify the current Tzap object but returns it.
 func (t *Tzap) IsolatedTzap(fn func(*Tzap)) *Tzap {
 	Log(t, "Isolated Tzap")
-	isolated := t.New()
+	isolated := t.CopyConnection()
 	fn(isolated)
 	return t
 }

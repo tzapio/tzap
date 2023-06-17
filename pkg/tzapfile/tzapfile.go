@@ -33,6 +33,7 @@ func DeserializeMessageThread(content string) []types.Message {
 	}
 	return reverseMessages
 }
+
 func SerializeMessageThread(messages []types.Message) (string, error) {
 	reversedMessages := []types.Message{}
 	for i := len(messages) - 1; i >= 0; i-- {

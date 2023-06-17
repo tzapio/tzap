@@ -32,6 +32,10 @@ const BaseTzapInclude = `# Common languages. Example, remove .js if .js files ar
 *.rb
 *.rs
 *.php
+*.cob
+*.COB
+*.cbl
+*.CBL
 `
 
 var baseExcludePatterns = []string{".git", ".DS_Store", "desktop.ini"}
@@ -66,6 +70,13 @@ func New(baseDir string) (*FileEvaluator, error) {
 		includePatterns = append(includePatterns, includePatternsFromFile...)
 	}
 	return NewWithPatterns(excludePatterns, includePatterns), nil
+}
+func NewWithBasePatterns() *FileEvaluator {
+	baseTzapIgnore, _ := ReadPatternString(BaseTzapIgnore)
+	excludePatterns := append(baseExcludePatterns, baseTzapIgnore...)
+	baseTzapInclude, _ := ReadPatternString(BaseTzapInclude)
+	includePatterns := append(baseExcludePatterns, baseTzapInclude...)
+	return NewWithPatterns(excludePatterns, includePatterns)
 }
 func NewWithPatterns(excludePatterns []string, includePatterns []string) *FileEvaluator {
 	excludeMatcher := ignore.CompileIgnoreLines(excludePatterns...)

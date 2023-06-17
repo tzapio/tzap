@@ -1,6 +1,8 @@
 package cmdinstance
 
 import (
+	"fmt"
+	"os"
 	"path"
 
 	"github.com/tzapio/tzap/pkg/embed/localdb"
@@ -17,7 +19,9 @@ type LibProject struct {
 
 func NewLocalLibProject(baseDir string, name project.ProjectName) (project.Project, error) {
 	projectDir := path.Join(baseDir, "./.tzap-data", string(name))
-
+	if _, err := os.Stat(projectDir); os.IsNotExist(err) {
+		return nil, fmt.Errorf("localLib directory not found: %v", err)
+	}
 	embeddingCollection, err := localdb.NewFileDB[types.Vector](path.Join(projectDir, "fileembeddings.db"))
 	if err != nil {
 		return nil, err

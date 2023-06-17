@@ -44,6 +44,10 @@ func getThread(t *Tzap) []types.Message {
 	}
 	return append(messages, t.Message)
 }
+func (t *Tzap) GetThread() []types.Message {
+	messages := GetThread(t)
+	return messages
+}
 func (t *Tzap) GetThreadAsJSON() (string, error) {
 	messages := GetThread(t)
 	jsonBytes, err := json.MarshalIndent(messages, "", "  ")
@@ -89,23 +93,6 @@ func (t *Tzap) LoadThread(messages []types.Message) *Tzap {
 		}
 		if message.Role == openai.ChatMessageRoleUser {
 			t = t.AddUserMessage(message.Content)
-			continue
-		}
-	}
-	return t
-}
-func (t *Tzap) storeThread(messages []types.Message) *Tzap {
-	for _, message := range messages {
-		if message.Role == openai.ChatMessageRoleSystem {
-			t.AddSystemMessage(message.Content)
-			continue
-		}
-		if message.Role == openai.ChatMessageRoleAssistant {
-			t.AddAssistantMessage(message.Content)
-			continue
-		}
-		if message.Role == openai.ChatMessageRoleUser {
-			t.AddUserMessage(message.Content)
 			continue
 		}
 	}

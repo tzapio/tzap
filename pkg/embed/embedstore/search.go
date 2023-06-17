@@ -9,7 +9,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *EmbedStore) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
+func (idx *embedStore) ListAllEmbeddingsIds(ctx context.Context) (types.SearchResults, error) {
 	tl.Logger.Println("ListAllEmbeddings")
 	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
 	allResults := embeddingCollection.GetAll()
@@ -21,7 +21,7 @@ func (idx *EmbedStore) ListAllEmbeddingsIds(ctx context.Context) (types.SearchRe
 	}
 	return listEmbeddings, nil
 }
-func (idx *EmbedStore) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
+func (idx *embedStore) SearchWithEmbedding(ctx context.Context, embedding types.QueryFilter, k int) (types.SearchResults, error) {
 	tl.Logger.Println("SearchWithEmbedding")
 	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
 	res := embeddingCollection.GetAll()
@@ -48,7 +48,7 @@ func (idx *EmbedStore) SearchWithEmbedding(ctx context.Context, embedding types.
 	}
 	return searchResults, nil
 }
-func (idx *EmbedStore) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
+func (idx *embedStore) GetEmbeddingDocument(ctx context.Context, docID string) (types.Vector, bool, error) {
 	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
 	vector, exists := embeddingCollection.Get(docID)
 

@@ -19,8 +19,8 @@ import (
 )
 
 var inspirationFiles []string
-var embedsCountFlag int
-var nCountFlag int
+var embedsCountFlag int32
+var nCountFlag int32
 var promptFile string
 var disableIndex bool
 var searchQuery string
@@ -29,9 +29,9 @@ func init() {
 	RootCmd.AddCommand(promptCmd)
 	promptCmd.Flags().StringSliceVarP(&inspirationFiles,
 		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
-	promptCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10,
+	promptCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 10,
 		"Number of embeddings to use for the prompt generation")
-	promptCmd.Flags().IntVarP(&nCountFlag, "searchsize", "n", 15,
+	promptCmd.Flags().Int32VarP(&nCountFlag, "searchsize", "n", 15,
 		"Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
 	promptCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
 		"For large projects disabling indexing speeds up the process.")
@@ -59,11 +59,16 @@ func promptFunc(cmd *cobra.Command, args []string) {
 	if embedsCountFlag > nCountFlag {
 		nCount = embedsCountFlag + 5
 	}
+	if promptFile == "-" {
+		promptFile = ""
+
+	}
 	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
 	messageThread := cmdui.NewMessageThread()
 	if tzapCliSettings.ApiMode {
 		tzapCliSettings.Editor = "api"
 	}
+
 	if promptFile != "" {
 		messageThread.SetMessages(cmdUI.ReadMessagesFromFile())
 	}
@@ -89,7 +94,7 @@ func promptFunc(cmd *cobra.Command, args []string) {
 				continue
 			}
 			searchQuery = messageThread.LastMessage().Content
-			truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessages(), 1000)
+			truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessages(), 4000)
 
 			promptWorkflowArgs := action.PromptWorkflowArgs{
 				InspirationFiles: inspirationFiles,

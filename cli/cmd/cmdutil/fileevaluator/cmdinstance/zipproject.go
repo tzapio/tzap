@@ -20,9 +20,9 @@ type ZipProject struct {
 	*zipwalker.ZipWalker //GetFiles() @TODO: Refactor to FS interface?
 }
 
-func NewLocalZipProject(name, relativeDirInZip, url string, excludePatterns, includePatterns []string) (project.Project, error) {
+func NewLocalZipProject(name, relativeDirInZip, url string) (project.Project, error) {
 	tl.Logger.Println("URL: ", url)
-	fileevaluator := fileevaluator.NewWithPatterns(excludePatterns, includePatterns)
+	fileevaluator := fileevaluator.NewWithBasePatterns()
 	projectDir := project.ProjectDir(path.Join("./.tzap-data", name))
 	zipwalker := zipwalker.New(fileevaluator, relativeDirInZip, url)
 

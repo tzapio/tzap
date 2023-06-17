@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/action"
+	"github.com/tzapio/tzap/cli/actionpb"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -19,8 +20,8 @@ var lib string
 
 func init() {
 	RootCmd.AddCommand(searchCmd)
-	searchCmd.Flags().IntVarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
-	searchCmd.Flags().IntVarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
+	searchCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
+	searchCmd.Flags().Int32VarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
 	searchCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
 	searchCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
 	searchCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
@@ -40,7 +41,7 @@ var searchCmd = &cobra.Command{
 
 			defer t.HandleShutdown()
 
-			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
+			output := action.LoadAndSearchEmbeddings(t, &actionpb.SearchArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  searchQuery,
 				EmbedsCount:  embedsCountFlag,

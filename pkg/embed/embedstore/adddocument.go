@@ -7,7 +7,7 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func (idx *EmbedStore) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
+func (idx *embedStore) AddEmbeddingDocument(ctx context.Context, docID string, embedding [1536]float32, metadata types.Metadata) error {
 	v := types.Vector{
 		ID:        docID,
 		TimeStamp: 0,
@@ -20,7 +20,7 @@ func (idx *EmbedStore) AddEmbeddingDocument(ctx context.Context, docID string, e
 	}
 	return nil
 }
-func (idx *EmbedStore) AddEmbeddingDocuments(ctx context.Context, vectors []types.Vector) (int, error) {
+func (idx *embedStore) AddEmbeddingDocuments(ctx context.Context, vectors []types.Vector) (int, error) {
 	pairs := []types.KeyValue[types.Vector]{}
 	for _, v := range vectors {
 		pairs = append(pairs, types.KeyValue[types.Vector]{Key: v.ID, Value: v})
@@ -32,14 +32,14 @@ func (idx *EmbedStore) AddEmbeddingDocuments(ctx context.Context, vectors []type
 	}
 	return wrote, nil
 }
-func (idx *EmbedStore) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
+func (idx *embedStore) DeleteEmbeddingDocument(ctx context.Context, docID string) error {
 	embeddingCollection := project.GetProjectFromContext(ctx).GetEmbeddingCollection()
 	if err := embeddingCollection.Set(docID, types.Vector{}); err != nil {
 		return err
 	}
 	return nil
 }
-func (idx *EmbedStore) DeleteEmbeddingDocuments(ctx context.Context, docIDs []string) error {
+func (idx *embedStore) DeleteEmbeddingDocuments(ctx context.Context, docIDs []string) error {
 	var pairs []types.KeyValue[types.Vector]
 	for _, docID := range docIDs {
 		pairs = append(pairs, types.KeyValue[types.Vector]{Key: docID})

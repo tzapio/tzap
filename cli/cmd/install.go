@@ -3,13 +3,11 @@ package cmd
 import (
 	"fmt"
 	"net/url"
-	"os"
 	"path"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/cmdinstance"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/project"
@@ -57,17 +55,7 @@ var installCmd = &cobra.Command{
 
 		zipURL := args[1]
 		err := tzap.HandlePanic(func() {
-			ignorePatterns, err := fileevaluator.ReadPatternString(fileevaluator.BaseTzapIgnore)
-			if err != nil {
-				println("should never happen. BaseTzapIgnore is not valid pattern.")
-				os.Exit(1)
-			}
-			includePatterns, err := fileevaluator.ReadPatternString(fileevaluator.BaseTzapInclude)
-			if err != nil {
-				println("should never happen. BaseTzapInclude is not valid pattern.")
-				os.Exit(1)
-			}
-			zipProject, err := cmdinstance.NewLocalZipProject(string(name), "/", zipURL, ignorePatterns, includePatterns)
+			zipProject, err := cmdinstance.NewLocalZipProject(string(name), "/", zipURL)
 			if err != nil {
 				panic(err)
 			}

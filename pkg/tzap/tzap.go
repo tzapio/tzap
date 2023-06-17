@@ -61,8 +61,8 @@ func NewWithConnector(connector types.TzapConnector) *Tzap {
 	return t
 }
 
-// New returns a new Tzap with default values.
-func (t *Tzap) New() *Tzap {
+// CopyConnection returns a new Tzap with default values.
+func (t *Tzap) CopyConnection() *Tzap {
 	tc := &Tzap{
 		Name:    "NewConnection",
 		Message: types.Message{},

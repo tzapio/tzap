@@ -1,6 +1,7 @@
 package action
 
 import (
+	"github.com/tzapio/tzap/cli/actionpb"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/pkg/embed/embedstore"
@@ -13,8 +14,8 @@ import (
 type PromptWorkflowArgs struct {
 	InspirationFiles []string
 	SearchQuery      string
-	EmbedsCount      int
-	NCount           int
+	EmbedsCount      int32
+	NCount           int32
 	DisableIndex     bool
 	Yes              bool
 	MessageThread    []types.Message
@@ -28,7 +29,7 @@ type PromptWorkflowArgs struct {
 func PromptWorkflow(promptWorkflowArgs PromptWorkflowArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-			loadAndSearchEmbeddingsArgs := LoadAndSearchEmbeddingsArgs{
+			loadAndSearchEmbeddingsArgs := &actionpb.SearchArgs{
 				ExcludeFiles: promptWorkflowArgs.InspirationFiles,
 				SearchQuery:  promptWorkflowArgs.SearchQuery,
 				EmbedsCount:  promptWorkflowArgs.EmbedsCount,

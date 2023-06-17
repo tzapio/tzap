@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/action"
+	"github.com/tzapio/tzap/cli/actionpb"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
@@ -29,7 +30,7 @@ var pcaCMD = &cobra.Command{
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 
-			output := action.LoadAndSearchEmbeddings(t, action.LoadAndSearchEmbeddingsArgs{
+			output := action.LoadAndSearchEmbeddings(t, &actionpb.SearchArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  searchQuery,
 				EmbedsCount:  -1,
