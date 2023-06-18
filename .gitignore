@@ -11,3 +11,4 @@ npm/release
 .DS_Store
 animation
 generated
+*.wasm

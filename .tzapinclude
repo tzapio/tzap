@@ -1,3 +1,7 @@
 # This file is applied after .gitignore and .tzapignore 
 *.go
 *.js
+*.ts
+*.rs
+projects/**/*.tsx
+*.proto

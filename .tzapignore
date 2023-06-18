@@ -19,7 +19,13 @@ pkg/connectors/redisembeddbconnector
 cli/cmd/embeddingpromptv2.go
 mermaid
 *wasm*
-*prompt*
+*prompts*
 *compiled*
 *bundle*
+build
+examples
+bleep-main
+*graphviz*
 *test*
+*generated*
+*actionpb*
