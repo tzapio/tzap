@@ -43,3 +43,14 @@ wasml:
 	npx live-server cli/wasm
 
 .PHONY: release
+
+
+proto:
+	go install \
+		google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+
+	protoc \
+	-I cli/proto \
+	--go_out=cli/ --go_opt=paths=import \
+	--go-grpc_out=cli/ --go-grpc_opt=paths=import \
+	tzap.proto prompt.proto search.proto

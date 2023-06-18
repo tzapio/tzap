@@ -39,6 +39,39 @@
             "program": "cli/main.go",
             "args": ["install", "alex", "https://github.com/tzapio/tokenizer/archive/refs/heads/main.zip"],
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Prompt",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "env": {
+            
+            },
+            "program": "cli/main.go",
+            "args": ["p", "-l", "bloop", "hello world"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Backend",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "env": {
+            
+            },
+            "program": "cli/backend/main.go",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Smoldev",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "examples/tdev/tdev.go", 
+            "args": ["hello","Create a new library that implements a html page where you can view a map but it prompts the cordinates using tzap"],
+            "cwd": "${workspaceFolder}"
         }
 
     ]
