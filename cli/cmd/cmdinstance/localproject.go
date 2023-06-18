@@ -3,8 +3,9 @@ package cmdinstance
 import (
 	"path"
 
+	"github.com/tzapio/tzap/cli/cmd/cmdinstance/localwalker"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/localwalker"
+
 	"github.com/tzapio/tzap/pkg/embed/localdb"
 	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"

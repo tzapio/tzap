@@ -3,8 +3,9 @@ package cmdinstance
 import (
 	"path"
 
+	"github.com/tzapio/tzap/cli/cmd/cmdinstance/zipwalker"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/zipwalker"
+
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/types"

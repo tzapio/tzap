@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tzapio/tzap/cli/cmd/cmdinstance/zipwalker"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/zipwalker"
 )
 
 func TestWalkDirFromURL(t *testing.T) {
