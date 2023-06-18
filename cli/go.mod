@@ -16,7 +16,10 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tzapio/tzap v0.0.0-00010101000000-000000000000
 	github.com/tzapio/tzap/pkg/tzapconnect v0.0.0-00010101000000-000000000000
+	google.golang.org/protobuf v1.30.0
 )
+
+require github.com/google/go-cmp v0.5.9 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
