@@ -43,7 +43,7 @@ var initCmd = &cobra.Command{
 			stdin.GetStdinInput("Press enter to continue.")
 			cmd.Println("\n\nA gpt4 call costs maximum 0.2 dollars and a gpt3.5 (default) costs a fraction of that. https://openai.com/pricing for more info.")
 			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_APIKEY=<apikey> for .env file. ")
+			cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_API_KEY=<apikey> for .env file. ")
 			stdin.GetStdinInput("Press enter to continue.")
 			cmd.Println("\n\nTzap is designed to be used with a .tzapignore file. This file is similar to a .gitignore file, but it is used to ignore files that interfere with search quality. ")
 			stdin.GetStdinInput("Press enter to continue.")

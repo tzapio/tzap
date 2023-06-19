@@ -54,7 +54,7 @@ func main() {
 		panic(err)
 	}
 
-	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	openai_apikey, err := tzapconnect.LoadOPENAI_API_KEY()
 	if err != nil {
 		panic(err)
 	}

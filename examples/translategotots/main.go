@@ -44,7 +44,7 @@ Tzap is a library for Prompts as Code. It provides a toolkit to build, customize
 
 func main() {
 
-	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	openai_apikey, err := tzapconnect.LoadOPENAI_API_KEY()
 	if err != nil {
 		panic(err)
 	}

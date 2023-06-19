@@ -13,7 +13,7 @@ import (
 func main() {
 	filename := os.Args[1]
 	content := strings.Join(os.Args[2:], " ")
-	openai_apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+	openai_apikey, err := tzapconnect.LoadOPENAI_API_KEY()
 	if err != nil {
 		panic(err)
 	}
