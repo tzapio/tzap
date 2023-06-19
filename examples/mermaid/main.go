@@ -22,7 +22,7 @@ func main() {
 				EnableLogs:  true}))
 
 	// Assume there's a Tzap hierarchy created like t1 -> t2 -> t3
-	t1 := t.New().AddAssistantMessage("t2", "t2 message")
+	t1 := t.CopyConnection().AddAssistantMessage("t2", "t2 message")
 
 	// Fill the Mermaid graph with the Tzap hierarchy
 	graph := mermaid.FillMermaidGraph(t1)
