@@ -1,10 +1,10 @@
-# Tzap Dev Tools: Code generation style transfer with GPT. 
+# Tzap: Find what you need, prompt with it! Embeddings and prompts combined!
 [![Discord](https://img.shields.io/badge/Discord-Join%20Our%20Community-blue?logo=discord&logoColor=white)](https://discord.gg/your_discord_invite_link)
 [![Official Page](https://img.shields.io/badge/Official%20Page-Visit%20Our%20Site-blue?logo=internet-explorer)](https://tzap.io)
 [![NPM](https://img.shields.io/badge/NPM-tzap-blue?logo=npm)](https://npmjs.com/package/tzap)
 [![Twitter Follow](https://img.shields.io/twitter/follow/tzap_io?style=social)](https://twitter.com/tzap_io)
 ## What is Tzap?
-Tzap is an easy to use CLI tool designed to streamline GPT-based code generation tasks. It works by indexing your project (using embeddings) and extracting relevant contextual information, such as interfaces, types, database models, and more. 
+Tzap is tool to make it possible for you to search just about anything from "endpoints" and "color" to full code snippets or use cases to find the most relevant files.
 
 When you run the `tzap prompt` command, Tzap combines your prompt with the extracted context and generates a suitable prompt for the GPT model. This allows GPT to generate both very complex and highly specific code.
 
@@ -25,9 +25,10 @@ export OPENAI_APIKEY=<apikey>
 
 tzap init
 # Adapt below to your project!
-tzap prompt "can you add a tzap cli command that enables users \
-to generate code based on the users code without requiring them to manage prompts themselves? \
-Utilize Tzap embedding search."
+tzap search "where is the background color defined?"
+tzap search "using endpoints"
+
+tzap prompt "add a email verification regexp to the user field"
 ```
 
 ## Resources
