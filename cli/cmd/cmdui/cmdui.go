@@ -4,9 +4,11 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzapfile"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
@@ -77,6 +79,17 @@ func (ui *CMDUI) RunEditor() {
 		if err != nil {
 			panic(err)
 		}
+		messages := ui.ReadMessagesFromFile()
+		if len(messages) == 0 {
+			println("No messages found in file.")
+			os.Exit(1)
+			return
+		}
+		if strings.TrimSpace(messages[len(messages)-1].Role) == openai.ChatMessageRoleAssistant {
+			println("No messages found in file. ", messages[len(messages)-1].Content, messages[len(messages)-1].Role)
+			os.Exit(1)
+			return
+		}
 		return
 	}
 	if ui.editor == "nano" {
@@ -88,6 +101,18 @@ func (ui *CMDUI) RunEditor() {
 		err := cmd.Run()
 		if err != nil {
 			panic(err)
+		}
+		messages := ui.ReadMessagesFromFile()
+		println(len(messages))
+		if len(messages) == 0 {
+			println("No messages found in file.")
+			os.Exit(1)
+			return
+		}
+		if strings.TrimSpace(messages[len(messages)-1].Content) == "" {
+			println("No user message found in file.")
+			os.Exit(1)
+			return
 		}
 		return
 	}
