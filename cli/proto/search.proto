@@ -1,0 +1,20 @@
+syntax = "proto3";
+import "prompt.proto";
+package actionpb;
+
+option go_package = "./actionpb";
+
+message SearchArgs {
+    repeated string excludeFiles = 1;
+    string searchQuery = 2;
+    int32 embedsCount = 3;
+    int32 nCount = 4;
+    bool disableIndex = 5;
+    bool yes = 6;
+}
+message SearchRequest {
+    SearchArgs searchArgs = 1;
+}
+message SearchResponse {
+    repeated string embeddings = 1;
+}
