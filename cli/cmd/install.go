@@ -8,7 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/cmdinstance"
+	"github.com/tzapio/tzap/cli/cmd/cmdinstance"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/project"
 	"github.com/tzapio/tzap/pkg/tzap"
