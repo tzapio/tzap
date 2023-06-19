@@ -122,7 +122,7 @@ func initializeTzap() (*tzap.Tzap, error) {
 	if tzapCliSettings.Stub {
 		connector = stubconnector.StubWithConfig(config)
 	} else {
-		apikey, err := tzapconnect.LoadOPENAI_APIKEY()
+		apikey, err := tzapconnect.LoadOPENAI_API_KEY()
 		if err != nil {
 			return nil, err
 		}

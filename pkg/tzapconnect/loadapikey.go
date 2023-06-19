@@ -7,8 +7,12 @@ import (
 	"strings"
 )
 
-func LoadOPENAI_APIKEY() (string, error) {
-	return loadAPIKey("OPENAI_APIKEY")
+func LoadOPENAI_API_KEY() (string, error) {
+	key, err := loadAPIKey("OPENAI_APIKEY")
+	if err != nil {
+		return loadAPIKey("OPENAI_API_KEY")
+	}
+	return key, err
 }
 
 func loadAPIKey(key string) (string, error) {
