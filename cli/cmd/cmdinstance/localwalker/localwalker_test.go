@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/tzapio/tzap/cli/cmd/cmdinstance/localwalker"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator"
-	"github.com/tzapio/tzap/cli/cmd/cmdutil/fileevaluator/localwalker"
 )
 
 func TestWalkDir(t *testing.T) {
