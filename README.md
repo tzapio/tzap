@@ -12,10 +12,10 @@ When you run the `tzap prompt` command, Tzap combines your prompt with the extra
 ![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/docs/promptdemo.gif)
 # Comparing generation to existing code:
 ![prompt demo](https://raw.githubusercontent.com/tzapio/tzap/main/docs/comparison.png)
-### Quick install (NPM)
+### Quick install
 ```bash
-# Choose how to install. install.sh, npm, npx
-curl https://tzap.io/install.sh | bash
+# Choose how to install. curl, npm, npx
+curl https://tzap.io/sh | bash
 # npm install -g tzap
 # npx tzap
 
@@ -95,7 +95,7 @@ npx tzap
 or
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/tzapio/tzap/main/cli/install.sh | bash 
+curl https://tzap.io/sh | bash 
 ```
 
 Once you have installed Tzap, you can start using it immediately by typing `tzap` in your terminal.
