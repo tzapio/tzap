@@ -1046,16 +1046,16 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
     
       // Load the JSON file containing the points
       var loader = new THREE.FileLoader();
-      loader.load('points.json', function (data) {
-        var points = JSON.parse(data);
-    
+      loader.load('points2.json', function (data) {
+        var results = JSON.parse(data).searchResults.Results;
+		
         // Create a geometry to hold the points
         var geometry = new THREE.Geometry();
     
         // Add the points to the geometry and create labels
         var labels = [];
-        for (var i = 0; i < points.length; i++) {
-          var point = points[i];
+        for (var i = 0; i < results.length; i++) {
+          var point = results[i].pca;
           geometry.vertices.push(new THREE.Vector3(point[0], point[1], point[2]));
     
           // Create a label for each point using index as the label text
@@ -1069,7 +1069,7 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
         // Create a material for the points
         var pointMaterial = new THREE.PointsMaterial({
           color: 0x00ff00,
-          size: 0.05
+          size: 0.01
         });
     
         // Create a points object and add it to the scene
@@ -1079,24 +1079,39 @@ Object.defineProperties( THREE.OrbitControls.prototype, {
         // Create a red dot as the center point
         var centerGeometry = new THREE.Geometry();
         centerGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-        var centerMaterial = new THREE.PointsMaterial({ color: 0xff0000 });
+        var centerMaterial = new THREE.PointsMaterial({ color: 0xff0000, size: 0.05 });
         var centerPoint = new THREE.Points(centerGeometry, centerMaterial);
         scene.add(centerPoint);
     
         // Create lines between the red dot and 10 random green dots
         var lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
         for (var j = 0; j < 10; j++) {
-          var randomIndex = Math.floor(Math.random() * points.length);
-          var randomPoint = points[randomIndex];
+          var randomPoint = results[j];
           var lineGeometry = new THREE.Geometry();
           lineGeometry.vertices.push(new THREE.Vector3(0, 0, 0));
-          lineGeometry.vertices.push(new THREE.Vector3(randomPoint[0], randomPoint[1], randomPoint[2]));
+          lineGeometry.vertices.push(new THREE.Vector3(randomPoint.pca[0], randomPoint.pca[1], randomPoint.pca[2]));
           var line = new THREE.Line(lineGeometry, lineMaterial);
           scene.add(line);
         }
-    
-        // Position the camera to view the points
-        camera.position.z = 5;
+		const positionJ = localStorage.getItem("positions")
+		if (positionJ != null) {
+			
+			const position = JSON.parse(positionJ)
+			console.log("loading position",position)
+			camera.position.x = position.x+0.0001
+			camera.position.y = position.y+0.0001
+			camera.position.z = position.z+0.0001
+		}
+		setInterval(()=>{
+			
+			const position = {
+				x: camera.position.x,
+				y: camera.position.y,
+				z: camera.position.z
+			}
+			localStorage.setItem("positions", JSON.stringify(position))
+			console.log("storing position",JSON.stringify(position))
+		},1000)
     
         // Create controls for mouse interaction
         var controls = new THREE.OrbitControls(camera, renderer.domElement);
