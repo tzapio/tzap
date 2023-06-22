@@ -17,7 +17,8 @@ import (
 )
 
 var refactorCmd = &cobra.Command{
-	Use:   "refactor [filein] [fileout]",
+
+	Use:   "refactor [filein]",
 	Short: "Refactors code",
 	Long: `The refactor command enables you to refactor code using either command-line flags or a configuration file. 
 It is used to generate refactor and document code or generate documentation files.`,
@@ -83,7 +84,6 @@ func runRefactor(cmd *cobra.Command, basicConfig *codegeneration.BasicRefactorin
 }
 
 func runRefactorWithConfigFile(cmd *cobra.Command, configFile string) {
-	//#### you should refactor this part such that it uses codegeneration.BasicRefactoringConfig
 	config, err := loadConfig(configFile)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error loading config file: %v\n", err)

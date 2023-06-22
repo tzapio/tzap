@@ -54,6 +54,41 @@ func ListFilesInDir(dir string) ([]string, error) {
 	return files, nil
 }
 
+func ListGlob(globb string) ([]string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	pattern := filepath.Join(globb)
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []string
+	for _, file := range files {
+		info, err := os.Stat(file)
+		if err != nil {
+			return nil, err
+		}
+		if !info.IsDir() {
+			absPath, err := filepath.Abs(file)
+			if err != nil {
+				return []string{}, err
+			}
+			relPath, err := filepath.Rel(cwd, absPath)
+			if err != nil {
+				return []string{}, err
+			}
+			relPath = strings.TrimPrefix(relPath, "./")
+
+			result = append(result, filepath.ToSlash(relPath))
+		}
+	}
+
+	return result, nil
+}
+
 // MkdirPAndWriteFile writes the edited content to the file
 func MkdirPAndWriteFile(filePath, content string) error {
 	dir := filepath.Dir(filePath)

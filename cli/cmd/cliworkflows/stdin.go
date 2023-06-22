@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/embed"
@@ -32,8 +33,8 @@ func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.Pro
 			projectP.GetEmbeddingCollection().StartInit()
 			embedder := embed.NewEmbedder(projectP.GetEmbeddingsCache(), projectP.GetTimestampCache())
 			tl.Logger.Println("Indexing files...")
-			tl.Logger.Println("Finished index files...")
-			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
+
+			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, yes))
 		},
 	}
 }
@@ -62,8 +63,12 @@ func IndexFilesAndEmbeddings(disableIndex, yes bool) types.NamedWorkflow[*tzap.T
 
 			embedder := embed.NewEmbedder(embeddingCacheDB, filesStampsDB)
 			tl.Logger.Println("Finished index files...")
+			if !disableIndex {
+				println("Checking for file changes. " + cmdutil.Black("(use -d to disable this check)...\n"))
+				return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, yes))
+			}
+			return t
 
-			return t.ApplyWorkflow(embedworkflows.LoadAndFetchEmbeddings(files, embedder, disableIndex, yes))
 		},
 	}
 }
@@ -73,7 +78,7 @@ func PrintInspirationFiles(inspirationFiles []string) types.NamedWorkflow[*tzap.
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.WorkTzap(func(t *tzap.Tzap) {
 				if len(inspirationFiles) == 0 {
-					println(cmdutil.Bold("\nInspiration files: None (use --inspiration to add more)"))
+					println("\nInspiration files: None" + cmdutil.Black(" (use --inspiration to add more)"))
 					return
 				}
 				println(cmdutil.Bold("\nInspiration files:"))
@@ -102,9 +107,23 @@ func PrintEmbeddings(searchResults types.SearchResults) types.NamedWorkflow[*tza
 					if err != nil {
 						panic(err)
 					}
-					fmt.Fprintf(os.Stderr, "\tt:%d\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
+					fmt.Fprintf(os.Stderr, "\t"+cmdutil.Black("t:%d")+"\t%s\n", tokens, cmdutil.Cyan(cmdutil.FormatVectorToClickable(result.Vector)))
 				}
 				println()
+			})
+		},
+	}
+}
+
+func PrintFileDiff(compareToFile string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "listInspirationFiles",
+		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
+
+			return t.WorkTzap(func(t *tzap.Tzap) {
+				dmp := diffmatchpatch.New()
+				diffs := dmp.DiffPrettyText(dmp.DiffMain(util.ReadFileP(compareToFile), t.Data["content"].(string), false))
+				println(diffs)
 			})
 		},
 	}

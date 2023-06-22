@@ -1,6 +1,7 @@
 package codegeneration
 
 import (
+	"os"
 	"path"
 	"strings"
 
@@ -15,6 +16,7 @@ func MakeCodeExtReplacer(language, extensionIn, extensionOut, mission, task stri
 			return t
 		}
 		fileout := strings.TrimSuffix(t.Data["filepath"].(string), extensionIn) + extensionOut
+
 		return t.
 			HijackTzap(&tzap.Tzap{Name: "MakeCodeGO"}).
 			AddSystemMessage("### The overall mission: \n"+mission).
@@ -32,7 +34,17 @@ func MakeCodeExtReplacer(language, extensionIn, extensionOut, mission, task stri
 				"####file: "+filein+"\n",
 				t.Data["content"].(string),
 			).
-			LoadCompletionOrRequestCompletionMD5(fileout)
+			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+				if _, err := os.Stat(fileout); err == nil {
+					return t.AddSystemMessage(
+						"####",
+						"####file: "+fileout+"\n",
+						t.Data["content"].(string),
+					)
+				}
+				return t
+			})
+
 	}
 }
 
@@ -86,7 +98,7 @@ func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
 		return t.
 			HijackTzap(&tzap.Tzap{Name: "MakeCodeGO"}).
 			AddSystemMessage(systemMessage).
-			AddUserMessage(
+			AddSystemMessage(
 				"####",
 				"TASK: "+config.Task,
 				"PLAN: "+planStr,
@@ -94,6 +106,12 @@ func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
 				"OUTFILE: "+config.FileOut,
 				outputStr,
 				exampleStr).
+			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
+
+				return t.AddUserMessage(
+					util.ReadFileP(config.FileIn),
+				)
+			}).
 			AddUserMessage(
 				util.ReadFileP(config.FileIn),
 			).

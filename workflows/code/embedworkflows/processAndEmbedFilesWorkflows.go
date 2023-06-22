@@ -34,7 +34,7 @@ func FetchOrCachedEmbeddingForFilesWorkflow(files []types.FileReader) types.Name
 			}
 			uncachedEmbeddings, ok := t.Data["uncachedEmbeddings"].(*types.Embeddings)
 			if !ok {
-				panic(fmt.Errorf("Loading embeddings went wrong"))
+				panic(fmt.Errorf("loading embeddings went wrong"))
 			}
 			if len(uncachedEmbeddings.Vectors) > 0 {
 				if err := embedder.FetchThenCacheNewEmbeddings(t, files, uncachedEmbeddings); err != nil {

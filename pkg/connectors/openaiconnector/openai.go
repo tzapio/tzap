@@ -17,15 +17,22 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func InitiateOpenaiClient(apikey string) *OpenaiTgenerator {
+func InitiateOpenaiClient(baseurl, apikey string) *OpenaiTgenerator {
 	tl.Logger.Println("Initiating OpenAI Client")
 	tokenizer := tokenizer.NewTokenizer()
 
-	return &OpenaiTgenerator{client: getClient(apikey), Tokenizer: tokenizer}
+	return &OpenaiTgenerator{client: getClient(baseurl, apikey), Tokenizer: tokenizer}
 }
 
-func getClient(apikey string) *openai.Client {
-	client := openai.NewClient(apikey)
+func getClient(baseurl, apikey string) *openai.Client {
+	if baseurl == "" {
+		return openai.NewClient(apikey)
+	}
+
+	config := openai.DefaultConfig(apikey)
+	config.BaseURL = baseurl
+	client := openai.NewClientWithConfig(config)
+
 	return client
 }
 func (ot *OpenaiTgenerator) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {

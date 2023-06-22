@@ -7,6 +7,7 @@ import (
 	"github.com/tzapio/tzap/pkg/embed/embedstore"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 	"github.com/tzapio/tzap/workflows/code/fileworkflows"
 )
@@ -29,8 +30,19 @@ type PromptWorkflowArgs struct {
 func PromptWorkflow(promptWorkflowArgs PromptWorkflowArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
+
+			var allFiles []string
+			for _, ins := range promptWorkflowArgs.InspirationFiles {
+				files, err := util.ListGlob(ins)
+				if err != nil {
+					panic(err)
+				}
+				allFiles = append(allFiles, files...)
+
+			}
+
 			loadAndSearchEmbeddingsArgs := &actionpb.SearchArgs{
-				ExcludeFiles: promptWorkflowArgs.InspirationFiles,
+				ExcludeFiles: allFiles,
 				SearchQuery:  promptWorkflowArgs.SearchQuery,
 				EmbedsCount:  promptWorkflowArgs.EmbedsCount,
 				NCount:       promptWorkflowArgs.NCount,
@@ -40,8 +52,8 @@ func PromptWorkflow(promptWorkflowArgs PromptWorkflowArgs) types.NamedWorkflow[*
 
 			return t.
 				// Include all full length inspiration files.
-				ApplyWorkflow(cliworkflows.PrintInspirationFiles(promptWorkflowArgs.InspirationFiles)).
-				ApplyWorkflow(fileworkflows.InspirationWorkflow(promptWorkflowArgs.InspirationFiles)).
+				ApplyWorkflow(cliworkflows.PrintInspirationFiles(allFiles)).
+				ApplyWorkflow(fileworkflows.InspirationWorkflow(allFiles)).
 				// Find all embeddings search them, returning the top results.
 				ApplyWorkflow(LoadAndSearchEmbeddingsWorkflow(loadAndSearchEmbeddingsArgs)).
 				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
