@@ -54,3 +54,6 @@ proto:
 	--go_out=cli/ --go_opt=paths=import \
 	--go-grpc_out=cli/ --go-grpc_opt=paths=import \
 	tzap.proto prompt.proto search.proto
+
+docu:
+	cd documentation && npm start
