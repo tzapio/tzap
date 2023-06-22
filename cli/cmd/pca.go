@@ -20,9 +20,10 @@ func init() {
 }
 
 var pcaCMD = &cobra.Command{
-	Use:   "pca",
-	Short: "Search for relevant embeddings using the query",
-	Args:  cobra.MinimumNArgs(1),
+	Use:    "pca",
+	Short:  "Search for relevant embeddings using the query",
+	Hidden: true,
+	Args:   cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		tl.Logger.Println("Cobra CLI Search start")
 		searchQuery := args[0]

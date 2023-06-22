@@ -17,8 +17,8 @@ import (
 var showDiff bool
 var semanticGitcommitCmd = &cobra.Command{
 	Aliases: []string{"c", "commit"},
-	Use:     "semantic:gitcommit [clarifying prompt]",
-	Short:   "Generate a git commit message using ChatGPT",
+	Use:     "commit [clarifying prompt]",
+	Short:   "Generate a semantic git commit message using ChatGPT",
 	Long:    `Prompts ChatGPT to generate a commit message and commits it to the current git repo. The generated commit message is based on the diff of the currently staged files.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := tzap.HandlePanic(func() {

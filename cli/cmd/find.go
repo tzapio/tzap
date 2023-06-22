@@ -28,6 +28,7 @@ var findCmd = &cobra.Command{
 	Aliases: []string{"f"},
 	Use:     "find <query>",
 	Short:   "Find for relevant file using the query",
+	Hidden:  true,
 	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		tl.Logger.Println("Cobra CLI Search start")

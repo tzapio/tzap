@@ -24,7 +24,6 @@ var tzapCliSettings struct {
 	TruncateLimit int
 	ConfigPath    string
 	MD5Rewrites   bool
-	IncludeList   string
 	DisableLogs   bool
 	LoggerOutput  string
 	Stub          bool
@@ -150,18 +149,20 @@ var modelMap map[string]string = map[string]string{
 }
 
 func init() {
+	RootCmd.CompletionOptions.HiddenDefaultCmd = true
+	tzapCliSettings.MD5Rewrites = true
+
 	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt356 (june model) gpt3516 (alias gpt16) gpt4).")
 	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.BaseURL, "baseurl", "b", "", "Hello world")
-	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.AutoMode, "automode", false, "Some but not all functions prompt if you want to overwrite an existing file. Putting automode to true enaled overwriting for those cases. Setting this to false does not disable anything.")
-	RootCmd.PersistentFlags().IntVar(&tzapCliSettings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
-	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
-	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.IncludeList, "include", "", "Files include MD5 matching pattern.")
-	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.DisableLogs, "disablelogs", false, "Whether to disable logging.")
+	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.AutoMode, "automode", false, "Some but not all functions prompt if you want to overwrite an existing file. Putting automode to true enaled overwriting for those cases. Setting this to false does not disable anything.")
+	//RootCmd.PersistentFlags().IntVar(&tzapCliSettings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
+	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
+	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.DisableLogs, "disablelogs", false, "Whether to disable logging.")
 	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.LoggerOutput, "loggeroutput", "./.tzap-data/logs", "Path and name of the log file.")
-	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.Stub, "stub", false, "Test non-live mode")
+	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.Stub, "stub", false, "Test non-live mode")
 	RootCmd.PersistentFlags().Float32VarP(&tzapCliSettings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
 	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Verbose, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.ApiMode, "api", false, "ALPHA: Enable clean stdout outputs. Also turns off editor mode.")
 	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
-	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Editor, "editor", "e", "vscode", "ALPHA: Select editor mode (stdin, editor, vscode (alias code), vim, nano).")
+	//RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Editor, "editor", "e", "vscode", "ALPHA: Select editor mode (stdin, editor, vscode (alias code), vim, nano).")
 }

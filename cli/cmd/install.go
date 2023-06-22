@@ -46,7 +46,7 @@ func GetZipUrlFromGithubUrl(githubUrl string) (string, error) {
 var installCmd = &cobra.Command{
 	Aliases: []string{"i"},
 	Use:     "install <name> <zip url>",
-	Short:   "ALPHA: Install git packages",
+	Short:   "ALPHA: Install git packages to serve as library",
 	Args:    cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		tl.Logger.Println("Cobra CLI Install start")
