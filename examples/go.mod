@@ -24,7 +24,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
-	github.com/sashabaranov/go-openai v1.9.5 // indirect
+	github.com/sashabaranov/go-openai v1.11.3 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
 	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.0.0-00010101000000-000000000000 // indirect

@@ -29,7 +29,7 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/sashabaranov/go-openai v1.9.5 // indirect
+	github.com/sashabaranov/go-openai v1.11.3 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
 	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.0.0-00010101000000-000000000000 // indirect
