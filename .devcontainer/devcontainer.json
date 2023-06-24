@@ -21,7 +21,8 @@
 		"tintinweb.graphviz-interactive-preview",
 		"mhutchie.git-graph",
 		"ms-azuretools.vscode-docker",
-		"GitHub.copilot"
+		"GitHub.copilot",
+		"github.vscode-github-actions"
 	]
     }
   }
