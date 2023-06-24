@@ -18,22 +18,7 @@ jobs:
           go-version: ^1.20
 
       - name: Build Go package
-        run: make build
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.20
-
-      - name: Release to GitHub
-        uses: goreleaser/goreleaser-action@v2
-        with:
-          version: latest
+        run: make release
 
   publish-npm:
     needs: build
