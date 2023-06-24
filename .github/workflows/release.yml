@@ -25,6 +25,20 @@ jobs:
             goos: ${{ matrix.goos }}
             goarch: ${{ matrix.goarch }}
             goversion: "https://dl.google.com/go/go1.20.5.linux-amd64.tar.gz"
-            project_path: "./cli/test-binary"
-            binary_name: "test-binary"
+            project_path: "./release"
+            binary_name: "test"
             extra_files: LICENSE README.md
+    publish-npm:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Install Node.js
+          uses: actions/setup-node@v2
+          with:
+            node-version: 20
+
+        - name: Set up NPM
+          run: echo "//registry.npmjs.org/:_authToken=\${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+        - name: Publish NPM package
+          run: npm publish
