@@ -10,6 +10,9 @@ type configKey struct{}
 
 type Configuration struct {
 	OpenAIModel    string
+	EmbedModel     string
+	CompletionURL  string
+	EmbeddingURL   string
 	AutoMode       bool
 	TruncateLimit  int
 	MD5Rewrites    bool

@@ -12,8 +12,8 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func WithConfig(baseurl string, openai_apikey string, conf config.Configuration) types.TzapConnector {
-	tg, err := newBaseconnector(baseurl, openai_apikey)
+func WithConfig(openai_apikey string, conf config.Configuration) types.TzapConnector {
+	tg, err := newBaseconnector(openai_apikey, conf)
 	if err != nil {
 		println(err)
 		os.Exit(1)
@@ -23,9 +23,9 @@ func WithConfig(baseurl string, openai_apikey string, conf config.Configuration)
 	}
 }
 
-func newBaseconnector(baseurl, openai_apikey string) (types.TGenerator, error) {
+func newBaseconnector(openai_apikey string, conf config.Configuration) (types.TGenerator, error) {
 	tl.Logger.Println("Initializing tzapConnect")
-	openaiC := openaiconnector.InitiateOpenaiClient(baseurl, openai_apikey)
+	openaiC := openaiconnector.InitiateOpenaiClient(openai_apikey, conf)
 
 	tl.Logger.Println("Open AI Client Initialized")
 

@@ -32,7 +32,8 @@ var tzapCliSettings struct {
 	ApiMode       bool
 	Yes           bool
 	Editor        string
-	BaseURL       string
+	EmbeddingURL  string
+	CompletionURL string
 }
 
 var RootCmd = &cobra.Command{
@@ -117,6 +118,8 @@ func initializeTzap() (*tzap.Tzap, error) {
 		EnableLogs:    !tzapCliSettings.DisableLogs,
 		LoggerOutput:  tzapCliSettings.LoggerOutput,
 		Temperature:   tzapCliSettings.Temperature,
+		EmbeddingURL:  tzapCliSettings.EmbeddingURL,
+		CompletionURL: tzapCliSettings.CompletionURL,
 	}
 
 	var connector types.TzapConnector
@@ -127,7 +130,7 @@ func initializeTzap() (*tzap.Tzap, error) {
 		if err != nil {
 			return nil, err
 		}
-		connector = tzapconnect.WithConfig(tzapCliSettings.BaseURL, apikey, config)
+		connector = tzapconnect.WithConfig(apikey, config)
 	}
 	t := tzap.NewWithConnector(connector)
 
@@ -154,7 +157,8 @@ func init() {
 	tzapCliSettings.MD5Rewrites = true
 
 	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Model, "model", "m", "gpt35", "Define what openai model to use. (Available gpt35 gpt356 (june model) gpt3516 (alias gpt16) gpt4).")
-	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.BaseURL, "baseurl", "b", "", "Hello world")
+	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.CompletionURL, "baseurl", "b", "", "Completion URL")
+	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.EmbeddingURL, "embeddingbaseurl", "", "Embedding URL")
 	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.AutoMode, "automode", false, "Some but not all functions prompt if you want to overwrite an existing file. Putting automode to true enaled overwriting for those cases. Setting this to false does not disable anything.")
 	//RootCmd.PersistentFlags().IntVar(&tzapCliSettings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
 	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")

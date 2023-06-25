@@ -17,11 +17,11 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
-func InitiateOpenaiClient(baseurl, apikey string) *OpenaiTgenerator {
+func InitiateOpenaiClient(apikey string, conf config.Configuration) *OpenaiTgenerator {
 	tl.Logger.Println("Initiating OpenAI Client")
 	tokenizer := tokenizer.NewTokenizer()
 
-	return &OpenaiTgenerator{client: getClient(baseurl, apikey), Tokenizer: tokenizer}
+	return &OpenaiTgenerator{completionClient: getClient(conf.CompletionURL, apikey), embeddingClient: getClient(conf.EmbeddingURL, apikey), Tokenizer: tokenizer}
 }
 
 func getClient(baseurl, apikey string) *openai.Client {
@@ -76,7 +76,7 @@ func (ot *OpenaiTgenerator) streamCompletion(ctx context.Context, request openai
 	// Create a stream completion
 	retries := 3
 	for i := 0; i < retries; i++ {
-		s, err := ot.client.CreateChatCompletionStream(ctx, request)
+		s, err := ot.completionClient.CreateChatCompletionStream(ctx, request)
 		if err != nil {
 			e := &openai.APIError{}
 			if errors.As(err, &e) {
@@ -123,7 +123,7 @@ func (ot *OpenaiTgenerator) streamCompletion(ctx context.Context, request openai
 func (ot *OpenaiTgenerator) createChatCompletion(ctx context.Context, request openai.ChatCompletionRequest) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, 15*time.Minute)
 	defer cancel()
-	response, err := ot.client.CreateChatCompletion(ctx, request)
+	response, err := ot.completionClient.CreateChatCompletion(ctx, request)
 	if err != nil {
 		return "", fmt.Errorf("chatcompletion error: %v", err)
 	}

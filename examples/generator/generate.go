@@ -20,7 +20,7 @@ func main() {
 
 	tzap.
 		NewWithConnector(
-			tzapconnect.WithConfig("", openai_apikey, config.Configuration{MD5Rewrites: true})).
+			tzapconnect.WithConfig(openai_apikey, config.Configuration{MD5Rewrites: true})).
 		ApplyWorkflow(fileworkflows.InspirationWorkflow(
 			[]string{
 				"README.md",

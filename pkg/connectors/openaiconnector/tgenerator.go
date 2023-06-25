@@ -11,7 +11,8 @@ import (
 type openaiconnectorKey struct{}
 
 type OpenaiTgenerator struct {
-	client *openai.Client
+	completionClient *openai.Client
+	embeddingClient  *openai.Client
 	*tokenizer.Tokenizer
 }
 

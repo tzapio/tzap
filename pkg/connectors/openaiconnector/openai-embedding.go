@@ -17,7 +17,7 @@ func (ot *OpenaiTgenerator) FetchEmbedding(ctx context.Context, content ...strin
 	}
 	retries := 3
 	for i := 0; i < retries; i++ {
-		response, err := ot.client.CreateEmbeddings(ctx, request)
+		response, err := ot.embeddingClient.CreateEmbeddings(ctx, request)
 		if err != nil {
 			e := &openai.APIError{}
 			if errors.As(err, &e) {

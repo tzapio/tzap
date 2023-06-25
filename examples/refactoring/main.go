@@ -61,7 +61,7 @@ func main() {
 
 	tzap.
 		NewWithConnector(
-			tzapconnect.WithConfig("", openai_apikey, config.Configuration{
+			tzapconnect.WithConfig(openai_apikey, config.Configuration{
 				MD5Rewrites: true,
 				OpenAIModel: openai.GPT4,
 				EnableLogs:  true})).
