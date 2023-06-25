@@ -69,6 +69,7 @@ var RootCmd = &cobra.Command{
 		} else {
 			tl.Logger.Println("No config.json found")
 			os.WriteFile(".tzap-data/config.json", []byte(`{"editor":"stdin"}`), 0644)
+			tzapCliSettings.Editor = "stdin"
 		}
 		tl.Logger.Println("Current working directory:", baseDir)
 		t, err := initializeTzap()
