@@ -97,8 +97,8 @@ func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
 	return func(t *tzap.Tzap) *tzap.Tzap {
 		return t.
 			HijackTzap(&tzap.Tzap{Name: "MakeCodeGO"}).
-			AddSystemMessage(systemMessage).
 			AddSystemMessage(
+				systemMessage,
 				"####",
 				"TASK: "+config.Task,
 				"PLAN: "+planStr,
@@ -107,14 +107,20 @@ func MakeCode(config BasicRefactoringConfig) func(t *tzap.Tzap) *tzap.Tzap {
 				outputStr,
 				exampleStr).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-
-				return t.AddUserMessage(
+				t = t.AddUserMessage(
+					"####\nfile in: "+config.FileIn+"\n####\n",
 					util.ReadFileP(config.FileIn),
 				)
+				if config.FileIn != config.FileOut && config.FileOut != "" {
+					if _, err := os.Stat(config.FileOut); err == nil {
+						return t.AddUserMessage(
+							"####\nfile out: "+config.FileOut+"\n####\n",
+							util.ReadFileP(config.FileOut),
+						)
+					}
+				}
+				return t
 			}).
-			AddUserMessage(
-				util.ReadFileP(config.FileIn),
-			).
 			RequestChatCompletion()
 
 	}

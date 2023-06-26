@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/tzap"
@@ -14,7 +15,6 @@ import (
 )
 
 var refactorCmd = &cobra.Command{
-
 	Use:   "refactor [filein] [fileout] \nOR\n tzap refactor --refactorconfig refactorconfig.json \nOR\n tzap refactor --filein filein [--fileout fileout] [see for all params: tzap refactor --help] \n\n Json example: \n" + refactorJSONExample,
 	Short: "Refactors code",
 	Long: `The refactor command enables you to refactor code using either command-line flags or a configuration file. 
@@ -85,6 +85,7 @@ func runRefactor(cmd *cobra.Command, basicConfig *codegeneration.BasicRefactorin
 				})).*/
 			ApplyWorkflowFN(codegeneration.MakeCode(*basicConfig)).
 			ApplyWorkflow(stdinworkflows.BeforeProceedingWorkflow()).
+			ApplyWorkflow(cliworkflows.PrintFileDiff(basicConfig.FileOut)).
 			StoreCompletion(basicConfig.FileOut)
 	})
 

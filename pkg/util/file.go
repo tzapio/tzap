@@ -12,6 +12,7 @@ import (
 func ReadFileP(filepath string) string {
 	b, err := os.ReadFile(filepath)
 	if err != nil {
+		println("Opening file: " + filepath + " failed.")
 		panic(err)
 	}
 	return string(b)
@@ -99,4 +100,8 @@ func MkdirPAndWriteFile(filePath, content string) error {
 		}
 	}
 	return os.WriteFile(filePath, []byte(content), 0644)
+}
+
+func ReplaceExt(file string, ext string) string {
+	return strings.TrimSuffix(file, filepath.Ext(file)) + ext
 }

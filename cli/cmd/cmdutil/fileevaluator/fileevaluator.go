@@ -36,6 +36,16 @@ const BaseTzapInclude = `# Common languages. Example, remove .js if .js files ar
 *.COB
 *.cbl
 *.CBL
+*.c
+*.cpp
+*.cc
+*.cxx
+*.hpp
+*.h
+*.lua
+*.cs
+*.rb
+*.hlsl
 `
 
 var baseExcludePatterns = []string{".git", ".DS_Store", "desktop.ini"}
