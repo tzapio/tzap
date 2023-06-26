@@ -117,12 +117,15 @@ func PrintEmbeddings(searchResults types.SearchResults) types.NamedWorkflow[*tza
 
 func PrintFileDiff(compareToFile string) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
-		Name: "listInspirationFiles",
+		Name: "printFileDiff",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
-
 			return t.WorkTzap(func(t *tzap.Tzap) {
+				oldContent := ""
+				if _, err := os.Stat(compareToFile); err == nil {
+					oldContent = util.ReadFileP(compareToFile)
+				}
 				dmp := diffmatchpatch.New()
-				diffs := dmp.DiffPrettyText(dmp.DiffMain(util.ReadFileP(compareToFile), t.Data["content"].(string), false))
+				diffs := dmp.DiffPrettyText(dmp.DiffMain(oldContent, t.Data["content"].(string), false))
 				println(diffs)
 			})
 		},
