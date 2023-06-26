@@ -25,12 +25,12 @@ var initCmd = &cobra.Command{
 		cmd.Println("Initializing Tzap...")
 		time.Sleep(time.Millisecond * 500)
 		if _, err := os.Stat(".git"); os.IsNotExist(err) {
-			if !stdin.ConfirmPrompt("Warning: Trying to find .git in the folder. This command should be run from the root of a project. ") {
+			if !stdin.ConfirmPrompt("\n\nWarning: Trying to find .git in the folder. This command should be run from the root of a project.\n\nIt's safe to continue, this is just incase you did not stand in your root folder. Continue anyway?") {
 				return
 			}
 		}
 
-		if b := stdin.ConfirmPrompt("Tzap is in Beta. Would you like some general information about Tzap?"); b {
+		if b := stdin.ConfirmPrompt("\n\nTzap is in Beta. Would you like some general information about Tzap?"); b {
 			cmd.Println("\n\nTzap is a code cli tool that is designed to be easy to use.")
 			stdin.GetStdinInput("Press enter to continue.")
 			cmd.Println("\n\nYou ask tzap to finish a prompt using: tzap prompt \"How do I use X library to enable my backend to do Y\" ")
@@ -43,7 +43,7 @@ var initCmd = &cobra.Command{
 			stdin.GetStdinInput("Press enter to continue.")
 			cmd.Println("\n\nA gpt4 call costs maximum 0.2 dollars and a gpt3.5 (default) costs a fraction of that. https://openai.com/pricing for more info.")
 			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_API_KEY=<apikey> for .env file. ")
+			cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_APIKEY=<apikey> for .env file. ")
 			stdin.GetStdinInput("Press enter to continue.")
 			cmd.Println("\n\nTzap is designed to be used with a .tzapignore file. This file is similar to a .gitignore file, but it is used to ignore files that interfere with search quality. ")
 			stdin.GetStdinInput("Press enter to continue.")
@@ -88,7 +88,7 @@ func writeEditorToConfigFile(selected string) error {
 }
 func askForEditor() string {
 	options := []string{"vscode", "code", "vim", "nano", "editor", "stdin"}
-	prompt := fmt.Sprintf("Choose your preferred text editor:\n- %s (alias: code): Edit prompts directly from file and have them automatically open using /usr/bin/code vscode command\n- %s: Opens the file in vim when prompting\n- %s:Opens the file in vim when prompting\n- %s: allows for editing files directly but does not connect to any specific UI.\n- stdin: default, asks for input in CLI.\n\n code is recommended and stdin is the easiest to get started with.", options[0], options[1], options[2], options[3])
+	prompt := fmt.Sprintf("\n\nChoose your preferred text editor:\n- %s (alias: code): Edit prompts directly from file and have them automatically open using /usr/bin/code vscode command\n- %s: Opens the file in vim when prompting\n- %s:Opens the file in vim when prompting\n- %s: allows for editing files directly but does not connect to any specific UI.\n- stdin: default, asks for input in CLI.\n\n code is recommended and stdin is the easiest to get started with.", options[0], options[1], options[2], options[3])
 	fmt.Print(prompt)
 
 	text := stdin.GetStdinInput("\nEnter your choice (press enter to chose: stdin): ")
@@ -133,7 +133,6 @@ func touchTzapignore() {
 }
 
 func touchTzapinclude() {
-
 	//if not exist, copy .gitignore to .tzapignore
 	if _, err := os.Stat(".tzapinclude"); err == nil {
 		println("Warning: .tzapinclude already exists.")
