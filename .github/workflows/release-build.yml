@@ -21,8 +21,12 @@ jobs:
             curl -sfL https://github.com/upx/upx/releases/download/v4.0.2/upx-4.0.2-amd64_linux.tar.xz | tar -xJvf -;
             sudo mv upx-4.0.2-amd64_linux/upx /usr/local/bin;
             rm -rf upx-4.0.2-amd64_linux/
+        - name: Test Go
+          run: make test
+        - name: Test Go
+          run: make -C cli build
         - name: Build Go package
-          run: make release
+          run: make -C cli github-upload
           env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
