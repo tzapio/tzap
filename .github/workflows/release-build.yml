@@ -22,3 +22,5 @@ jobs:
             rm -rf upx-4.0.2-amd64_linux/
         - name: Build Go package
           run: make release
+          env:
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
