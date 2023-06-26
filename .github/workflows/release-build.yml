@@ -1,0 +1,26 @@
+# .github/workflows/release.yaml
+
+on:
+  release:
+    types: [created]
+jobs:
+    releases-matrix:
+        name: Release Go Binary
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v3
+        - name: Install Node.js
+          uses: actions/setup-node@v2
+          with:
+            node-version: 20.3.1
+        - name: Set up Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: ^1.20.5
+        - name: Install UPX
+          run: | 
+            curl -sfL https://github.com/upx/upx/releases/download/v4.0.2/upx-4.0.2-amd64_linux.tar.xz | tar -xJvf -;
+            sudo mv upx-4.0.2-amd64_linux/upx /usr/local/bin;
+            rm -rf upx-4.0.2-amd64_linux/
+        - name: Build Go package
+          run: make build
