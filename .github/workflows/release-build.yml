@@ -1,9 +1,10 @@
 on:
   release:
     types: [created]
+
 jobs:
     gobuild:
-        permissions: write-all
+        permissions: read-all|write-all
         name: Release Go Binary
         runs-on: ubuntu-latest
         steps:
