@@ -17,13 +17,13 @@
     "vscode": {
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
-		"golang.Go",
-		"tintinweb.graphviz-interactive-preview",
-		"mhutchie.git-graph",
-		"ms-azuretools.vscode-docker",
-		"GitHub.copilot",
-		"github.vscode-github-actions"
-	]
+        "golang.Go",
+        "tintinweb.graphviz-interactive-preview",
+        "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
+        "github.vscode-github-actions"
+	    ]
     }
   }
 }

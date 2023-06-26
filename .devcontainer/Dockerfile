@@ -35,9 +35,12 @@ RUN sudo ln -s /usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin/node /usr/local/b
 RUN sudo ln -s /usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin/npm /usr/local/bin/npm
 RUN sudo ln -s /usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin/npx /usr/local/bin/npx
 
+
 USER vscode
 RUN mkdir -p /home/vscode/go/src/github.com/tzapio/tzap
 WORKDIR /home/vscode/go/src/github.com/tzapio/tzap
+RUN curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+
 RUN echo set enable-bracketed-paste off > ~/.inputrc
 RUN echo "export PATH=/home/vscode/go/bin:/usr/local/lib/nodejs/node-$VERSION-$DISTRO/bin:\$PATH" >> /home/vscode/.bashrc
 RUN echo 'alias tt="go run ./cli/main.go"' >> /home/vscode/.bashrc
