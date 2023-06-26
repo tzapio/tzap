@@ -20,8 +20,8 @@ curl https://tzap.io/sh | bash
 # npx tzap
 
 # Provide the apikey. env variable or .env file
-export OPENAI_API_KEY=<apikey>
-# echo "OPENAI_API_KEY=<apikey>" > .env
+export OPENAI_APIKEY=<apikey>
+# echo "OPENAI_APIKEY=<apikey>" > .env
 
 tzap init
 # Adapt below to your project!
