@@ -47,6 +47,7 @@ var installCmd = &cobra.Command{
 	Aliases: []string{"i"},
 	Use:     "install <name> <zip url>",
 	Short:   "ALPHA: Install git packages to serve as library",
+	Hidden:  true,
 	Args:    cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		tl.Logger.Println("Cobra CLI Install start")
