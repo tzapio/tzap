@@ -4,13 +4,15 @@ build: gomodtidy
 	go test ./...
 	make -C cli build
 release:
+	go test ./...
+	make -C cli build
+	make -C cli github-upload
+release-local:
 	make gomodtidy
 	go test ./...
 	git pull
 	git push
 	make -C cli build
-	make -C cli tzapPrepareRelease
-	make -C cli tzapWriteRelease
 	make -C cli github-upload
 releaseOther:
 	make -C cli github-otherpkgs-release
