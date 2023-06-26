@@ -19,7 +19,7 @@ require (
 
 require (
 	github.com/dlclark/regexp2 v1.9.0 // indirect
-	github.com/sashabaranov/go-openai v1.11.3 // indirect
+	github.com/sashabaranov/go-openai v1.12.0 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
 	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.0.0-00010101000000-000000000000 // indirect
 )
