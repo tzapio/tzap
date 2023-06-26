@@ -4,7 +4,7 @@ on:
 
 jobs:
     gobuild:
-        permissions: read-all|write-all
+        permissions: write-all
         name: Release Go Binary
         runs-on: ubuntu-latest
         steps:
