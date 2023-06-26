@@ -24,10 +24,15 @@ jobs:
             rm -rf upx-4.0.2-amd64_linux/
         - name: Test Go
           run: make test
-        - name: Test Go
+        - name: Build Go
           run: make -C cli build
-        - name: Build Go package
+        - name: Release Go package
           run: make -C cli github-upload
           env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        - name: Add NPM token
+          run: npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
+          env:
+            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        - name: Publish NPM
+          run: cd npm && make release
