@@ -2,7 +2,8 @@ on:
   release:
     types: [created]
 jobs:
-    releases-matrix:
+    gobuild:
+        permissions: write-all
         name: Release Go Binary
         runs-on: ubuntu-latest
         steps:
