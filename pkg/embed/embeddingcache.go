@@ -16,6 +16,7 @@ type EmbeddingCache struct {
 func NewEmbeddingCache(embeddingCacheDB types.DBCollectionInterface[string]) *EmbeddingCache {
 	return &EmbeddingCache{embeddingCacheDB}
 }
+
 func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddings *types.Embeddings) (*types.Embeddings, error) {
 	tl.Logger.Println("Getting cached embeddings", len(embeddings.Vectors))
 	var cachedEmbeddings []*types.Vector
@@ -25,17 +26,21 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddin
 		kv, exists := ec.embeddingCacheDB.ScanGet(splitPart)
 		if exists {
 			if !reflectutil.IsZero(kv.Value) {
-				var float32Vector = [1536]float32(make([]float32, 1536))
-				json.Unmarshal([]byte(kv.Value), &float32Vector)
+				var float32Vector [1536]float32
+				err := json.Unmarshal([]byte(kv.Value), &float32Vector)
+				if err != nil {
+					return nil, err
+				}
+
 				if len(float32Vector) == 1536 {
-					vector := &types.Vector{
+					cachedVector := &types.Vector{
 						ID:        vector.ID,
 						TimeStamp: 0,
 						Metadata:  vector.Metadata,
 						Values:    float32Vector,
 					}
 
-					cachedEmbeddings = append(cachedEmbeddings, vector)
+					cachedEmbeddings = append(cachedEmbeddings, cachedVector)
 					continue
 				} else {
 					println("invalid vector length", splitPart)
@@ -43,6 +48,7 @@ func (ec *EmbeddingCache) GetCachedEmbeddings(files []types.FileReader, embeddin
 				}
 			}
 		}
+
 		println("Warning: %s is uncached.", vector.ID)
 	}
 
@@ -58,13 +64,13 @@ func (ec *EmbeddingCache) GetUncachedEmbeddings(embeddings *types.Embeddings) *t
 		if !exists || reflectutil.IsZero(kv.Value) {
 			uncachedEmbeddings = append(uncachedEmbeddings, vector)
 		}
-
 	}
+
 	return &types.Embeddings{Vectors: uncachedEmbeddings}
 }
 
 func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []types.FileReader, uncachedEmbeddings *types.Embeddings) error {
-	var storedFiles map[string]struct{} = map[string]struct{}{}
+	storedFiles := map[string]struct{}{}
 
 	if len(uncachedEmbeddings.Vectors) > 0 {
 		batchSize := 100
@@ -87,22 +93,23 @@ func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []type
 				return err
 			}
 
-			cacheKeyVal := []types.KeyValue[string]{}
+			cacheKeyVal := make([]types.KeyValue[string], len(embeddingsResult))
 			for i, embedding := range embeddingsResult {
 				embBytes, err := json.Marshal(embedding)
 				if err != nil {
 					return err
 				}
-				cacheKeyVal = append(cacheKeyVal, types.KeyValue[string]{Key: inputStrings[i], Value: string(embBytes)})
+				cacheKeyVal[i] = types.KeyValue[string]{Key: inputStrings[i], Value: string(embBytes)}
 			}
 
 			added, err := ec.embeddingCacheDB.BatchSet(cacheKeyVal)
 			if err != nil {
 				return err
 			}
+
 			tl.UILogger.Println("Added", added, "embeddings to cache")
 		}
-
 	}
+
 	return nil
 }

@@ -24,21 +24,21 @@ func NewEmbedder(embeddingCacheDB types.DBCollectionInterface[string], filesTime
 func (fe *Embedder) PrepareEmbeddingsFromFiles(t *tzap.Tzap, changedFileContents map[string]string) *types.Embeddings {
 	tl.Logger.Println("Preparing embeddings from files", len(changedFileContents))
 
-	rawFileEmbeddings, err := fe.processFileContents(t, changedFileContents)
+	rawFileEmbeddings, err := fe.ProcessFileContents(t, changedFileContents)
 	if err != nil {
 		panic(err)
 	}
 	return rawFileEmbeddings
 }
 
-func (fe *Embedder) processFileContents(t *tzap.Tzap, changedFiles map[string]string) (*types.Embeddings, error) {
+func (fe *Embedder) ProcessFileContents(t *tzap.Tzap, changedFiles map[string]string) (*types.Embeddings, error) {
 	tl.Logger.Println("Processing files", len(changedFiles))
 	totalTokens := 0
 	totalLines := 0
 
 	embeddings := &types.Embeddings{}
 	for file, content := range changedFiles {
-		fileTokens, lines, err := fe.processFileContent(t, content)
+		fileTokens, lines, err := fe.ProcessFileContent(t, content)
 		if err != nil {
 			panic(err)
 		}
@@ -47,7 +47,7 @@ func (fe *Embedder) processFileContents(t *tzap.Tzap, changedFiles map[string]st
 
 		tl.Logger.Printf("File: %s - Tokens: %d, Lines: %d\n", file, fileTokens, lines)
 
-		fileEmbeddings, err := fe.processFileOffsets(t, file, content, fileTokens)
+		fileEmbeddings, err := fe.ProcessFileOffsets(t, file, content, fileTokens)
 		if err != nil {
 			return &types.Embeddings{}, err
 		}
@@ -58,7 +58,7 @@ func (fe *Embedder) processFileContents(t *tzap.Tzap, changedFiles map[string]st
 	return embeddings, nil
 }
 
-func (fe *Embedder) processFileOffsets(t *tzap.Tzap, file string, content string, fileTokens int) (*types.Embeddings, error) {
+func (fe *Embedder) ProcessFileOffsets(t *tzap.Tzap, file string, content string, fileTokens int) (*types.Embeddings, error) {
 	vectors := []*types.Vector{}
 	baseStep := 200
 	step := 4000
@@ -77,7 +77,7 @@ func (fe *Embedder) processFileOffsets(t *tzap.Tzap, file string, content string
 		start := 0
 		end := baseStep
 		for start < c {
-			partialVector, err := fe.processOffset(t, file, chunkContent, start, end, baseStep, chunkStart, lineStart, c)
+			partialVector, err := fe.ProcessOffset(t, file, chunkContent, start, end, baseStep, chunkStart, lineStart, c)
 			if err != nil {
 				return &types.Embeddings{}, err
 			}
@@ -96,7 +96,8 @@ func (fe *Embedder) processFileOffsets(t *tzap.Tzap, file string, content string
 
 	return &types.Embeddings{Vectors: vectors}, nil
 }
-func (fe *Embedder) processFileContent(t *tzap.Tzap, content string) (int, int, error) {
+
+func (fe *Embedder) ProcessFileContent(t *tzap.Tzap, content string) (int, int, error) {
 	lines := strings.Count(content, "\n")
 
 	fileTokens, err := t.TG.CountTokens(t.C, content)
@@ -107,7 +108,7 @@ func (fe *Embedder) processFileContent(t *tzap.Tzap, content string) (int, int, 
 	return fileTokens, lines, nil
 }
 
-func (fe *Embedder) processOffset(t *tzap.Tzap, filename, content string, start int, end int, step int, chunkStart int, lineStart int, fileTokens int) (*types.Vector, error) {
+func (fe *Embedder) ProcessOffset(t *tzap.Tzap, filename, content string, start int, end int, step int, chunkStart int, lineStart int, fileTokens int) (*types.Vector, error) {
 	truncatedEnd := end
 	if end > fileTokens {
 		truncatedEnd = fileTokens

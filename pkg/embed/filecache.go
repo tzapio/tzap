@@ -32,7 +32,7 @@ func (fc *FilestampCache) CheckFileCache(files []types.FileReader) (changedFiles
 		}
 		currentEditTime := fileStats.ModTime().UnixNano()
 		cachedEditTime, exists := fc.filesTimestampsDB.Get(fileName)
-		if exists && !isTimePassedSignificant(currentEditTime, cachedEditTime) {
+		if exists && !isTimeDiffSignificant(currentEditTime, cachedEditTime) {
 			tl.DeepLogger.Printf("NO CHANGE %s. Old Edittime: %d, New Edittime: %d, TimeDiff: %d", fileName, cachedEditTime, currentEditTime, cachedEditTime-currentEditTime)
 			unchangedFiles[fileName] = cachedEditTime
 			continue

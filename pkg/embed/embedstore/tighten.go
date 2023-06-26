@@ -11,20 +11,41 @@ import (
 
 // Sorts search results in a way that preserves original order based on filenames
 func TightenSearchResults(searchResults []types.SearchResult) types.SearchResults {
-	// group search results by filename
-	searchResultsByFilename := make(map[string][]types.SearchResult)
+	type FileResult struct {
+		Filename string
+		Results  []types.SearchResult
+	}
+	searchResultsByFilename := []FileResult{}
 	for _, sr := range searchResults {
 		filename := sr.Vector.Metadata.Filename
-		searchResultsByFilename[filename] = append(searchResultsByFilename[filename], sr)
+
+		// check if the filename already exists in searchResultsByFilename
+		found := false
+		for i, fr := range searchResultsByFilename {
+			if fr.Filename == filename {
+				searchResultsByFilename[i].Results = append(searchResultsByFilename[i].Results, sr)
+				found = true
+				break
+			}
+		}
+
+		// if filename is not found, create a new FileResult struct and add it to searchResultsByFilename
+		if !found {
+			searchResultsByFilename = append(searchResultsByFilename, FileResult{
+				Filename: filename,
+				Results:  []types.SearchResult{sr},
+			})
+		}
 	}
 
 	// sort each group of search results by start position
 	var sortedResults []types.SearchResult
 	for _, results := range searchResultsByFilename {
-		sort.SliceStable(results, func(i, j int) bool {
-			return results[i].Vector.Metadata.Start < results[j].Vector.Metadata.Start
+		sort.SliceStable(results.Results, func(i, j int) bool {
+			return results.Results[i].Vector.Metadata.Start < results.Results[j].Vector.Metadata.Start
 		})
-		consecutiveResults := groupConsecutiveMetadata(results)
+
+		consecutiveResults := groupConsecutiveMetadata(results.Results)
 		sortedResults = append(sortedResults, consecutiveResults...)
 	}
 
