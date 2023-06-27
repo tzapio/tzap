@@ -13,6 +13,7 @@ jobs:
           uses: actions/setup-node@v2
           with:
             node-version: 20.3.1
+            registry-url: 'https://registry.npmjs.org'
         - name: Set up Go
           uses: actions/setup-go@v2
           with:
@@ -30,13 +31,7 @@ jobs:
           run: make -C cli github-upload
           env:
             GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        - name: Add NPM token
-          run: npm config set '//registry.npmjs.org/:_authToken' '${NPM_TOKEN}'
-          env:
-            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        - name: Login NPM
-          run: npm login
-          env:
-            NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         - name: Publish NPM
           run: cd npm && make release
+          env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
