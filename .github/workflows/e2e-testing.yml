@@ -23,9 +23,12 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: install tzap
-        run: curl https://tzap.io/sh | bash
+        run: wget https://github.com/tzapio/tzap/releases/download/v0.8.8/tzap-linux-amd64 -o tzap
 
-      - name: tzap refactor
+      - name: change permissions
+        run: chmod +x tzap
+
+      - name: ./tzap refactor
         run: |
           tzap refactor \
             --filein e2e_examples/utils.py \
