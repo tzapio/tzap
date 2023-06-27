@@ -45,7 +45,7 @@ jobs:
             --task "Fix the implementation of the function 'is_even' to make the tests work. Only answer with code and do not explain your solution." \
             --outputformat python \
             --temperature 0.0 \
-            --plan "Do not write any text because this file will be saved directly to e2e_examples/utils.py. Just answer with the plain code. Don not wrap the code in backticks." \
+            --plan "Make sure to only write python code without any further explanation since the results are direclry stored to the file "e2e_examples/utils.py". Just answer with the plain code. Also do not wrap the code in backticks." \
             --automode=true
 
       - name: show differences
