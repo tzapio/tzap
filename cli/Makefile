@@ -14,17 +14,17 @@ clean:
 build: clean
 	mkdir -p ../release
 # GOOS=js GOARCH=wasm go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME).wasm ./wasm/main.go
-	GOOS=darwin GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-darwin-amd64 .
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-darwin-amd64 .
 #upx ../release/$(BINARY_NAME)-darwin-amd64
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-linux-amd64 .
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-linux-amd64 .
 	upx ../release/$(BINARY_NAME)-linux-amd64
-	GOOS=windows GOARCH=amd64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-windows-amd64.exe .
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-windows-amd64.exe .
 #	upx ../release/$(BINARY_NAME)-windows-amd64.exe
-	GOOS=darwin GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-darwin-arm64 .
+	GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-darwin-arm64 .
 #	upx ../release/$(BINARY_NAME)-darwin-arm64
-	GOOS=linux GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-linux-arm64 .
+	GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-linux-arm64 .
 	upx ../release/$(BINARY_NAME)-linux-arm64
-	GOOS=windows GOARCH=arm64 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-windows-arm64.exe .
+	GOOS=windows GOARCH=arm64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o ../release/$(BINARY_NAME)-windows-arm64.exe .
 #upx ../release/$(BINARY_NAME)-windows-arm64.exe
 tzapPrepareRelease:
 	git tag -d $(git tag -l);
