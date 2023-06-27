@@ -21,19 +21,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          repository: 'tzapio/tzap'
-          ref: 'refs/tags/v.0.8.6'
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.20
+      #- name: Set up Go
+      #  uses: actions/setup-go@v2
+      #  with:
+      #    go-version: ^1.20
 
-      - name: build tzap
-        run: | 
-          cd ../cli
-          go build
+      #- name: build tzap
+      #  run: |
+      #    cd ../cli
+      #    go build
+
+      - name: install tzap
+        run: npm install -g tzap@0.8.6
 
       # the tzap executable is located at ../cli/cli
       - name: initialize tzap
