@@ -22,6 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: install tzap
+        run: curl https://tzap.io/sh | bash
+
+      - name: tzap debug
+        run: tzap --help
+
       - name: debug
         run: ls -a
 
