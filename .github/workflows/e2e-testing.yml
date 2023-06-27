@@ -28,9 +28,9 @@ jobs:
       - name: change permissions
         run: chmod +x tzap
 
-      - name: ./tzap refactor
+      - name: tzap refactor
         run: |
-          tzap refactor \
+          ./tzap refactor \
             --filein e2e_examples/utils.py \
             --task "Fix the implementation of the function 'is_even' to make the tests work. Only answer with code and do not explain your solution." \
             --outputformat python \
