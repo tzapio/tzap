@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      OPENAI_APIKEY: {{ secrets.OPENAI_API_KEY }}
+      OPENAI_APIKEY: ${{ secrets.OPENAI_API_KEY }}
 
     defaults:
       run:
