@@ -32,8 +32,9 @@ jobs:
           cd ../cli
           go build
 
+      # the tzap executable is located at ../cli/cli
       - name: initialize tzap
-        run: echo "y" | tzap init
+        run: echo "y" | ../cli/cli init
 
       - name: tzap refactor
         run: |
