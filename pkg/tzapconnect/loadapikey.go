@@ -29,8 +29,8 @@ func loadAPIKey(key string) (string, error) {
 		for scanner.Scan() {
 			line := scanner.Text()
 			splits := strings.SplitN(line, "=", 2)
-			if len(splits) == 2 && splits[0] == key {
-				return strings.TrimSpace(splits[1]), nil
+			if len(splits) == 2 && strings.EqualFold(splits[0], key) {
+				return strings.ReplaceAll(strings.TrimSpace(splits[1]), "\"", ""), nil
 			}
 		}
 	}

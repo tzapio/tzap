@@ -166,7 +166,7 @@ func init() {
 	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.LoggerOutput, "loggeroutput", "", "Path and name of the log file.")
 	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.Stub, "stub", false, "Test non-live mode")
 	RootCmd.PersistentFlags().Float32VarP(&tzapCliSettings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
-	//RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Verbose, "verbose", "v", false, "Enable verbose logging")
+	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Verbose, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.ApiMode, "api", false, "ALPHA: Enable clean stdout outputs. Also turns off editor mode.")
 	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
 	//RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Editor, "editor", "e", "vscode", "ALPHA: Select editor mode (stdin, editor, vscode (alias code), vim, nano).")

@@ -13,11 +13,11 @@ type FileEvaluator struct {
 	excludeMatcher *ignore.GitIgnore
 }
 
-const BaseTzapIgnore = `# Tzap ignore file. Add extra files like test folders, or other files that interfere with search (embeddings) quality. 
+const BaseTzapIgnore = `# Tzap ignore file. Add extra files like test folders, or other files that interfere with search (embeddings) quality.
 node_modules
 .env
-
 `
+
 const BaseTzapInclude = `# Common languages. Example, remove .js if .js files are only compiled bundles.
 *.js
 *.tsx
@@ -46,6 +46,67 @@ const BaseTzapInclude = `# Common languages. Example, remove .js if .js files ar
 *.cs
 *.rb
 *.hlsl
+*.swift
+*.kts
+*.kt
+*.dart
+*.groovy
+*.gvy
+*.gy
+*.gsh
+*.scala
+*.sc
+*.pl
+*.pm
+*.t
+*.r
+*.m
+*.mm
+*.f
+*.f90
+*.f95
+*.for
+*.hs
+*.asm
+*.s
+*.m
+*.v
+*.vhdl
+*.pro
+*.lisp
+*.cl
+*.el
+*.scm
+*.ss
+*.rkt
+*.il
+*.fs
+*.fsx
+*.fsi
+*.ml
+*.mli
+*.purs
+*.ex
+*.exs
+*.elm
+*.erl
+*.hrl
+*.clj
+*.cljs
+*.cljc
+*.edn
+*.vb
+*.vbs
+*.bas
+*.ada
+*.adb
+*.ads
+*.pascal
+*.pas
+*.d
+*.nim
+*.jl
+*.cr
 `
 
 var baseExcludePatterns = []string{".git", ".DS_Store", "desktop.ini"}
