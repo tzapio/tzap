@@ -40,7 +40,7 @@ jobs:
             --outputformat python \
             --temperature 0.0 \
             --plan "Do not write any text because this file will be saved directly to e2e_examples/utils.py. Just answer with the plain code. Don not wrap the code in backticks." \
-            --automode=true
+            --yes
 
       - name: show differences
         run: git diff
