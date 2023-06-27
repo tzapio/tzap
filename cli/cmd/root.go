@@ -163,7 +163,7 @@ func init() {
 	//RootCmd.PersistentFlags().IntVar(&tzapCliSettings.TruncateLimit, "truncate", 0, "Truncate limit for the interaction.")
 	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.MD5Rewrites, "md5rewrites", true, "For some functions, this flag enables overwriting files with the same MD5 hash.")
 	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.DisableLogs, "disablelogs", false, "Whether to disable logging.")
-	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.LoggerOutput, "loggeroutput", "", "Path and name of the log file.")
+	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.LoggerOutput, "loggeroutput", ".tzap-data/logs/", "Path and name of the log file.")
 	//RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.Stub, "stub", false, "Test non-live mode")
 	RootCmd.PersistentFlags().Float32VarP(&tzapCliSettings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
 	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Verbose, "verbose", "v", false, "Enable verbose logging")
