@@ -22,15 +22,19 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: install tzap
-        run: wget https://github.com/tzapio/tzap/releases/download/v0.8.8/tzap-linux-amd64 -o tzap
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ^1.20
 
-      - name: change permissions
-        run: chmod +x tzap
+      - name: build tzap
+        run: | 
+          cd ../cli
+          go build
 
       - name: tzap refactor
         run: |
-          ./tzap refactor \
+          ../cli/cli refactor \
             --filein e2e_examples/utils.py \
             --task "Fix the implementation of the function 'is_even' to make the tests work. Only answer with code and do not explain your solution." \
             --outputformat python \
