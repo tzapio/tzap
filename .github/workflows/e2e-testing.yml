@@ -35,13 +35,12 @@ jobs:
       - name: install tzap
         run: npm install -g tzap@0.8.6
 
-      # the tzap executable is located at ../cli/cli
       - name: initialize tzap
-        run: echo "y" | ../cli/cli init
+        run: echo "y" | tzap init
 
       - name: tzap refactor
         run: |
-          ../cli/cli refactor \
+          tzap refactor \
             --filein e2e_examples/utils.py \
             --task "Fix the implementation of the function 'is_even' to make the tests work. Only answer with code and do not explain your solution." \
             --outputformat python \
