@@ -32,6 +32,9 @@ jobs:
           cd ../cli
           go build
 
+      - name: initialize tzap
+        run: echo "y" | tzap init
+
       - name: tzap refactor
         run: |
           ../cli/cli refactor \
