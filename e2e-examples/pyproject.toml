@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "e2e-examples"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+packages = [{include = "e2e_examples"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
