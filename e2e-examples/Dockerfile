@@ -26,7 +26,7 @@ WORKDIR /app
 
 # copy dependencies
 RUN  touch ./README.md # required by poetry somehow
-COPY pyproject.toml poetry.lock .
+COPY pyproject.toml poetry.lock ./
 COPY e2e_examples ./e2e_examples
 COPY tests ./tests
 COPY Makefile ./Makefile
