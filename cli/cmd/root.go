@@ -112,7 +112,7 @@ var RootCmd = &cobra.Command{
 func initializeTzap() (*tzap.Tzap, error) {
 	config := config.Configuration{
 		OpenAIModel:   modelMap[tzapCliSettings.Model],
-		AutoMode:      tzapCliSettings.Yes,
+		AutoMode:      tzapCliSettings.Yes, // automode == yes
 		TruncateLimit: tzapCliSettings.TruncateLimit,
 		MD5Rewrites:   tzapCliSettings.MD5Rewrites,
 		EnableLogs:    !tzapCliSettings.DisableLogs,
