@@ -22,48 +22,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      #- name: Set up Go
-      #  uses: actions/setup-go@v2
-      #  with:
-      #    go-version: ^1.20
 
-      #- name: build tzap
-      #  run: |
-      #    cd ../cli
-      #    go build
+      - name: build test docker image
+        run: docker build --build-arg OPENAI_APIKEY=${OPENAI_APIKEY} . -t tzap-e2e-tests
+        working-directory: e2e-examples
 
-      - name: install tzap
-        run: npm install -g tzap@0.8.6
+      - name: run refactor e2e test
+        run: docker run --rm tzap-e2e-tests make test-refactor
 
-      - name: initialize tzap
-        run: echo "y" | tzap init
-
-      - name: tzap refactor
-        run: |
-          tzap refactor \
-            --filein e2e_examples/utils.py \
-            --task "Fix the implementation of the function 'is_even' to make the tests work. Only answer with code and do not explain your solution." \
-            --outputformat python \
-            --temperature 0.0 \
-            --plan "Make sure to only write python code without any further explanation since the results are direclry stored to the file "e2e_examples/utils.py". Just answer with the plain code. Also do not wrap the code in backticks." \
-            --automode=true
-
-      - name: show differences
-        run: git diff
-
-      - name: Setup Python 3.10.5
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10.5
-
-      - name: Setup Poetry 1.5.1
-        run: pip install poetry==1.5.1
-
-      - name: Check pyproject.toml
-        run: poetry check
-
-      - name: Install python dependencies with Poetry
-        run: poetry install
-
-      - name: Run tests
-        run: poetry run pytest
