@@ -1,6 +1,6 @@
 {
   "name": "tzap",
-  "version": "0.8.8a",
+  "version": "0.8.8b",
   "description": "Tzap Dev Tools: Code generation style transfer with GPT.",
   "bin": { "tzap": "./run.js" },
   "scripts": {
