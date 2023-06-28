@@ -61,7 +61,6 @@ func promptFunc(cmd *cobra.Command, args []string) {
 	}
 	if promptFile == "-" {
 		promptFile = ""
-
 	}
 	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
 	messageThread := cmdui.NewMessageThread()
@@ -105,6 +104,7 @@ func promptFunc(cmd *cobra.Command, args []string) {
 				Yes:              tzapCliSettings.Yes,
 				MessageThread:    truncThread,
 			}
+
 			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 			t.WorkTzap(func(t *tzap.Tzap) {
 				t = t.ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs)).AsAssistantMessage()
