@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "e2e-examples"
+name = "test-e2e"
 version = "0.1.0"
 description = ""
 authors = []
 readme = "README.md"
-packages = [{include = "e2e_examples"}]
+packages = [{include = "test_e2e"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"

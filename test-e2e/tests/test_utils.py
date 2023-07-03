@@ -1,4 +1,4 @@
-from e2e_examples.utils import is_even
+from test_e2e.utils import is_even
 
 
 def test_is_even():
