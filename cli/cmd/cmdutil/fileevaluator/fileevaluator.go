@@ -24,13 +24,15 @@ const BaseTzapInclude = `# Common languages. Example, remove .js if .js files ar
 *.ts
 *.py
 *.go
+*.cpp
+*.css
+*.html
 *.java
 *.c
-*.cpp
 *.h
 *.hpp
-*.rb
 *.rs
+*.rb
 *.php
 *.cob
 *.COB
