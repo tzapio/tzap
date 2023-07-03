@@ -8,6 +8,10 @@ In the test-e2e directory, you will find a collection of test files that are org
 
 To run the end-to-end tests, you can use the test runner provided in the test-e2e directory. This test runner executes all the test files and reports any failures or errors encountered during the testing process.
 
+We use Docker to build an image of our application for testing. The Dockerfile is located in the root of the test-e2e directory. The Docker image is built using the command `docker build --build-arg OPENAI_APIKEY=${OPENAI_APIKEY} . -t tzap-test-e2e` as specified in the `.github/workflows/test-e2e.yml` file.
+
+The tests are executed in the Docker container using the command `docker run --rm tzap-test-e2e make test-refactor` as specified in the `.github/workflows/test-e2e.yml` file.
+
 We recommend regularly running the end-to-end tests as part of your development workflow to ensure the overall integrity and functionality of our application.
 
 Please refer to the documentation in the test-e2e directory for more information on how to run and analyze the results of the end-to-end tests.
