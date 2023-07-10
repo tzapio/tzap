@@ -16,10 +16,13 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
 	"github.com/tzapio/tzap/pkg/tzapconnect/stubconnector"
+	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
 var tzapCliSettings struct {
-	Model         string
+	Model       string
+	Temperature float32
+
 	AutoMode      bool
 	TruncateLimit int
 	ConfigPath    string
@@ -27,7 +30,6 @@ var tzapCliSettings struct {
 	DisableLogs   bool
 	LoggerOutput  string
 	Stub          bool
-	Temperature   float32
 	Verbose       bool
 	ApiMode       bool
 	Yes           bool
@@ -100,6 +102,7 @@ var RootCmd = &cobra.Command{
 			}
 			projectP = localProject
 		}
+
 		t = t.
 			AddContextChange(func(c context.Context) context.Context {
 				return project.SetProjectInContext(c, projectP)
@@ -128,7 +131,24 @@ func initializeTzap() (*tzap.Tzap, error) {
 	} else {
 		apikey, err := tzapconnect.LoadOPENAI_API_KEY()
 		if err != nil {
-			return nil, err
+			choice := stdin.ConfirmPrompt("Cannot find OPENAI_APIKEY.\n\nWould you like to add it now?")
+			if choice {
+				apikey = stdin.GetStdinInput("Enter OPENAI_APIKEY to save to .env:\n")
+				f, err := os.OpenFile(".env", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+				if err != nil {
+					panic(err)
+				}
+				if _, err := f.Write([]byte("\nOPENAI_APIKEY=" + apikey)); err != nil {
+					panic(err)
+				}
+				if err := f.Close(); err != nil {
+					panic(err)
+				}
+			} else {
+				println("Aborted, cannot continue without OPENAI_APIKEY.")
+				os.Exit(1)
+				return nil, err
+			}
 		}
 		connector = tzapconnect.WithConfig(apikey, config)
 	}
