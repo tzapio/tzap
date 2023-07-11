@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "test-e2e"
+version = "0.1.0"
+description = ""
+authors = []
+readme = "README.md"
+packages = [{include = "test_e2e"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
