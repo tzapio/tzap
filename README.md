@@ -1,5 +1,5 @@
 # Tzap: Find what you need, prompt with it! Embeddings and prompts combined!
-[![Discord](https://img.shields.io/badge/Discord-Join%20Our%20Community-blue?logo=discord&logoColor=white)](https://discord.gg/your_discord_invite_link)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Our%20Community-blue?logo=discord&logoColor=white)](https://discord.gg/Y8WpMmFH)
 [![Official Page](https://img.shields.io/badge/Official%20Page-Visit%20Our%20Site-blue?logo=internet-explorer)](https://tzap.io)
 [![NPM](https://img.shields.io/badge/NPM-tzap-blue?logo=npm)](https://npmjs.com/package/tzap)
 [![Twitter Follow](https://img.shields.io/twitter/follow/tzap_io?style=social)](https://twitter.com/tzap_io)
