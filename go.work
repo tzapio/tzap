@@ -4,6 +4,8 @@ use .
 
 use ./pkg/tzapconnect
 
+use ./pkg/tzapaction
+
 use ./pkg/connectors/openaiconnector
 
 use ./pkg/connectors/googlevoiceconnector

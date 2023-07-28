@@ -24,25 +24,25 @@ func GenerateCodeAndApplyWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] 
 				WorkTzap(func(t *tzap.Tzap) {
 					// Load the file content
 					t.IsolatedTzap(func(ti *tzap.Tzap) {
-						codeContent, ok := t.Data["content"].(string)
+						codeCompletionMessage, ok := t.Data["content"].(types.CompletionMessage)
 						if !ok {
 							panic("Could not extract content")
 						}
-						println("code:" + codeContent)
+						println("code:" + codeCompletionMessage.Content)
 						ti.
 							AddSystemMessage("You are rewriting code into JSON. It is not allowed to use newline in the json.",
 								`Template:
 - {"code":"{code}","filePath":"{filePath}", "type": "{full code OR partial code}"}
 `).
-							AddAssistantMessage(codeContent).
+							AddAssistantMessage(codeCompletionMessage.Content).
 							AddUserMessage("Extract as JSON").
 							RequestChatCompletion(). // Run the completion
 							WorkTzap(func(t *tzap.Tzap) {
-								completion, ok := t.Data["content"].(string)
+								completionMessage, ok := t.Data["content"].(types.CompletionMessage)
 								if !ok {
 									panic("Could not extract content")
 								}
-								codeSegments := strings.Split(completion, "\n")
+								codeSegments := strings.Split(completionMessage.Content, "\n")
 
 								var jsonObjects []CodeGeneration
 								for _, codeSeg := range codeSegments {

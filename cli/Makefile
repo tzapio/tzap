@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
-PREVIOUS_VERSION=v0.8.8
-VERSION=v0.8.9
+PREVIOUS_VERSION=v0.8.10
+VERSION=v0.9.0
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION) -s -w" -trimpath
 
@@ -42,6 +42,9 @@ github-otherpkgs-release:
 	if [ -z "$(shell gh release list | grep -F pkg/tzapconnect/$(VERSION))" ]; then \
 		gh release create pkg/tzapconnect/$(VERSION) --prerelease --title "Release pkg/tzapconnect/$(VERSION)" --notes "Golang specific release"; \
 	fi
+	if [ -z "$(shell gh release list | grep -F pkg/tzapaction/$(VERSION))" ]; then \
+		gh release create pkg/tzapaction/$(VERSION) --prerelease --title "Release pkg/tzapaction/$(VERSION)" --notes "Golang specific release"; \
+	fi
 	if [ -z "$(shell gh release list | grep -F pkg/connectors/openaiconnector/$(VERSION))" ]; then \
 		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
@@ -55,18 +58,21 @@ github-otherpkgs-release:
 
 remove-releases:
 	-gh release delete pkg/tzapconnect/$(VERSION) --yes
+	-gh release delete pkg/tzapaction/$(VERSION) --yes
 	-gh release delete pkg/connectors/openaiconnector/$(VERSION) --yes
 	-gh release delete pkg/connectors/googlevoiceconnector/$(VERSION) --yes
 	-gh release delete pkg/connectors/redisembeddbconnector/$(VERSION) --yes
 	-gh release delete $(VERSION) --yes
 
 	-git push --delete origin pkg/tzapconnect/$(VERSION)
+	-git push --delete origin pkg/tzapaction/$(VERSION)
 	-git push --delete origin pkg/connectors/openaiconnector/$(VERSION)
 	-git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
 	-git push --delete origin pkg/connectors/redisembeddbconnector/$(VERSION)
 	-git push --delete origin $(VERSION)
 
 	-git tag -d pkg/tzapconnect/$(VERSION)
+	-git tag -d pkg/tzapaction/$(VERSION)
 	-git tag -d pkg/connectors/openaiconnector/$(VERSION)
 	-git tag -d pkg/connectors/googlevoiceconnector/$(VERSION)
 	-git tag -d pkg/connectors/redisembeddbconnector/$(VERSION)

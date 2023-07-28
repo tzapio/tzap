@@ -18,6 +18,8 @@ func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedWork
 			if strings.HasSuffix(filein, "_test.go") || strings.Contains(filein, "file2") || strings.Contains(filein, "interfaces.go") {
 				return t
 			}
+			completionMessage := t.Data["content"].(types.CompletionMessage)
+
 			return t.
 				HijackTzap(&tzap.Tzap{Name: "MakeCodeGO"}).
 				AddSystemMessage("### The overall mission: \n"+mission).
@@ -32,9 +34,8 @@ func TranslateCodeFromTo(from, to, outDir, mission, task string) types.NamedWork
 					"EXAMPLE:",
 					"{"+to+" code}").
 				AddSystemMessage(
-					"###",
-					"//file: "+filein+"\n",
-					t.Data["content"].(string),
+					"###FILE: "+filein+"\n",
+					completionMessage.Content,
 				).
 				LoadCompletionOrRequestCompletionMD5(fileout)
 
@@ -59,8 +60,7 @@ func MakeCodeTSMessage(mission, task, filein, fileout string) types.NamedWorkflo
 					"EXAMPLE:",
 					"{ts code}").
 				AddSystemMessage(
-					"###",
-					"//file: "+filein+"\n",
+					"###FILE: "+filein+"\n",
 					util.ReadFileP(filein),
 				).
 				LoadCompletionOrRequestCompletion(fileout)

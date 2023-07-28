@@ -48,8 +48,9 @@ func InternalNew() *Tzap {
 	return t
 }
 
-func NewWithConnector(connector types.TzapConnector) *Tzap {
-	tg, conf := connector()
+// NewTzap creates a new Tzap with default values, and returns its pointer.
+// Mainly for mocking purposes. Does not have a connector, will likely crash.
+func InjectNew(tg types.TGenerator, conf config.Configuration) *Tzap {
 	t := &Tzap{
 		Name:    "Connection",
 		Message: types.Message{},
@@ -59,6 +60,10 @@ func NewWithConnector(connector types.TzapConnector) *Tzap {
 	}
 	addId(t)
 	return t
+}
+func NewWithConnector(connector types.TzapConnector) *Tzap {
+	tg, conf := connector()
+	return InjectNew(tg, conf)
 }
 
 // CopyConnection returns a new Tzap with default values.

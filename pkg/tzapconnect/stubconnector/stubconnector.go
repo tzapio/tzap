@@ -23,8 +23,8 @@ func (StubConnector) TextToSpeech(ctx context.Context, content, language, voice 
 func (StubConnector) SpeechToText(ctx context.Context, audioContent *[]byte, language string) (string, error) {
 	return "nil", nil
 }
-func (StubConnector) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {
-	return "Hello world", nil
+func (StubConnector) GenerateChat(ctx context.Context, messages []types.Message, stream bool, functions string) (types.CompletionMessage, error) {
+	return types.CompletionMessage{Content: "Hello world"}, nil
 }
 func (StubConnector) CountTokens(ctx context.Context, content string) (int, error) {
 	return len("Hello world"), nil

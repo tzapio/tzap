@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package actionpb;
+
+option go_package = "./actionpb";
+
+message Message {
+    string role = 1;
+    string content = 2;
+}
+message Embedding {
+    string file = 1;
+    string content = 2;
+    int32 lineStart = 3;
+}
+message FileWrite {
+    string filein = 1;
+    string contentin = 2;
+    string fileout = 3;
+    string contentout = 4;
+}

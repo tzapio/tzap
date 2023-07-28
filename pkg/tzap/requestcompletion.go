@@ -14,7 +14,7 @@ import (
 
 func (t *Tzap) StoreCompletion(filePath string) *Tzap {
 	config := config.FromContext(t.C)
-	editedContent := t.Data["content"].(string)
+	editedContent := t.Data["content"].(types.CompletionMessage).Content
 
 	autoMode := config.AutoMode
 	makeChange := autoMode
@@ -28,7 +28,6 @@ func (t *Tzap) StoreCompletion(filePath string) *Tzap {
 		if err != nil {
 			panic(fmt.Errorf("error applying changes: %w", err))
 		}
-		writeMessageMD5(filePath, t)
 		data := types.MappedInterface{
 			"filepath": filePath,
 			"content":  editedContent,
@@ -48,7 +47,7 @@ func (t *Tzap) StoreCompletion(filePath string) *Tzap {
 
 // RequestChatCompletion initializes the openai chat completion request and creates a new Tzap with the edited content.
 func (t *Tzap) RequestChatCompletion() *Tzap {
-	output, err := fetchChatResponse(t, true)
+	output, err := fetchChatResponse(t, true, "")
 	if err != nil {
 		panic(err)
 	}
@@ -56,11 +55,22 @@ func (t *Tzap) RequestChatCompletion() *Tzap {
 		"content": output,
 	}
 	requestChat := t.AddTzap(&Tzap{Name: "requestChat", Data: data})
+	return requestChat
+}
 
+func (t *Tzap) RequestFunctionCompletion(functions string) *Tzap {
+	output, err := fetchChatResponse(t, true, functions)
+	if err != nil {
+		panic(err)
+	}
+	data := types.MappedInterface{
+		"content": output,
+	}
+	requestChat := t.AddTzap(&Tzap{Name: "requestChat", Data: data})
 	return requestChat
 }
 func (t *Tzap) AsAssistantMessage() *Tzap {
-	content := t.Data["content"].(string)
+	content := t.Data["content"].(types.CompletionMessage).Content
 	return t.AddAssistantMessage(content)
 }
 
@@ -75,7 +85,7 @@ func (t *Tzap) OffsetTokens(content string, from int, to int) (string, int, erro
 }
 
 // fetchChatResponse requests openai-chat completion for the given Tzap and returns the modified content.
-func fetchChatResponse(t *Tzap, stream bool) (string, error) {
+func fetchChatResponse(t *Tzap, stream bool, functions string) (types.CompletionMessage, error) {
 	config := config.FromContext(t.C)
 
 	thread := TruncateToMaxTokens(t.TG, GetThread(t), config.TruncateLimit)
@@ -84,11 +94,11 @@ func fetchChatResponse(t *Tzap, stream bool) (string, error) {
 	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, thread, filelog.RequestLog)
 	tl.UILogger.Println("\n--- Completion:")
-	result, err := t.TG.GenerateChat(t.C, thread, stream)
+	result, err := t.TG.GenerateChat(t.C, thread, stream, functions)
 
 	if err != nil {
 		filelog.LogData(t.C, err.Error(), filelog.ResponseLog)
-		return "", err
+		return types.CompletionMessage{}, err
 	}
 	tl.UILogger.Println("\n---")
 	getMessagesGraphViz(t)

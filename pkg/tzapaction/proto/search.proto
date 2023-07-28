@@ -1,0 +1,18 @@
+syntax = "proto3";
+package actionpb;
+
+option go_package = "./actionpb";
+import "common.proto";
+message SearchArgs {
+    repeated string excludeFiles = 1;
+    string searchQuery = 2;
+    int32 embedsCount = 3;
+    string lib = 4;
+}
+message SearchRequest {
+    SearchArgs searchArgs = 1;
+}
+
+message SearchResponse {
+    repeated Embedding embeddings = 1;
+}

@@ -7,23 +7,24 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/cli/action"
-	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
+	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows"
+	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows/codegeneration"
 	"github.com/tzapio/tzap/pkg/util"
-	"github.com/tzapio/tzap/workflows/code/codegeneration"
+	"github.com/tzapio/tzap/pkg/util/stdin"
 	"github.com/tzapio/tzap/workflows/stdinworkflows"
 )
 
 var editdirCmd = &cobra.Command{
-	Use:    "editdir [template] [directory]",
-	Short:  "Refactor source code using the given template in the given directory",
-	Hidden: true,
+	Use:    "editdir [template] [directoryglob]",
+	Short:  "Refactor source code using the given template in the given directory. \nTemplate to choose: refactor, test, documentation",
+	Hidden: false,
 	Args:   cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// store the template and directory path
@@ -43,19 +44,11 @@ var editdirCmd = &cobra.Command{
 
 			for _, file := range files {
 				config := getConfig(template, file)
-
-				cmd.Println("Editing file: ", file, "template", template)
-				promptWorkflowArgs := action.PromptWorkflowArgs{
-					InspirationFiles: []string{config.FileIn},
-					SearchQuery:      util.ReadFileP(config.FileIn),
-					EmbedsCount:      60,
-					NCount:           60,
-					DisableIndex:     false,
-					Yes:              tzapCliSettings.Yes,
-					MessageThread:    []types.Message{},
+				if !stdin.ConfirmPrompt("Edit file: " + file + " with template: " + template + "?") {
+					continue // skip this file
 				}
+				cmd.Println("Editing file: ", file, "template", template)
 				t.
-					ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs)).
 					ApplyWorkflowFN(codegeneration.MakeCode(config)).
 					ApplyWorkflow(stdinworkflows.BeforeProceedingWorkflow()).
 					ApplyWorkflow(cliworkflows.PrintFileDiff(config.FileOut)).
@@ -71,9 +64,9 @@ var editdirCmd = &cobra.Command{
 	},
 }
 
-func getConfig(template string, file string) codegeneration.BasicRefactoringConfig {
+func getConfig(template string, file string) *actionpb.RefactorArgs {
 	if template == "refactor" {
-		refactorConfig := codegeneration.BasicRefactoringConfig{
+		refactorConfig := &actionpb.RefactorArgs{
 			FileIn:           file,
 			FileOut:          file,
 			Mission:          "Improve code readability and maintainability",
@@ -86,8 +79,13 @@ func getConfig(template string, file string) codegeneration.BasicRefactoringConf
 		return refactorConfig
 	}
 	if template == "documentation" {
-		fileOut := util.ReplaceExt(file, ".md")
-		refactorConfig := codegeneration.BasicRefactoringConfig{
+		var fileOut string
+		if changeExtension == "" {
+			fileOut = util.ReplaceExt(file, ".md")
+		} else {
+			fileOut = util.ReplaceExt(file, changeExtension)
+		}
+		refactorConfig := &actionpb.RefactorArgs{
 			FileIn:           file,
 			FileOut:          fileOut,
 			Mission:          "Document code in markdown format",
@@ -99,20 +97,29 @@ func getConfig(template string, file string) codegeneration.BasicRefactoringConf
 		return refactorConfig
 	}
 	if template == "test" {
-		fileOut := util.ReplaceExt(file, "_test.go")
-		refactorConfig := codegeneration.BasicRefactoringConfig{
+		var fileOut string
+		if changeExtension == "" {
+			fileOut = util.ReplaceExt(file, "_test"+filepath.Ext(file))
+		} else {
+			fileOut = util.ReplaceExt(file, changeExtension)
+		}
+		refactorConfig := &actionpb.RefactorArgs{
 			FileIn:           file,
 			FileOut:          fileOut,
-			Mission:          "Add golang unit tests to the code",
+			Mission:          "Add " + filepath.Ext(file) + " unit tests to the code",
 			Task:             "Add unit tests to the following file. Add a test file with the same name as the file and add the unit tests to it.",
 			Plan:             "Do not write any text because this file will be saved directly to " + fileOut,
-			OutputFormat:     "{golang unit test}",
+			OutputFormat:     "{ " + filepath.Ext(file) + " unit test}",
 			InspirationFiles: []string{},
 		}
 		return refactorConfig
 	}
-	return codegeneration.BasicRefactoringConfig{}
+	panic("template not found. Must be, refactor, documentation, or test")
 }
+
+var changeExtension string
+
 func init() {
+	editdirCmd.PersistentFlags().StringVarP(&changeExtension, "extensionchange", "e", "", "Change the extension of the output file. Example: To add markdown documentation for a file like userComponent.js, adding the extension flag will generate a file that removes the extension and appends the new extension, userComponent.md when used like: -e .md")
 	RootCmd.AddCommand(editdirCmd)
 }

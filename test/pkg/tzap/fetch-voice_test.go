@@ -3,12 +3,13 @@ package tzap_test
 import (
 	"testing"
 
+	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 )
 
 func Test_RequestTextToSpeech_SynthesizeSpeech(t *testing.T) {
 	rootTzap := tzap.InternalNew()
-	rootTzap.Data["content"] = "Hello world!"
+	rootTzap.Data["content"] = types.CompletionMessage{Content: "Hello world!"}
 
 	// Use the fake implementation of TG
 	rootTzap.TG = &mockTG{}

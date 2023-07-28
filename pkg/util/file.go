@@ -55,12 +55,12 @@ func ListFilesInDir(dir string) ([]string, error) {
 	return files, nil
 }
 
-func ListGlob(globb string) ([]string, error) {
+func ListGlob(glob string) ([]string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	pattern := filepath.Join(globb)
+	pattern := filepath.Join(glob)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
 		return nil, err

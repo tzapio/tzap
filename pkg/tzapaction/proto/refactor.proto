@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package actionpb;
+
+option go_package = "./actionpb";
+
+import "common.proto";
+
+message RefactorArgs {
+  repeated string inspirationFiles = 1;
+  string fileIn = 2;
+  string fileOut = 3;
+  string mission = 4;
+  string task = 5;
+  string plan = 6;
+  string outputFormat = 7;
+  string example = 8;
+}
+
+message RefactorRequest {
+    RefactorArgs refactorArgs = 1;
+}
+message RefactorResponse {
+    repeated FileWrite fileWrites = 1;
+}

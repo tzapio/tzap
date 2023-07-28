@@ -7,10 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/tzapio/tzap/cli/action"
 	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
+	"github.com/tzapio/tzap/pkg/tzapaction/action"
+	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -20,21 +21,15 @@ import (
 
 var inspirationFiles []string
 var embedsCountFlag int32
-var nCountFlag int32
 var promptFile string
-var disableIndex bool
 var searchQuery string
 
 func init() {
 	RootCmd.AddCommand(promptCmd)
 	promptCmd.Flags().StringSliceVarP(&inspirationFiles,
 		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
-	promptCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 10,
+	promptCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 30,
 		"Number of embeddings to use for the prompt generation")
-	promptCmd.Flags().Int32VarP(&nCountFlag, "searchsize", "n", 15,
-		"Number of embeddings to include in the search space before filtering out the matches with inspiration files.")
-	promptCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false,
-		"For large projects disabling indexing speeds up the process.")
 	promptCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
 	promptCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
@@ -55,10 +50,7 @@ func promptFunc(cmd *cobra.Command, args []string) {
 	t := cmdutil.GetTzapFromContext(cmd.Context())
 
 	embedsCount := embedsCountFlag
-	nCount := nCountFlag
-	if embedsCountFlag > nCountFlag {
-		nCount = embedsCountFlag + 5
-	}
+
 	if promptFile == "-" {
 		promptFile = ""
 	}
@@ -95,23 +87,24 @@ func promptFunc(cmd *cobra.Command, args []string) {
 			searchQuery = messageThread.LastMessage().Content
 			truncThread := tzap.TruncateToMaxTokens(t.TG, messageThread.GetMessages(), 4000)
 
-			promptWorkflowArgs := action.PromptWorkflowArgs{
+			promptWorkflowArgs := &actionpb.PromptArgs{
 				InspirationFiles: inspirationFiles,
 				SearchQuery:      searchQuery,
 				EmbedsCount:      embedsCount,
-				NCount:           nCount,
-				DisableIndex:     disableIndex,
-				Yes:              tzapCliSettings.Yes,
-				MessageThread:    truncThread,
+				Thread:           action.ToPBMessage(truncThread),
 			}
 
 			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 			t.WorkTzap(func(t *tzap.Tzap) {
-				t = t.ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs)).AsAssistantMessage()
+				t = t.
+					ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs)).
+					AsAssistantMessage()
 				messageThread.Append(t.Message)
 
 				if tzapCliSettings.ApiMode {
 					cmdUI.SaveMessageThreadToFile(messageThread.GetMessages())
+					fmt.Print(t.Message.Content)
+					os.Exit(0)
 					threadText, err := tzapfile.SerializeMessageThread(messageThread.GetMessages())
 					if err != nil {
 						panic(err)

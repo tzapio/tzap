@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package actionpb;
+
+option go_package = "./actionpb";
+
+import "common.proto";
+
+message PromptArgs {
+    repeated string inspirationFiles = 1;
+    repeated string excludeFiles = 2;
+    string prompt = 3;
+    string searchQuery = 4;
+    int32 embedsCount = 5;
+    repeated Message thread = 6;
+}
+message PromptRequest {
+    PromptArgs promptArgs = 1;
+}
+message PromptResponse {
+    repeated Message thread = 1;
+}

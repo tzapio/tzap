@@ -19,10 +19,9 @@ func (tg *mockTG) SpeechToText(ctx context.Context, audioContent *[]byte, langua
 	// Return pre-defined value for testing purposes
 	return "Hello world!", nil
 }
-func (tg *mockTG) GenerateChat(ctx context.Context, messages []types.Message, stream bool) (string, error) {
-
+func (tg *mockTG) GenerateChat(ctx context.Context, messages []types.Message, stream bool, functions string) (types.CompletionMessage, error) {
 	if len(messages) == 0 {
-		return "", fmt.Errorf("empty messages")
+		return types.CompletionMessage{}, fmt.Errorf("empty messages")
 	}
 	str := ""
 	for i, message := range messages {
@@ -31,7 +30,7 @@ func (tg *mockTG) GenerateChat(ctx context.Context, messages []types.Message, st
 			str += "|"
 		}
 	}
-	return str, nil
+	return types.CompletionMessage{Content: str}, nil
 }
 func (tg *mockTG) CountTokens(ctx context.Context, content string) (int, error) {
 	// Return pre-defined value for testing purposes

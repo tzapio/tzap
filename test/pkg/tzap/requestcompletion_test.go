@@ -30,7 +30,7 @@ func Test_RequestChat_ValidFetch_OpenAIChatRequested(t *testing.T) {
 	if responseTzap.Parent.Parent.InitialSystemContent == "validHeader" {
 		t.Errorf("Expected header to be 'validHeader', but got '%s'", responseTzap.Parent.Parent.InitialSystemContent)
 	}
-	if responseTzap.Data["content"] != "r=system;c=validHeader|r=mocked;c=Hello!" {
+	if responseTzap.Data["content"].(types.CompletionMessage).Content != "r=system;c=validHeader|r=mocked;c=Hello!" {
 		t.Errorf("Expected content to be 'r=system;c=validHeader|r=mocked;c=Hello!', but got '%s'", responseTzap.Data["content"])
 	}
 	if responseTzap.Parent.Data["filepath"] != "validFilePath" {
@@ -52,9 +52,14 @@ func Test_FetchTask_ValidFetch_ChangesApplied(t *testing.T) {
 	tzapObj = tzapObj.AddTzap(&tzap.Tzap{
 		InitialSystemContent: "validHeader",
 		Name:                 "Mock",
-		Message:              types.Message{Role: "mocked", Content: "Hello!"},
+		Message: types.Message{
+			Role:    "mocked",
+			Content: "Hello!",
+		},
 		Data: types.MappedInterface{
-			"content": "someOldFile",
+			"content": types.CompletionMessage{
+				Content: "someOldFile",
+			},
 		},
 	})
 

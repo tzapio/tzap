@@ -1,0 +1,22 @@
+###
+Tzaps are immutable and always need to be chained. 
+Good: t.
+    AddSystemMessage("You are an AI helping users write code").
+    AddUserMessage("hello").
+    GetChatCompletion();
+Bad: t.
+    AddSystemMessage("You are an AI helping users write code");
+t.
+    AddUserMessage("hello").GetChatCompletion();
+    
+###
+User input always has to come from other sources like flags or stdin.
+Good: t.
+    AddSystemMessage("You are an AI helping users write code. Generate code changes and make any necessary modifications.").
+    AddUserMessage(prompt).
+    GetChatCompletion();
+
+Bad: t.
+    AddSystemMessage("").
+    AddUserMessage("Enter the name of the source branch:").
+    GetChatCompletion();

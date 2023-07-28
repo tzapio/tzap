@@ -24,14 +24,14 @@ func (m *MessageThread) IsLastMessageFromUser() bool {
 	}
 	return false
 }
-func (m *MessageThread) LastMessage() *types.Message {
+func (m *MessageThread) LastMessage() types.Message {
 	if len(m.messageThread) > 0 {
 		lastMessage := m.messageThread[len(m.messageThread)-1]
 		if lastMessage.Content != "" {
-			return &lastMessage
+			return lastMessage
 		}
 	}
-	return nil
+	return types.Message{}
 }
 func (m *MessageThread) SetMessages(messageThread []types.Message) {
 	m.messageThread = messageThread

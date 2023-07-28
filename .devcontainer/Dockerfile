@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:bullseye
+FROM --platform=linux/amd64 mcr.microsoft.com/devcontainers/base:bullseye
 
 # Update and install required packages
 RUN apt-get update && \

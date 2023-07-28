@@ -8,7 +8,7 @@ import (
 
 // k is amount of embeddings to be included.
 // When using inspiration files, embeddings are likely to be duplicated and as such are filtered out. n is used to increase how many embeddings are fetched but are trimmed to only contain top K after filtering.
-func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int, n int) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "searchFilesWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -21,7 +21,7 @@ func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int,
 				panic("should only return one embedding")
 			}
 			embedding := query.Queries[0]
-			searchResults, err := t.TG.SearchWithEmbedding(t.C, embedding, n)
+			searchResults, err := t.TG.SearchWithEmbedding(t.C, embedding, k)
 			if err != nil {
 				panic(err)
 			}
@@ -40,6 +40,9 @@ func SearchFilesWorkflow(query types.QueryRequest, excludeFiles []string, k int,
 func filterSearchResults(searchResults types.SearchResults, excludedFiles []string, k int) types.SearchResults {
 	filteredResults := []types.SearchResult{}
 	for _, result := range searchResults.Results {
+		if len(filteredResults) >= k && k > -1 {
+			break
+		}
 		fileName := result.Vector.Metadata.Filename
 		isExcluded := false
 		for _, excludedFile := range excludedFiles {
@@ -51,9 +54,7 @@ func filterSearchResults(searchResults types.SearchResults, excludedFiles []stri
 		if !isExcluded {
 			filteredResults = append(filteredResults, result)
 		}
-		if len(filteredResults) >= k && k > -1 {
-			break
-		}
+
 	}
 	return types.SearchResults{Results: filteredResults}
 }

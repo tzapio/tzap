@@ -27,9 +27,11 @@ exRefactoring:
 	go run examples/refactoring/main.go
 exTesting:
 	go run examples/testing/main.go
-
+install:
+	go install ./cli 
 gomodtidy:
 	go mod tidy
+	cd pkg/tzapaction && go mod tidy
 	cd pkg/connectors/openaiconnector && go mod tidy
 	cd pkg/tzapconnect && go mod tidy
 	cd pkg/connectors/redisembeddbconnector && go mod tidy
@@ -55,10 +57,9 @@ proto:
 	go install \
 		google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
 	protoc \
-	-I cli/proto \
-	--go_out=cli/ --go_opt=paths=import \
-	--go-grpc_out=cli/ --go-grpc_opt=paths=import \
-	tzap.proto prompt.proto search.proto
+	-I pkg/tzapaction/proto \
+	--go_out=pkg/tzapaction/ --go_opt=paths=import \
+	tzap.proto prompt.proto search.proto refactor.proto edit.proto implement.proto common.proto 
 
 docu:
 	cd documentation && npm start

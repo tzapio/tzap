@@ -4,23 +4,19 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/cli/action"
-	"github.com/tzapio/tzap/cli/actionpb"
-	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/embed/embedstore"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/workflows/code/embedworkflows"
+	"github.com/tzapio/tzap/pkg/tzapaction/action"
+	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
 )
 
 func init() {
 	RootCmd.AddCommand(findCmd)
 	findCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 10, "Number of embeddings to use for the search")
-	findCmd.Flags().Int32VarP(&nCountFlag, "ncount", "n", 20, "Number of embeddings to use for the search")
 	findCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
-	findCmd.Flags().BoolVarP(&disableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
+	findCmd.Flags().BoolVarP(&tzapCliSettings.DisableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
 	findCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 
@@ -39,39 +35,19 @@ var findCmd = &cobra.Command{
 			actionArgs := &actionpb.SearchArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  findQuery,
-				EmbedsCount:  -1,
-				NCount:       -1,
-				DisableIndex: disableIndex,
-				Yes:          tzapCliSettings.Yes,
+				EmbedsCount:  embedsCountFlag,
+				Lib:          lib,
 			}
 			t.
 				AddSystemMessage(action.FindChainOfThoughtPrompt()).
-				ApplyWorkflow(action.LoadAndSearchEmbeddingsWorkflow(actionArgs)).
-				MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-					original := t.Data["searchResults"].(types.SearchResults)
-					filenames := map[string]struct{}{}
-					for _, result := range original.Results {
-						filenames[result.Vector.Metadata.Filename] = struct{}{}
-					}
-					tmp := ""
-					for filename := range filenames {
-						tmp += filename + "\n"
-					}
-					shortenedSearchResults := types.SearchResults{
-						Results: embedstore.TightenSearchResults(original.Results[:embedsCountFlag]).Results,
-					}
-
-					return t.
-						ApplyWorkflow(cliworkflows.PrintEmbeddings(shortenedSearchResults)).
-						ApplyWorkflow(embedworkflows.EmbedWorkflow(shortenedSearchResults))
-				}).
+				ApplyWorkflow(action.SearchWorkflow(actionArgs)).
 				WorkTzap(func(t *tzap.Tzap) {
 					println("---")
 					t = t.
 						AddUserMessage("####Find files for:\n" + findQuery).
 						RequestChatCompletion()
 					println("\n---\n")
-					println(t.Data["content"].(string))
+					println(t.Data["content"].(types.CompletionMessage).Content)
 
 				})
 

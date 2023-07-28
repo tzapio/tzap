@@ -5,17 +5,17 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/cli/action"
-	"github.com/tzapio/tzap/cli/actionpb"
-	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/tzap"
+	"github.com/tzapio/tzap/pkg/tzapaction/action"
+	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
+	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows"
 )
 
 func init() {
 	RootCmd.AddCommand(pcaCMD)
-	pcaCMD.Flags().BoolVarP(&disableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
+	pcaCMD.Flags().BoolVarP(&tzapCliSettings.DisableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
 	pcaCMD.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 
@@ -31,14 +31,14 @@ var pcaCMD = &cobra.Command{
 			t := cmdutil.GetTzapFromContext(cmd.Context())
 			defer t.HandleShutdown()
 
-			output := action.LoadAndSearchEmbeddings(t, &actionpb.SearchArgs{
+			output, err := action.Search(t, &actionpb.SearchRequest{SearchArgs: &actionpb.SearchArgs{
 				ExcludeFiles: []string{},
 				SearchQuery:  searchQuery,
 				EmbedsCount:  -1,
-				NCount:       -1,
-				DisableIndex: disableIndex,
-				Yes:          tzapCliSettings.Yes,
-			})
+			}})
+			if err != nil {
+				panic(err)
+			}
 			if tzapCliSettings.ApiMode {
 				byte, err := json.MarshalIndent(output, "", "  ")
 				if err != nil {
@@ -47,7 +47,7 @@ var pcaCMD = &cobra.Command{
 				embeddingJson := string(byte)
 				fmt.Println(embeddingJson)
 			} else {
-				t.ApplyWorkflow(cliworkflows.PrintEmbeddings(output.SearchResults))
+				t.ApplyWorkflow(cliworkflows.PrintEmbeddings(output.Embeddings))
 			}
 		})
 

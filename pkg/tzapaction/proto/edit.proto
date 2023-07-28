@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package actionpb;
+
+option go_package = "./actionpb";
+
+import "common.proto";
+
+message EditRequest {
+    EditArgs editArgs = 1;
+}
+message EditArgs {
+  string mission = 1;
+  string plan = 2;
+
+  string task = 3;
+  string fileIn = 4;
+  string fileOut = 5;
+  string code = 6;
+
+  repeated string inspirationFiles = 7;
+}
+message EditResponse {
+    repeated FileWrite fileWrites = 1;
+}
+

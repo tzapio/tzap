@@ -4,7 +4,7 @@ const (
 	GPT432K0314             = "gpt-4-32k-0314"
 	GPT432K                 = "gpt-4-32k"
 	GPT40314                = "gpt-4-0314"
-	GPT4                    = "gpt-4"
+	GPT4                    = "gpt-4-0613"
 	GPT16                   = "gpt-3.5-turbo-16k"
 	GPT316                  = "gpt-3.5-turbo-16k"
 	GPT3Dot5Turbo16k        = "gpt-3.5-turbo-16k"
@@ -28,4 +28,5 @@ const (
 	ChatMessageRoleSystem    = "system"
 	ChatMessageRoleUser      = "user"
 	ChatMessageRoleAssistant = "assistant"
+	ChatMessageRoleFunction  = "function"
 )

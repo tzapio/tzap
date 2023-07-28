@@ -16,7 +16,7 @@ type TGenerator interface {
 	DeleteEmbeddingDocuments(ctx context.Context, ids []string) error
 	SearchWithEmbedding(ctx context.Context, embedding QueryFilter, k int) (SearchResults, error)
 	ListAllEmbeddingsIds(ctx context.Context) (SearchResults, error)
-	GenerateChat(ctx context.Context, messages []Message, stream bool) (string, error)
+	GenerateChat(ctx context.Context, messages []Message, stream bool, functions string) (CompletionMessage, error)
 	CountTokens(ctx context.Context, content string) (int, error)
 	OffsetTokens(ctx context.Context, content string, from int, to int) (string, int, error)
 	RawTokens(ctx context.Context, content string) ([]string, error)

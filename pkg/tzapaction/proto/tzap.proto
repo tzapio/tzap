@@ -1,0 +1,14 @@
+syntax = "proto3";
+package actionpb;
+option go_package = "./actionpb";
+
+import "search.proto";
+import "prompt.proto";
+import "refactor.proto";
+
+service TzapService {
+    rpc Search(SearchRequest) returns (SearchResponse);
+    rpc Refactor(RefactorRequest) returns (RefactorResponse);
+    rpc Prompt(PromptRequest) returns (PromptResponse);
+}
+

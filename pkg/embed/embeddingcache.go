@@ -73,7 +73,7 @@ func (ec *EmbeddingCache) FetchThenCacheNewEmbeddings(t *tzap.Tzap, files []type
 	storedFiles := map[string]struct{}{}
 
 	if len(uncachedEmbeddings.Vectors) > 0 {
-		batchSize := 100
+		batchSize := 200
 
 		for i := 0; i < len(uncachedEmbeddings.Vectors); i += batchSize {
 			end := i + batchSize

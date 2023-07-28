@@ -6,12 +6,11 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/tzapio/tzap/cli/cmd/cliworkflows"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
-	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/workflows/code/codegeneration"
-	"github.com/tzapio/tzap/workflows/stdinworkflows"
+	"github.com/tzapio/tzap/pkg/tzapaction/action"
+	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
+	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows"
 )
 
 var refactorCmd = &cobra.Command{
@@ -33,7 +32,7 @@ It is used to generate refactor and document code or generate documentation file
 				cmd.Println(refactorJSONExample)
 				os.Exit(1)
 			}
-			basicConfig = *config
+			basicConfig = config
 		}
 
 		if basicConfig.FileOut == "" {
@@ -44,14 +43,22 @@ It is used to generate refactor and document code or generate documentation file
 			cmd.Println(refactorJSONExample)
 			os.Exit(1)
 		}
-
-		runRefactor(cmd, &basicConfig)
-
+		t := cmdutil.GetTzapFromContext(cmd.Context())
+		result, err := action.Refactor(t, &actionpb.RefactorRequest{RefactorArgs: basicConfig})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		for _, fileWrite := range result.FileWrites {
+			t.
+				ApplyWorkflow(cliworkflows.PrintVSCode(fileWrite)).
+				StoreCompletion(fileWrite.Fileout)
+		}
 	},
 }
 
 var configFile string
-var basicConfig codegeneration.BasicRefactoringConfig
+var basicConfig *actionpb.RefactorArgs = &actionpb.RefactorArgs{}
 
 func init() {
 	RootCmd.AddCommand(refactorCmd)
@@ -67,41 +74,13 @@ func init() {
 	refactorCmd.Flags().StringSliceVarP(&basicConfig.InspirationFiles, "inspiration", "i", []string{}, "Optional comma-separated list of inspiration files or multiple -i flags.")
 }
 
-func runRefactor(cmd *cobra.Command, basicConfig *codegeneration.BasicRefactoringConfig) {
-	err := tzap.HandlePanic(func() {
-		t := cmdutil.GetTzapFromContext(cmd.Context())
-		defer t.HandleShutdown()
-
-		t.
-			/*
-				ApplyWorkflow(action.SearchWorkflow(action.PromptWorkflowArgs{
-					InspirationFiles: []string{basicConfig.FileIn},
-					SearchQuery:      util.ReadFileP(basicConfig.FileIn),
-					EmbedsCount:      embedsCountFlag,
-					NCount:           nCountFlag,
-					DisableIndex:     false,
-					Yes:              true,
-					MessageThread:    []types.Message{},
-				})).*/
-			ApplyWorkflowFN(codegeneration.MakeCode(*basicConfig)).
-			ApplyWorkflow(stdinworkflows.BeforeProceedingWorkflow()).
-			ApplyWorkflow(cliworkflows.PrintFileDiff(basicConfig.FileOut)).
-			StoreCompletion(basicConfig.FileOut)
-	})
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-}
-
-func loadConfig(filePath string) (*codegeneration.BasicRefactoringConfig, error) {
+func loadConfig(filePath string) (*actionpb.RefactorArgs, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
 
-	var configData codegeneration.BasicRefactoringConfig
+	var configData actionpb.RefactorArgs
 	err = json.Unmarshal(data, &configData)
 	if err != nil {
 		return nil, err

@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/dlclark/regexp2 v1.9.0 // indirect
-	github.com/sashabaranov/go-openai v1.12.0 // indirect
+	github.com/dlclark/regexp2 v1.10.0 // indirect
+	github.com/sashabaranov/go-openai v1.14.1 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
 )

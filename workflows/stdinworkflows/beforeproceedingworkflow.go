@@ -58,7 +58,6 @@ func BeforeProceeding(changes string) string {
 			}
 		}
 	}
-
 }
 func BeforeCompletionWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
@@ -68,14 +67,14 @@ func BeforeCompletionWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 			if err != nil {
 				panic(err)
 			}
-			var outContent string
+			var outContent types.CompletionMessage
 			t.IsolatedTzap(func(jt *tzap.Tzap) {
 				newJson := BeforeProceeding(priorThread)
 				jt = jt.LoadThreadString(newJson).
 					HandleError(func(et *tzap.ErrorTzap) error {
 						return et.Err
 					}).RequestChatCompletion()
-				outContent = jt.Data["content"].(string)
+				outContent = jt.Data["content"].(types.CompletionMessage)
 			})
 			return t.AddTzap(&tzap.Tzap{
 				Name: "BeforeCompletionWorkflow",
@@ -97,8 +96,8 @@ func BeforeProceedingWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 			if config.AutoMode {
 				return t
 			}
-			priorContent := t.Data["content"].(string)
-			t.Data["content"] = BeforeProceeding(priorContent)
+			priorContent := t.Data["content"].(types.CompletionMessage)
+			priorContent.Content = BeforeProceeding(priorContent.Content)
 			return t
 		},
 	}

@@ -3,9 +3,9 @@ package cmdutil
 import (
 	"fmt"
 
-	"github.com/tzapio/tzap/pkg/types"
+	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
 )
 
-func FormatVectorToClickable(v types.Vector) string {
-	return fmt.Sprintf("%s:%d", v.Metadata.Filename, v.Metadata.LineStart)
+func FormatVectorToClickable(embedding *actionpb.Embedding) string {
+	return fmt.Sprintf("%s:%d", embedding.File, embedding.LineStart)
 }

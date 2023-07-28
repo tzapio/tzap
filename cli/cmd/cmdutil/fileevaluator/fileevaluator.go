@@ -65,6 +65,7 @@ const BaseTzapInclude = `# Common languages. Example, remove .js if .js files ar
 *.m
 *.mm
 *.f
+*.liquid
 *.f90
 *.f95
 *.for

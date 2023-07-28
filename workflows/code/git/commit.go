@@ -52,11 +52,11 @@ func GitCommit() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap]{
 		Name: "GitCommit",
 		Workflow: func(t *tzap.Tzap) *tzap.ErrorTzap {
-			content := t.Data["content"].(string)
+			completionMessage := t.Data["content"].(types.CompletionMessage)
 
-			cmd := exec.Command("git", "commit", "-m", content)
+			cmd := exec.Command("git", "commit", "-m", completionMessage.Content)
 			if err := cmd.Run(); err != nil {
-				return t.ErrorTzap(fmt.Errorf("could not git commit. Content: %s, Error: %s", content, err))
+				return t.ErrorTzap(fmt.Errorf("could not git commit. Content: %s, Error: %s", completionMessage.Content, err))
 			}
 
 			return t.ErrorTzap(nil)

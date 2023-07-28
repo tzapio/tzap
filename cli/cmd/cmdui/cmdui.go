@@ -53,7 +53,6 @@ func NewCMDUI(promptFile string, editor string) *CMDUI {
 
 func (ui *CMDUI) Init() {
 	if ui.editor == "vscode" || ui.editor == "code" {
-		exec.Command("code", "-r", "--goto", ui.filePath+":-1").Run()
 		return
 	}
 }

@@ -24,7 +24,7 @@ func (t *Tzap) Memorize(key string) *Tzap {
 // MemorizeReq stores the Chat message content under a given key.
 func (t *Tzap) MemorizeReq(key string) *Tzap {
 	oldMemory := Mem[key]
-	Mem[key] = &types.Message{Role: oldMemory.Role, Content: t.RequestChatCompletion().Data["content"].(string)}
+	Mem[key] = &types.Message{Role: oldMemory.Role, Content: t.RequestChatCompletion().Data["content"].(types.CompletionMessage).Content}
 	println("Memorized ", Mem[key].Content)
 	return t
 }
