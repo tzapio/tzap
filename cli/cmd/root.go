@@ -8,12 +8,11 @@ import (
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/config"
-	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
-	"github.com/tzapio/tzap/pkg/tzapconnect/stubconnector"
+
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
@@ -27,7 +26,6 @@ var tzapCliSettings struct {
 	MD5Rewrites   bool
 	DisableLogs   bool
 	LoggerOutput  string
-	Stub          bool
 	Verbose       bool
 	ApiMode       bool
 	Yes           bool
@@ -107,24 +105,19 @@ func initializeConfig() error {
 func initializeTzap() (*tzap.Tzap, error) {
 	cfg := createConfigFromSettings()
 
-	var connector types.TzapConnector
-	if tzapCliSettings.Stub {
-		connector = stubconnector.StubWithConfig(cfg)
-	} else {
-		apikey, err := tzapconnect.LoadOPENAI_API_KEY()
-		if err != nil {
-			choice := stdin.ConfirmPrompt("Cannot find OPENAI_APIKEY.\n\nWould you like to add it now?")
-			if choice {
-				apikey = stdin.GetStdinInput("Enter OPENAI_APIKEY to save to .env:\n")
-				saveAPIKey(apikey)
-			} else {
-				println("Aborted, cannot continue without OPENAI_APIKEY.")
-				os.Exit(1)
-				return nil, err
-			}
+	apikey, err := tzapconnect.LoadOPENAI_API_KEY()
+	if err != nil {
+		choice := stdin.ConfirmPrompt("Cannot find OPENAI_APIKEY.\n\nWould you like to add it now?")
+		if choice {
+			apikey = stdin.GetStdinInput("Enter OPENAI_APIKEY to save to .env:\n")
+			saveAPIKey(apikey)
+		} else {
+			println("Aborted, cannot continue without OPENAI_APIKEY.")
+			os.Exit(1)
+			return nil, err
 		}
-		connector = tzapconnect.WithConfig(apikey, cfg)
 	}
+	connector := tzapconnect.WithConfig(apikey, cfg)
 
 	t := tzap.NewWithConnector(connector)
 	return t, nil
