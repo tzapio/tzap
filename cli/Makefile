@@ -1,7 +1,7 @@
 
 BINARY_NAME=tzap
-PREVIOUS_VERSION=v0.8.10
-VERSION=v0.9.0
+PREVIOUS_VERSION=v0.9.0
+VERSION=v0.9.1
 #VERSION=$(shell git describe --tags --always)
 BUILD_FLAGS=-ldflags="-X main.Version=$(VERSION) -s -w" -trimpath
 
