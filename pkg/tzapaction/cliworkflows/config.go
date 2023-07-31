@@ -5,6 +5,7 @@ import "context"
 var cliConfigContextKey = struct{ cliConfigContextKey string }{}
 
 type CLIWorkflowConfig struct {
+	Usd          float64
 	Yes          bool
 	DisableIndex bool
 }

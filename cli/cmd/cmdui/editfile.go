@@ -18,17 +18,20 @@ func (ui *CMDUI) EditFile(compareToFile *actionpb.FileWrite) error {
 	if _, err := temp.Write([]byte(compareToFile.Contentout)); err != nil {
 		return err
 	}
-
-	if _, err := os.Stat(compareToFile.Fileout); err == nil {
-		exec.Command("code", "-d", compareToFile.Fileout, temp.Name()).Run()
-	} else {
-		exec.Command("code", temp.Name()).Run()
+	if ui.editor == "vscode" {
+		if _, err := os.Stat(compareToFile.Fileout); err == nil {
+			exec.Command("code", "-d", compareToFile.Fileout, temp.Name()).Run()
+		} else {
+			exec.Command("code", temp.Name()).Run()
+		}
 	}
 	contentOut := editLoop(compareToFile.Contentout, temp.Name(), compareToFile.Fileout)
 	if err := os.WriteFile(compareToFile.Fileout, []byte(contentOut), 0755); err != nil {
 		return err
 	}
-	exec.Command("code", compareToFile.Fileout).Run()
+	if ui.editor == "vscode" {
+		exec.Command("code", compareToFile.Fileout).Run()
+	}
 	return nil
 }
 

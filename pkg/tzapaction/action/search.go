@@ -64,6 +64,7 @@ func loadAndSearchEmbeddingsWorkflow(args *actionpb.SearchArgs) types.NamedWorkf
 }
 func SearchWorkflow(args *actionpb.SearchArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "SearchWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			result, err := Search(t, &actionpb.SearchRequest{SearchArgs: args})
 			if err != nil {

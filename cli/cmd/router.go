@@ -17,17 +17,10 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
 	"github.com/tzapio/tzap/pkg/tzap"
-	"github.com/tzapio/tzap/pkg/tzapfile"
 )
 
 func init() {
 	RootCmd.AddCommand(routerCmd)
-	routerCmd.Flags().StringSliceVarP(&inspirationFiles,
-		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
-	routerCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 30,
-		"Number of embeddings to use for the prompt generation")
-	routerCmd.Flags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
-	routerCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 
 var routerCmd = &cobra.Command{
@@ -50,12 +43,11 @@ func routerFunc(cmd *cobra.Command, args []string) {
 	if promptFile == "-" {
 		promptFile = ""
 	}
-	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
-	messageThread := cmdui.NewMessageThread()
 	if tzapCliSettings.ApiMode {
 		tzapCliSettings.Editor = "api"
 	}
-
+	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
+	messageThread := cmdui.NewMessageThread()
 	if promptFile != "" {
 		messageThread.SetMessages(cmdUI.ReadMessagesFromFile())
 	}
@@ -85,9 +77,14 @@ func routerFunc(cmd *cobra.Command, args []string) {
 
 			promptWorkflowArgs := &actionpb.PromptArgs{
 				InspirationFiles: inspirationFiles,
-				SearchQuery:      searchQuery,
-				EmbedsCount:      embedsCount,
-				Thread:           action.ToPBMessage(truncThread),
+				SearchArgss: []*actionpb.SearchArgs{
+					{
+						SearchQuery: searchQuery,
+						Lib:         lib,
+						EmbedsCount: embedsCount,
+					},
+				},
+				Thread: action.ToPBMessage(truncThread),
 			}
 
 			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
@@ -99,15 +96,19 @@ func routerFunc(cmd *cobra.Command, args []string) {
 							fc := tzapFunc.Data["content"].(types.CompletionMessage).FunctionCall
 							if fc != nil {
 								tzapFunc.Message.Role = "function"
-								tzapFunc.Message.Content = fc.Arguments
-								messageThread.Append(types.Message{Role: "function", Content: fc.Arguments})
+								tzapFunc.Message.Content = fc.Name + "\n" + fc.Arguments
+								messageThread.Append(types.Message{Role: "function", Content: fc.Name + "\n" + fc.Arguments})
 								println("---")
 								result, err := resolver.LocalRun("/"+fc.Name, fc.Arguments)
 								if err != nil {
 									panic(err)
 								}
 								println("---")
-								tl.Logger.Println(result)
+								if tzapCliSettings.ApiMode {
+									fmt.Print(result)
+									os.Exit(0)
+									return tzapFunc
+								}
 								type FileWriter struct {
 									FileWrites []*actionpb.FileWrite `json:"fileWrites"`
 								}
@@ -124,18 +125,13 @@ func routerFunc(cmd *cobra.Command, args []string) {
 						},
 						func(notTzapFunc *tzap.Tzap) *tzap.Tzap {
 							notTzapFunc = notTzapFunc.AsAssistantMessage()
-							messageThread.Append(t.Message)
+							messageThread.Append(notTzapFunc.Message)
+							cmdUI.SaveMessageThreadToFile(messageThread.GetMessages())
 							return notTzapFunc
 						})
-				cmdUI.SaveMessageThreadToFile(messageThread.GetMessages())
+
 				if tzapCliSettings.ApiMode {
 					fmt.Print(t.Message.Content)
-					os.Exit(0)
-					threadText, err := tzapfile.SerializeMessageThread(messageThread.GetMessages())
-					if err != nil {
-						panic(err)
-					}
-					fmt.Print(threadText)
 					os.Exit(0)
 					return
 				}

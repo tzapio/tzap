@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 
@@ -29,6 +30,7 @@ var tzapCliSettings struct {
 	Verbose       bool
 	ApiMode       bool
 	Yes           bool
+	Price         float64
 	DisableIndex  bool
 	Editor        string
 	EmbeddingURL  string
@@ -36,10 +38,13 @@ var tzapCliSettings struct {
 }
 
 var RootCmd = &cobra.Command{
-	Use:   "tzap",
-	Short: "Tzap Cli",
-
+	Use:   "tzap [your request]",
+	Short: "Just use Tzap for that!",
+	Long: `Run tzap with 'tzap [your request]', which is alias for tzap router [your request]'.
+Or run specific commands like tzap prompt, commit, refactor and search.`,
 	PersistentPreRunE: preRun,
+	Args:              cobra.MinimumNArgs(0),
+	Run:               routerCmd.Run,
 }
 
 func preRun(cmd *cobra.Command, args []string) error {
@@ -72,10 +77,14 @@ func preRun(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	cmd.SetContext(cliworkflows.SetCLIWorkflowConfigInContext(cmd.Context(), &cliworkflows.CLIWorkflowConfig{
-		DisableIndex: tzapCliSettings.DisableIndex,
-		Yes:          tzapCliSettings.Yes,
-	}))
+
+	t = t.AddContextChange(func(ctx context.Context) context.Context {
+		return cliworkflows.SetCLIWorkflowConfigInContext(ctx, &cliworkflows.CLIWorkflowConfig{
+			DisableIndex: tzapCliSettings.DisableIndex,
+			Yes:          tzapCliSettings.Yes,
+			Usd:          tzapCliSettings.Price,
+		})
+	})
 	tl.Logger.Println("Tzap initialized")
 	cmd.SetContext(cmdutil.SetTzapInContext(cmd.Context(), t))
 	return nil
@@ -170,15 +179,30 @@ var modelMap map[string]string = map[string]string{
 func init() {
 	RootCmd.CompletionOptions.HiddenDefaultCmd = true
 	tzapCliSettings.MD5Rewrites = true
+	tzapCliSettings.LoggerOutput = ".tzap-data/logs/"
 
 	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.Model, "model", "m", "gpt16", "Define what openai model to use. (Available gpt35 gpt356 (june model) gpt3516 (alias gpt16) gpt4).")
 	RootCmd.PersistentFlags().StringVarP(&tzapCliSettings.CompletionURL, "baseurl", "b", "", "Completion URL")
 	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.EmbeddingURL, "embeddingbaseurl", "", "Embedding URL")
-	RootCmd.PersistentFlags().StringVar(&tzapCliSettings.LoggerOutput, "loggeroutput", ".tzap-data/logs/", "Path and name of the log file.")
 	RootCmd.PersistentFlags().Float32VarP(&tzapCliSettings.Temperature, "temperature", "t", 1.0, "Temperature for the interaction.")
 	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Verbose, "verbose", "v", false, "Enable verbose logging")
 	RootCmd.PersistentFlags().BoolVar(&tzapCliSettings.ApiMode, "api", false, "ALPHA: Enable clean stdout outputs. Also turns off editor mode.")
+	RootCmd.PersistentFlags().Float64Var(&tzapCliSettings.Price, "price", 0.001, "Maximum price treshhold")
 	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Yes, "yes", "y", false, "Answer yes on CLI related prompts - cost or similar related questions")
-	RootCmd.Flags().BoolVarP(&tzapCliSettings.DisableIndex, "disableindex", "d", false,
-		"For large projects disabling indexing speeds up the process.")
+	RootCmd.PersistentFlags().BoolVarP(&tzapCliSettings.DisableIndex, "disableindex", "d", false, "For large projects disabling indexing speeds up the process.")
+
+	RootCmd.PersistentFlags().StringSliceVarP(&inspirationFiles,
+		"inspiration", "i", []string{}, "Comma-separated list of inspiration files or multiple -i flags.")
+	RootCmd.PersistentFlags().Int32VarP(&embedsCountFlag, "embeds", "k", 30,
+		"Number of embeddings to use for the prompt generation")
+	RootCmd.PersistentFlags().StringVarP(&promptFile, "promptfile", "f", "", "Read from file instead of prompt")
+	RootCmd.PersistentFlags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
+
+	hiddenFlags := []string{"api", "yes", "disableindex", "price", "baseurl", "embeddingbaseurl"}
+	for _, flag := range hiddenFlags {
+		err := RootCmd.PersistentFlags().MarkHidden(flag)
+		if err != nil {
+			panic(err)
+		}
+	}
 }

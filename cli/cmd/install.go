@@ -71,7 +71,7 @@ var installCmd = &cobra.Command{
 					return t
 				})
 			defer t.HandleShutdown()
-			t.ApplyWorkflow(cliworkflows.IndexZipFilesAndEmbeddings(name, projectDir, zipURL, false, false))
+			t.ApplyWorkflow(cliworkflows.IndexZipFilesAndEmbeddings(name, projectDir, zipURL, false, tzapCliSettings.Yes, tzapCliSettings.Price))
 		})
 
 		if err != nil {

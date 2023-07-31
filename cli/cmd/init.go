@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"time"
 
@@ -23,34 +24,36 @@ var initCmd = &cobra.Command{
 		}
 
 		cmd.Println("Initializing Tzap...")
-		time.Sleep(time.Millisecond * 500)
-		if _, err := os.Stat(".git"); os.IsNotExist(err) {
-			if !stdin.ConfirmPrompt("\n\nWarning: Trying to find .git in the folder. This command should be run from the root of a project.\n\nIt's safe to continue, this is just incase you did not stand in your root folder. Continue anyway?") {
-				return
+		if !tzapCliSettings.Yes {
+			time.Sleep(time.Millisecond * 500)
+			if _, err := os.Stat(".git"); os.IsNotExist(err) {
+				if !stdin.ConfirmPrompt("\n\nWarning: Trying to find .git in the folder. This command should be run from the root of a project.\n\nIt's safe to continue, this is just incase you did not stand in your root folder. Continue anyway?") {
+					return
+				}
 			}
-		}
 
-		if b := stdin.ConfirmPrompt("\n\nTzap is in Beta. Would you like some general information about Tzap?"); b {
-			cmd.Println("\n\nTzap is a code cli tool that is designed to be easy to use.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nYou ask tzap to finish a prompt using: tzap prompt \"How do I use X library to enable my backend to do Y\"\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nTzap assumes that you are running it from the project root folder. - Tzap attempts to traverse the folder to run from the root folder. During beta, for best results, always run tzap from root folder.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nTzap requires an openai apikey. You can get one from https://platform.openai.com/. You need to add a payment method to get started\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nRegarding costs, embeddings should shows, but it's generally very affordable. A huge project like https://github.com/twitter/the-algorithm costs max 1 USD to embed. Usually less.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nA gpt4 call costs maximum 0.2 dollars and a gpt3.5 (default) costs a fraction of that. https://openai.com/pricing for more info.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_APIKEY=<apikey> for .env file.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nTzap is designed to be used with a .tzapignore file. This file is similar to a .gitignore file, but it is used to ignore files that interfere with search quality.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
-			stdin.GetStdinInput("Press enter to continue.")
-			cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
-			stdin.GetStdinInput("Press enter to continue.")
+			if b := stdin.ConfirmPrompt("\n\nTzap is in Beta. Would you like some general information about Tzap?"); b {
+				cmd.Println("\n\nTzap is a code cli tool that is designed to be easy to use.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nYou ask tzap to finish a prompt using: tzap prompt \"How do I use X library to enable my backend to do Y\"\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nTzap assumes that you are running it from the project root folder. - Tzap attempts to traverse the folder to run from the root folder. During beta, for best results, always run tzap from root folder.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nTzap requires an openai apikey. You can get one from https://platform.openai.com/. You need to add a payment method to get started\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nRegarding costs, embeddings should shows, but it's generally very affordable. A huge project like https://github.com/twitter/the-algorithm costs max 1 USD to embed. Usually less.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nA gpt4 call costs maximum 0.2 dollars and a gpt3.5 (default) costs a fraction of that. https://openai.com/pricing for more info.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_APIKEY=<apikey> for .env file.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nTzap is designed to be used with a .tzapignore file. This file is similar to a .gitignore file, but it is used to ignore files that interfere with search quality.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+				cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
+				stdin.GetStdinInput("Press enter to continue.")
+			}
 		}
 		// Ask which text editor the user wants to use
 		editor := askForEditor()
@@ -61,7 +64,6 @@ var initCmd = &cobra.Command{
 		}
 		touchTzapignore()
 		touchTzapinclude()
-		generateViperConfig()
 		cmd.Println("Initialization complete.")
 
 	},
@@ -86,12 +88,39 @@ func writeEditorToConfigFile(selected string) error {
 
 	return nil
 }
+func checkVSCodeInstalled() bool {
+	cmd := exec.Command("code", "--help")
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
+}
 func askForEditor() string {
+	if tzapCliSettings.Yes {
+		return "stdin"
+	}
 	options := []string{"vscode", "code", "vim", "nano", "editor", "stdin"}
-	prompt := fmt.Sprintf("\n\nChoose your preferred text editor:\n- %s (alias: code): Edit prompts directly from file and have them automatically open using /usr/bin/code vscode command\n- %s: Opens the file in vim when prompting\n- %s:Opens the file in vim when prompting\n- %s: allows for editing files directly but does not connect to any specific UI.\n- stdin: default, asks for input in CLI.\n\n code is recommended and stdin is the easiest to get started with.", options[0], options[1], options[2], options[3])
+	if checkVSCodeInstalled() {
+		time.Sleep(time.Millisecond * 1000)
+		stdin.ConfirmPrompt(`
+
+Would you like to run tzap with VSCode? Tzap will open VSCode when prompting for input and show diffs in VSCode.
+
+No extension will be installed. You can always change this later in the config.json file`)
+	}
+
+	prompt := fmt.Sprintf(`
+	
+Choose your preferred text editor:
+	- %s: Edit prompts directly from file, get diffs and more
+	- %s: Opens the file in vim when prompting
+	- %s: Opens the file in nano when prompting
+	- %s: allows for editing files directly but does not connect to any specific UI.
+	- stdin (default): asks for input in CLI.
+`, options[0], options[2], options[3], options[4])
 	fmt.Print(prompt)
 
-	text := stdin.GetStdinInput("\nEnter your choice (press enter to chose: stdin): ")
+	text := stdin.GetStdinInput("\nEnter your choice (press enter for default choice): ")
 	text = strings.TrimSpace(text)
 	for _, e := range options {
 		if text == e {
@@ -149,11 +178,7 @@ func touchTzapinclude() {
 	time.Sleep(time.Millisecond * 500)
 }
 
-func generateViperConfig() {
-
-}
-
 func init() {
 	RootCmd.AddCommand(initCmd)
-
+	initCmd.PersistentFlags().BoolVarP(&tzapCliSettings.Yes, "yes", "y", false, "Skip all prompts and use default values")
 }

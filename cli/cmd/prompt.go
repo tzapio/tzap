@@ -35,7 +35,7 @@ func init() {
 }
 
 var promptCmd = &cobra.Command{
-	Aliases: []string{"p", "embeddingprompt"},
+	Aliases: []string{"p"},
 	Use:     "prompt <prompt>",
 	Short:   "Generate code by combining prompt and code-search",
 	Long: `The 'prompt' command generates content based on code-searching existing files.
@@ -54,12 +54,12 @@ func promptFunc(cmd *cobra.Command, args []string) {
 	if promptFile == "-" {
 		promptFile = ""
 	}
-	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
-	messageThread := cmdui.NewMessageThread()
+
 	if tzapCliSettings.ApiMode {
 		tzapCliSettings.Editor = "api"
 	}
-
+	cmdUI := cmdui.NewCMDUI(promptFile, tzapCliSettings.Editor)
+	messageThread := cmdui.NewMessageThread()
 	if promptFile != "" {
 		messageThread.SetMessages(cmdUI.ReadMessagesFromFile())
 	}
@@ -89,9 +89,14 @@ func promptFunc(cmd *cobra.Command, args []string) {
 
 			promptWorkflowArgs := &actionpb.PromptArgs{
 				InspirationFiles: inspirationFiles,
-				SearchQuery:      searchQuery,
-				EmbedsCount:      embedsCount,
-				Thread:           action.ToPBMessage(truncThread),
+				SearchArgss: []*actionpb.SearchArgs{
+					{
+						SearchQuery: searchQuery,
+						Lib:         lib,
+						EmbedsCount: embedsCount,
+					},
+				},
+				Thread: action.ToPBMessage(truncThread),
 			}
 
 			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))

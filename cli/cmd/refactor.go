@@ -6,11 +6,11 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/tzapaction/action"
 	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
-	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows"
 )
 
 var refactorCmd = &cobra.Command{
@@ -43,16 +43,20 @@ It is used to generate refactor and document code or generate documentation file
 			cmd.Println(refactorJSONExample)
 			os.Exit(1)
 		}
+		if tzapCliSettings.ApiMode {
+			tzapCliSettings.Editor = "api"
+		}
+		cmdUI := cmdui.NewCMDUI("", tzapCliSettings.Editor)
+
 		t := cmdutil.GetTzapFromContext(cmd.Context())
 		result, err := action.Refactor(t, &actionpb.RefactorRequest{RefactorArgs: basicConfig})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
 		}
+
 		for _, fileWrite := range result.FileWrites {
-			t.
-				ApplyWorkflow(cliworkflows.PrintVSCode(fileWrite)).
-				StoreCompletion(fileWrite.Fileout)
+			cmdUI.EditFile(fileWrite)
 		}
 	},
 }

@@ -25,8 +25,9 @@ func RouterWorkflow(promptWorkflowArgs *actionpb.PromptArgs) types.NamedWorkflow
 
 			loadAndSearchEmbeddingsArgs := &actionpb.SearchArgs{
 				ExcludeFiles: append(promptWorkflowArgs.ExcludeFiles, allFiles...),
-				SearchQuery:  promptWorkflowArgs.SearchQuery,
-				EmbedsCount:  promptWorkflowArgs.EmbedsCount,
+				SearchQuery:  promptWorkflowArgs.SearchArgss[0].SearchQuery,
+				Lib:          promptWorkflowArgs.SearchArgss[0].Lib,
+				EmbedsCount:  promptWorkflowArgs.SearchArgss[0].EmbedsCount,
 			}
 
 			return t.

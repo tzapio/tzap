@@ -19,14 +19,14 @@ import (
 	"github.com/tzapio/tzap/workflows/code/embedworkflows"
 )
 
-func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, yes bool, usd float64) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "loadAndFetchEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			return t.MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
 				return t.
 					ApplyWorkflow(embedworkflows.PrepareEmbedFilesWorkflow(files, embedder)).
-					ApplyWorkflow(ConfirmEmbeddingSearch(yes)).
+					ApplyWorkflow(ConfirmEmbeddingSearch(yes, usd)).
 					ApplyWorkflow(embedworkflows.FetchOrCachedEmbeddingForFilesWorkflow(files)).
 					ApplyWorkflow(embedworkflows.SaveAndLoadEmbeddingsToDB())
 			})
@@ -34,7 +34,7 @@ func LoadAndFetchEmbeddings(files []types.FileReader, embedder *embed.Embedder, 
 	}
 }
 
-func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func ConfirmEmbeddingSearch(yes bool, usd float64) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "confirmEmbeddingSearch",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -51,8 +51,13 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 						len(uncachedEmbeddings.Vectors)*400,
 						price))
 					if !ok {
-						println("Fetching embeddings aborted by user")
-						os.Exit(0)
+						fmt.Print("Aborting...")
+						os.Exit(1)
+					}
+				} else {
+					if price > usd {
+						fmt.Print("Price too high", price, ">", usd)
+						os.Exit(1)
 					}
 				}
 			}
@@ -61,7 +66,7 @@ func ConfirmEmbeddingSearch(yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap
 	}
 }
 
-func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.ProjectDir, zipURL string, disableIndex, yes bool) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.ProjectDir, zipURL string, disableIndex bool, yes bool, usd float64) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "indexFilesAndEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
@@ -79,7 +84,7 @@ func IndexZipFilesAndEmbeddings(name project.ProjectName, projectDir project.Pro
 			embedder := embed.NewEmbedder(projectP.GetEmbeddingsCache(), projectP.GetTimestampCache())
 			tl.Logger.Println("Indexing files...")
 
-			return t.ApplyWorkflow(LoadAndFetchEmbeddings(files, embedder, yes))
+			return t.ApplyWorkflow(LoadAndFetchEmbeddings(files, embedder, yes, usd))
 		},
 	}
 }
@@ -89,13 +94,17 @@ func IndexFilesAndEmbeddings() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 		Name: "indexFilesAndEmbeddings",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			config := GetCLIWorkflowConfigFromContext(t.C)
-			var disableIndex, yes bool
+			var disableIndex bool
+			var usd float64
+			var yes bool
 			if config != nil {
 				disableIndex = config.DisableIndex
+				usd = config.Usd
 				yes = config.Yes
 			} else {
 				tl.Logger.Println("Warning: No CLIWorkflowConfig found in context")
 				disableIndex = false
+				usd = 0.001
 				yes = false
 			}
 
@@ -122,7 +131,7 @@ func IndexFilesAndEmbeddings() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 			tl.Logger.Println("Finished index files...")
 			if !disableIndex {
 				println("Checking for file changes. " + cmdutil.Black("(use -d to disable this check)...\n"))
-				return t.ApplyWorkflow(LoadAndFetchEmbeddings(files, embedder, yes))
+				return t.ApplyWorkflow(LoadAndFetchEmbeddings(files, embedder, yes, usd))
 			}
 			return t
 
@@ -191,7 +200,7 @@ func PrintFileDiff(compareToFile string) types.NamedWorkflow[*tzap.Tzap, *tzap.T
 	}
 }
 
-func PrintVSCode(compareToFile *actionpb.FileWrite) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
+func Print2VSCode(compareToFile *actionpb.FileWrite) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
 		Name: "printFileDiff",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {

@@ -20,7 +20,6 @@ var lib string
 func init() {
 	RootCmd.AddCommand(searchCmd)
 	searchCmd.Flags().Int32VarP(&embedsCountFlag, "embeds", "k", 30, "Number of embeddings to use for the search")
-	searchCmd.Flags().StringSliceVarP(&ignoreFiles, "ignore", "i", []string{}, "Files to exclude from search")
 	searchCmd.Flags().StringVarP(&lib, "lib", "l", "", "BETA: select library to search.")
 }
 

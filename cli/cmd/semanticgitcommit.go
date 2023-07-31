@@ -33,7 +33,7 @@ var semanticGitcommitCmd = &cobra.Command{
 					diff := t.Data["git-diff"].(string)
 					cmd.Print("Reading staged git commit diffs")
 					if !showDiff {
-						cmd.Println(" (Use --show-diff to show the git diff)")
+						cmd.Println(" (Use --diff to show the git diff)")
 					} else {
 						cmd.Println(":")
 					}
@@ -96,5 +96,5 @@ func RequestChat() types.NamedWorkflow[*tzap.Tzap, *tzap.ErrorTzap] {
 func init() {
 	RootCmd.AddCommand(semanticGitcommitCmd)
 	// add flag to show git diff
-	semanticGitcommitCmd.Flags().BoolVarP(&showDiff, "show-diff", "d", false, "Show git diff")
+	semanticGitcommitCmd.Flags().BoolVar(&showDiff, "diff", false, "Show git diff")
 }

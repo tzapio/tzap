@@ -19,6 +19,7 @@ func Prompt(t *tzap.Tzap, promptRequest *actionpb.PromptRequest) (*actionpb.Prom
 }
 func PromptWorkflow(promptWorkflowArgs *actionpb.PromptArgs) types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 	return types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap]{
+		Name: "PromptWorkflow",
 		Workflow: func(t *tzap.Tzap) *tzap.Tzap {
 			var allFiles []string
 			for _, ins := range promptWorkflowArgs.InspirationFiles {
@@ -32,8 +33,9 @@ func PromptWorkflow(promptWorkflowArgs *actionpb.PromptArgs) types.NamedWorkflow
 
 			loadAndSearchEmbeddingsArgs := &actionpb.SearchArgs{
 				ExcludeFiles: append(promptWorkflowArgs.ExcludeFiles, allFiles...),
-				SearchQuery:  promptWorkflowArgs.SearchQuery,
-				EmbedsCount:  promptWorkflowArgs.EmbedsCount,
+				SearchQuery:  promptWorkflowArgs.SearchArgss[0].SearchQuery,
+				Lib:          promptWorkflowArgs.SearchArgss[0].Lib,
+				EmbedsCount:  promptWorkflowArgs.SearchArgss[0].EmbedsCount,
 			}
 
 			return t.
