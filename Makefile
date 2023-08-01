@@ -63,3 +63,8 @@ proto:
 
 docu:
 	cd documentation && npm start
+
+dockerbuild:
+	docker build -t tzapio/tzap .
+dockerpush:
+	docker push tzapio/tzap
