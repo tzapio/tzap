@@ -3,8 +3,10 @@ package cmdui
 import (
 	"os"
 	"os/exec"
+	"path"
 
 	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
+	"github.com/tzapio/tzap/pkg/util"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
 
@@ -26,7 +28,12 @@ func (ui *CMDUI) EditFile(compareToFile *actionpb.FileWrite) error {
 		}
 	}
 	contentOut := editLoop(compareToFile.Contentout, temp.Name(), compareToFile.Fileout)
-	if err := os.WriteFile(compareToFile.Fileout, []byte(contentOut), 0755); err != nil {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	if err := util.MkdirPAndWriteFile(path.Join(cwd, compareToFile.Fileout), contentOut); err != nil {
 		return err
 	}
 	if ui.editor == "vscode" {
