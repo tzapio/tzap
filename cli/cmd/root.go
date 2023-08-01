@@ -62,7 +62,7 @@ func preRun(cmd *cobra.Command, args []string) error {
 
 	baseDir, err := cmdutil.SearchForTzapincludeAndGetRootDir()
 	if err != nil {
-		println("Warning: No .tzapinclude file found. Run 'tzap init'. Using current directory as root.", err)
+		println("Warning: No .tzapinclude file found. Run 'tzap init'. Using current directory as root.")
 	} else {
 		os.Chdir(baseDir)
 	}
