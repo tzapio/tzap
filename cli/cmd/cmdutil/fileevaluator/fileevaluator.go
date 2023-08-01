@@ -15,6 +15,7 @@ type FileEvaluator struct {
 const BaseTzapIgnore = `# Tzap ignore file. Add extra files like test folders, or other files that interfere with search (embeddings) quality.
 node_modules
 .env
+.next
 `
 
 const BaseTzapInclude = `# Common languages. Example, remove .js if .js files are only compiled bundles.
