@@ -2,6 +2,7 @@ package localwalker
 
 import (
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -27,11 +28,17 @@ func (f *LocalWalker) GetFiles() ([]types.FileReader, error) {
 			return err
 		}
 		if d.IsDir() {
-			if f.e.ShouldTraverseDir(path) || d.Name() == "." {
-				tl.DeepLogger.Println("KEEPDIR", path)
-				return nil
+			if _, err := os.ReadDir(path); err == nil {
+				if f.e.ShouldTraverseDir(path) || d.Name() == "." {
+					tl.DeepLogger.Println("KEEPDIR", path)
+
+					return nil
+				} else {
+					tl.DeepLogger.Println("SKIPDIR", path)
+					return filepath.SkipDir
+				}
 			} else {
-				tl.DeepLogger.Println("SKIPDIR", path)
+				tl.DeepLogger.Println("SKIPDIR - No permission", path)
 				return filepath.SkipDir
 			}
 		} else if f.e.ShouldKeepPath(path) {
@@ -41,6 +48,11 @@ func (f *LocalWalker) GetFiles() ([]types.FileReader, error) {
 				return err
 			}
 			relPath = strings.TrimPrefix(relPath, "./")
+			// check if has permission to read file
+			if _, err := os.Open(relPath); err != nil {
+				tl.DeepLogger.Println("SKIPFILE - No permission", path)
+				return nil
+			}
 			list = append(list, NewLocalfile(filepath.ToSlash(relPath)))
 			return nil
 		}

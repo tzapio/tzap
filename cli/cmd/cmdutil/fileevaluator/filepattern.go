@@ -2,20 +2,27 @@ package fileevaluator
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
 
 func ReadFilterPatternFiles(patternFilePath ...string) ([]string, error) {
 	ignorePatternss := [][]string{}
+	var errs []error
 	for _, path := range patternFilePath {
 		ignorePatterns, err := readPatternFile(path)
 		if err != nil {
-			return nil, err
+			errs = append(errs, err)
+			continue
 		}
 		ignorePatternss = append(ignorePatternss, ignorePatterns)
 	}
 	mergedPatterns := mergeFilterPatterns(ignorePatternss...)
+	if len(errs) > 0 {
+		err := fmt.Errorf("failed to read filter patterns: %v", errs)
+		return mergedPatterns, err
+	}
 	return mergedPatterns, nil
 }
 func readPatternFile(patternFilePath string) ([]string, error) {

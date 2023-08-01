@@ -1,7 +1,6 @@
 package fileevaluator
 
 import (
-	"os"
 	"path"
 
 	ignore "github.com/sabhiram/go-gitignore"
@@ -118,22 +117,26 @@ func New(baseDir string) (*FileEvaluator, error) {
 	gitIgnorePath := path.Join(baseDir, ".gitignore")
 	tzapIgnorePath := path.Join(baseDir, ".tzapignore")
 	tzapIncludePath := path.Join(baseDir, ".tzapinclude")
-	ignoreFiles := []string{tzapIgnorePath}
 	tl.Logger.Println("gitIgnorePath", gitIgnorePath)
 	tl.Logger.Println("tzapIgnorePath", tzapIgnorePath)
 	tl.Logger.Println("tzapIncludePath", tzapIncludePath)
-	if _, err := os.Stat(gitIgnorePath); err == nil {
-		ignoreFiles = append(ignoreFiles, gitIgnorePath)
-	}
+
 	var excludePatterns []string
-	excludePatternsFromFile, err := ReadFilterPatternFiles(ignoreFiles...)
-	if err != nil {
+	//base
+	excludePatterns = append(excludePatterns, baseExcludePatterns...)
+	//git
+	if excludePatternsFromFile, err := ReadFilterPatternFiles(gitIgnorePath); err == nil {
+		excludePatterns = append(excludePatterns, excludePatternsFromFile...)
+	}
+	//tzapignore
+	if excludePatternsFromFile, err := ReadFilterPatternFiles(tzapIgnorePath); err != nil {
 		baseTzapIgnore, _ := ReadPatternString(BaseTzapIgnore)
-		excludePatterns = append(baseExcludePatterns, baseTzapIgnore...)
+		excludePatterns = append(excludePatterns, baseTzapIgnore...)
 		println("Using base tzapignore")
 	} else {
-		excludePatterns = append(baseExcludePatterns, excludePatternsFromFile...)
+		excludePatterns = append(excludePatterns, excludePatternsFromFile...)
 	}
+
 	var includePatterns []string
 	includePatternsFromFile, err := ReadFilterPatternFiles(tzapIncludePath)
 	if err != nil {
