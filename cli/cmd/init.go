@@ -19,11 +19,11 @@ var initCmd = &cobra.Command{
 	Long:  `This command initiates the tzap configuration by creating .tzapignore, .tzapinclude, and configuration files.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := os.Stat(".tzapconfig"); os.IsExist(err) {
-			cmd.Println("Tzap is already initialized.")
+			println("Tzap is already initialized.")
 			stdin.ConfirmPrompt("Continue anyway?")
 		}
 
-		cmd.Println("Initializing Tzap...")
+		println("Initializing Tzap...")
 		if !tzapCliSettings.Yes {
 			time.Sleep(time.Millisecond * 500)
 			if _, err := os.Stat(".git"); os.IsNotExist(err) {
@@ -33,25 +33,25 @@ var initCmd = &cobra.Command{
 			}
 
 			if b := stdin.ConfirmPrompt("\n\nTzap is in Beta. Would you like some general information about Tzap?"); b {
-				cmd.Println("\n\nTzap is a code cli tool that is designed to be easy to use.\n")
+				println("\n\nTzap is a code cli tool that is designed to be easy to use.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nYou ask tzap to finish a prompt using: tzap prompt \"How do I use X library to enable my backend to do Y\"\n")
+				println("\n\nYou ask tzap to finish a prompt using: tzap prompt \"How do I use X library to enable my backend to do Y\"\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nTzap assumes that you are running it from the project root folder. - Tzap attempts to traverse the folder to run from the root folder. During beta, for best results, always run tzap from root folder.\n")
+				println("\n\nTzap assumes that you are running it from the project root folder. - Tzap attempts to traverse the folder to run from the root folder. During beta, for best results, always run tzap from root folder.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nTzap requires an openai apikey. You can get one from https://platform.openai.com/. You need to add a payment method to get started\n")
+				println("\n\nTzap requires an openai apikey. You can get one from https://platform.openai.com/. You need to add a payment method to get started\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nRegarding costs, embeddings should shows, but it's generally very affordable. A huge project like https://github.com/twitter/the-algorithm costs max 1 USD to embed. Usually less.\n")
+				println("\n\nRegarding costs, embeddings should shows, but it's generally very affordable. A huge project like https://github.com/twitter/the-algorithm costs max 1 USD to embed. Usually less.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nA gpt4 call costs maximum 0.2 dollars and a gpt3.5 (default) costs a fraction of that. https://openai.com/pricing for more info.\n")
+				println("\n\nA gpt4 call costs maximum 0.2 dollars and a gpt3.5 (default) costs a fraction of that. https://openai.com/pricing for more info.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nYou add your apikey through env variable or .env files. OPENAI_APIKEY=<apikey> for .env file.\n")
+				println("\n\nYou add your apikey through env variable or .env files. OPENAI_APIKEY=<apikey> for .env file.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nTzap is designed to be used with a .tzapignore file. This file is similar to a .gitignore file, but it is used to ignore files that interfere with search quality.\n")
+				println("\n\nTzap is designed to be used with a .tzapignore file. This file is similar to a .gitignore file, but it is used to ignore files that interfere with search quality.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
+				println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
 				stdin.GetStdinInput("Press enter to continue.")
-				cmd.Println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
+				println("\n\nTzap is designed to be used with a .tzapinclude file. This file is used to include.\n")
 				stdin.GetStdinInput("Press enter to continue.")
 			}
 		}
@@ -64,8 +64,8 @@ var initCmd = &cobra.Command{
 		}
 		touchTzapignore()
 		touchTzapinclude()
-		cmd.Println("Initialization complete.")
 
+		println("Initialization complete.")
 	},
 }
 

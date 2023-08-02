@@ -29,7 +29,7 @@ It is used to generate refactor and document code or generate documentation file
 			config, err := loadConfig(configFile)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error loading config file: %v\n", err)
-				cmd.Println(refactorJSONExample)
+				println(refactorJSONExample)
 				os.Exit(1)
 			}
 			basicConfig = config
@@ -40,7 +40,7 @@ It is used to generate refactor and document code or generate documentation file
 		}
 		if (basicConfig.FileIn == "") || (basicConfig.Task == "") {
 			fmt.Fprintf(os.Stderr, "error: filein and task are required\n")
-			cmd.Println(refactorJSONExample)
+			println(refactorJSONExample)
 			os.Exit(1)
 		}
 		if tzapCliSettings.ApiMode {

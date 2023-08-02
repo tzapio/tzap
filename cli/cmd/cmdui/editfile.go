@@ -32,7 +32,7 @@ func (ui *CMDUI) EditFile(compareToFile *actionpb.FileWrite) error {
 	if err != nil {
 		return err
 	}
-
+	println("Created file", compareToFile.Fileout)
 	if err := util.MkdirPAndWriteFile(path.Join(cwd, compareToFile.Fileout), contentOut); err != nil {
 		return err
 	}

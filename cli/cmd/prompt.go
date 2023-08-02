@@ -99,7 +99,7 @@ func promptFunc(cmd *cobra.Command, args []string) {
 				Thread: action.ToPBMessage(truncThread),
 			}
 
-			cmd.Println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
+			println(cmdutil.Bold("\nSearch query: "), cmdutil.Yellow(searchQuery))
 			t.WorkTzap(func(t *tzap.Tzap) {
 				t = t.
 					ApplyWorkflow(action.PromptWorkflow(promptWorkflowArgs)).

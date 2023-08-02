@@ -47,7 +47,7 @@ var editdirCmd = &cobra.Command{
 				if !stdin.ConfirmPrompt("Edit file: " + file + " with template: " + template + "?") {
 					continue // skip this file
 				}
-				cmd.Println("Editing file: ", file, "template", template)
+				println("Editing file: ", file, "template", template)
 				t.
 					ApplyWorkflowFN(codegeneration.MakeCode(config)).
 					ApplyWorkflow(stdinworkflows.BeforeProceedingWorkflow()).
