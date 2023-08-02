@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/util/stdin"
 	"github.com/tzapio/tzap/workflows/stdinworkflows"
 )
@@ -94,7 +95,7 @@ Repository: ` + string(url))).
 
 		// Parse the JSON object
 		var data map[string]string
-		err = json.Unmarshal([]byte(res.Data["content"].(string)), &data)
+		err = json.Unmarshal([]byte(res.Data["content"].(types.CompletionMessage).Content), &data)
 		if err != nil {
 			cmd.Println("Could not parse JSON object:", err)
 			return
