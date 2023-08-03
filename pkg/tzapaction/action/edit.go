@@ -10,6 +10,9 @@ import (
 )
 
 func Edit(t *tzap.Tzap, request *actionpb.EditRequest) (*actionpb.EditResponse, error) {
+	if request.EditArgs.FileIn == "" {
+		request.EditArgs.FileIn = request.EditArgs.FileOut
+	}
 	if _, err := os.Stat(request.EditArgs.FileIn); os.IsNotExist(err) {
 		return Create(t, request)
 	}

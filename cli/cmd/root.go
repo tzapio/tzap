@@ -3,7 +3,9 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
@@ -13,6 +15,7 @@ import (
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows"
 	"github.com/tzapio/tzap/pkg/tzapconnect"
+	"github.com/tzapio/tzap/pkg/util"
 
 	"github.com/tzapio/tzap/pkg/util/stdin"
 )
@@ -116,10 +119,37 @@ func initializeTzap() (*tzap.Tzap, error) {
 
 	apikey, err := tzapconnect.LoadOPENAI_API_KEY()
 	if err != nil {
-		choice := stdin.ConfirmPrompt("Cannot find OPENAI_APIKEY.\n\nWould you like to add it now?")
+		if tzapCliSettings.Editor == "api" || tzapCliSettings.Yes {
+			println("Aborted, cannot continue without OPENAI_APIKEY.")
+			os.Exit(1)
+		}
+		choice := stdin.ConfirmPrompt(`
+Tzap uses OpenAI and requires a OPENAI_APIKEY. Your account also needs to have an attached payment method. You can find your keys here: https://platform.openai.com/account/api-keys
+
+
+You can run tzap by either: 
+   1. OPENAI_APIKEY=THE_KEY tzap prompt hello world
+   2. Define it in a file (.env or ~/.tzap/.env).
+   
+For convenience, would you like to add it to file?`)
 		if choice {
+			envFilePath := ".env"
+			homeDir, err := os.UserHomeDir()
+			if err == nil {
+				homeTzapPath := path.Join(homeDir, ".tzap", ".env")
+				// ask if user wants to save to current folder or homefolder/.tzap/.env
+				saveToHome := stdin.ConfirmPrompt("Would you like the .env file to be saved globally in your home folder (" + homeTzapPath + ")")
+				if saveToHome {
+					err := util.MkdirPFromFile(homeTzapPath)
+					if err != nil {
+						println(fmt.Sprintf("Could not create tzap in home folder (%s). Saving to current folder .env. Error: %v", homeTzapPath, err))
+					} else {
+						envFilePath = homeTzapPath
+					}
+				}
+			}
 			apikey = stdin.GetStdinInput("Enter OPENAI_APIKEY to save to .env:\n")
-			saveAPIKey(apikey)
+			saveAPIKey(envFilePath, apikey)
 		} else {
 			println("Aborted, cannot continue without OPENAI_APIKEY.")
 			os.Exit(1)
@@ -146,8 +176,8 @@ func createConfigFromSettings() config.Configuration {
 	}
 }
 
-func saveAPIKey(apikey string) {
-	f, err := os.OpenFile(".env", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+func saveAPIKey(envFilePath, apikey string) {
+	f, err := os.OpenFile(envFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		panic(err)
 	}

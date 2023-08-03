@@ -92,6 +92,15 @@ func ListGlob(glob string) ([]string, error) {
 
 // MkdirPAndWriteFile writes the edited content to the file
 func MkdirPAndWriteFile(filePath, content string) error {
+	err := MkdirPFromFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filePath, []byte(content), 0644)
+}
+
+func MkdirPFromFile(filePath string) error {
 	dir := filepath.Dir(filePath)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		err = os.MkdirAll(dir, 0755)
@@ -99,9 +108,8 @@ func MkdirPAndWriteFile(filePath, content string) error {
 			return err
 		}
 	}
-	return os.WriteFile(filePath, []byte(content), 0644)
+	return nil
 }
-
 func ReplaceExt(file string, ext string) string {
 	return strings.TrimSuffix(file, filepath.Ext(file)) + ext
 }

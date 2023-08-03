@@ -55,6 +55,9 @@ var initCmd = &cobra.Command{
 				stdin.GetStdinInput("Press enter to continue.")
 			}
 		}
+		if !tzapCliSettings.Yes {
+			initializeTzap()
+		}
 		// Ask which text editor the user wants to use
 		editor := askForEditor()
 
@@ -66,6 +69,12 @@ var initCmd = &cobra.Command{
 		touchTzapinclude()
 
 		println("Initialization complete.")
+
+		println("\nHere are some commands to try: ")
+		println("\n   $ tzap change user component to contain an email field")
+		println("\n   $ tzap refactor my user component")
+		println("\n   $ tzap document my user component")
+		println("\n   $ tzap test my user component")
 	},
 }
 
@@ -104,9 +113,7 @@ func askForEditor() string {
 		time.Sleep(time.Millisecond * 1000)
 		stdin.ConfirmPrompt(`
 
-Would you like to run tzap with VSCode? Tzap will open VSCode when prompting for input and show diffs in VSCode.
-
-No extension will be installed. You can always change this later in the config.json file`)
+Would you like to run tzap with VSCode? Tzap will open VSCode when prompting for input and show diffs in VSCode.`)
 	}
 
 	prompt := fmt.Sprintf(`
