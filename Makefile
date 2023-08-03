@@ -65,6 +65,8 @@ docu:
 	cd documentation && npm start
 
 dockerbuild:
-	docker build -t tzapio/tzap .
+	docker build --no-cache -t tzapio/tzap .
 dockerpush:
+	make build
+	docker build --no-cache -t tzapio/tzap .
 	docker push tzapio/tzap
