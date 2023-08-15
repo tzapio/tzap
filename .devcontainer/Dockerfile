@@ -11,23 +11,21 @@ RUN apt-get update && \
         tar \
         gcc \
         ffmpeg
-RUN wget https://github.com/tinygo-org/tinygo/releases/download/v0.27.0/tinygo_0.27.0_amd64.deb
-RUN sudo dpkg -i tinygo_0.27.0_amd64.deb
 
 RUN curl -sfL https://github.com/upx/upx/releases/download/v4.0.2/upx-4.0.2-amd64_linux.tar.xz | tar -xJvf -; \
 sudo mv upx-4.0.2-amd64_linux/upx /usr/local/bin; \
 rm -rf upx-4.0.2-amd64_linux/
 
-RUN sudo rm -rf /usr/local/go && curl -sfL https://go.dev/dl/go1.20.3.linux-amd64.tar.gz | sudo tar -C /usr/local -xzf -
+RUN sudo rm -rf /usr/local/go && curl -sfL https://go.dev/dl/go1.21.0.linux-amd64.tar.gz | sudo tar -C /usr/local -xzf -
 RUN sudo ln -s /usr/local/go/bin/go /usr/bin/go
 RUN sudo ln -s /usr/local/go/bin/gofmt /usr/bin/gofmt
 
-RUN wget -q -O tmp.zip https://github.com/protocolbuffers/protobuf/releases/download/v22.0/protoc-22.0-linux-x86_64.zip && \
+RUN wget -q -O tmp.zip https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protoc-24.0-linux-x86_64.zip && \
     unzip tmp.zip -d /usr/local/ && \
     rm tmp.zip
 
 RUN sudo mkdir -p /usr/local/lib/nodejs
-ENV VERSION=v20.0.0
+ENV VERSION=v18.17.1
 ENV DISTRO=linux-x64
 RUN curl -sfL https://nodejs.org/dist/${VERSION}/node-${VERSION}-${DISTRO}.tar.xz | sudo tar -xJvf - -C /usr/local/lib/nodejs 
 
