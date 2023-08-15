@@ -71,18 +71,18 @@ func LocalRun(route string, jsonBody string) (string, error) {
 	// Handle "/documentation" endpoint
 	e.POST("/documentation", refactor)
 
-	e.POST("/implement", func(c echo.Context) error {
+	e.POST("/code", func(c echo.Context) error {
 		var implementCodeArgs actionpb.ImplementArgs
 		if err := json.NewDecoder(c.Request().Body).Decode(&implementCodeArgs); err != nil {
 			return err
 		}
 		response, err := action.Implement(t, &actionpb.ImplementRequest{ImplementArgs: &implementCodeArgs})
 		if err != nil {
-			return err
+			return c.JSON(http.StatusInternalServerError, err)
 		}
 		return c.JSON(http.StatusOK, response)
 	})
-	e.POST("/edit", func(c echo.Context) error {
+	edit := func(c echo.Context) error {
 		var editArgs actionpb.EditArgs
 		if err := json.NewDecoder(c.Request().Body).Decode(&editArgs); err != nil {
 			return err
@@ -92,7 +92,9 @@ func LocalRun(route string, jsonBody string) (string, error) {
 			return err
 		}
 		return c.JSON(http.StatusOK, response)
-	})
+	}
+	e.POST("/edit", edit)
+	e.POST("/add", edit)
 
 	e.ServeHTTP(rec, req)
 	localRunResult := rec.Body.String()
