@@ -157,13 +157,13 @@ func touchTzapignore() {
 		println("Warning: .gitignore does not exist.")
 		content, _ := os.ReadFile(".gitignore")
 		if len(content) > 0 {
-			gitignoreContent = string(content)
+			gitignoreContent = "\n" + string(content)
 		}
 	} else if err != nil {
-		println("Warning: did not copy for .tzapignore. .gitignore error: ", err)
+		println("Warning: did not copy .gitignore into .tzapignore. .gitignore missing: ", err)
 		time.Sleep(time.Millisecond * 500)
 	}
-	tzapIgnoreContent := fileevaluator.BaseTzapIgnore + "\n" + gitignoreContent
+	tzapIgnoreContent := fileevaluator.BaseTzapIgnore + gitignoreContent
 
 	if err := os.WriteFile(".tzapignore", []byte(tzapIgnoreContent), 0644); err != nil {
 		println("Error:", err)
