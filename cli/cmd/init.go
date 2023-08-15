@@ -111,9 +111,13 @@ func askForEditor() string {
 	options := []string{"vscode", "code", "vim", "nano", "editor", "stdin"}
 	if checkVSCodeInstalled() {
 		time.Sleep(time.Millisecond * 1000)
-		stdin.ConfirmPrompt(`
+		runWithVscode := stdin.ConfirmPrompt(`
 
 Would you like to run tzap with VSCode? Tzap will open VSCode when prompting for input and show diffs in VSCode.`)
+
+		if runWithVscode {
+			return "vscode"
+		}
 	}
 
 	prompt := fmt.Sprintf(`
