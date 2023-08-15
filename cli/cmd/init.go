@@ -126,8 +126,8 @@ Choose your preferred text editor:
 	- %s: Edit prompts directly from file, get diffs and more
 	- %s: Opens the file in vim when prompting
 	- %s: Opens the file in nano when prompting
-	- %s: allows for editing files directly but does not connect to any specific UI.
-	- stdin (default): asks for input in CLI.
+	- %s: allows for editing files directly but does not connect to any specific UI
+	- stdin (default): asks for input in CLI
 `, options[0], options[2], options[3], options[4])
 	fmt.Print(prompt)
 
