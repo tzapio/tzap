@@ -65,10 +65,14 @@ func MakeCode(args *actionpb.RefactorArgs) func(t *tzap.Tzap) *tzap.Tzap {
 				outputStr,
 				exampleStr).
 			MutationTzap(func(t *tzap.Tzap) *tzap.Tzap {
-				t = t.AddSystemMessage(
-					"####file in: "+args.FileIn,
-					util.ReadFileP(args.FileIn),
-				)
+				if args.FileIn != "" {
+					if _, err := os.Stat(args.FileIn); err == nil {
+						t = t.AddSystemMessage(
+							"####file in: "+args.FileIn,
+							util.ReadFileP(args.FileIn),
+						)
+					}
+				}
 
 				if args.FileIn != args.FileOut && args.FileOut != "" {
 					if _, err := os.Stat(args.FileOut); err == nil {

@@ -9,10 +9,10 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/tzapio/tzap/cli/cmd/cmdui"
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
-	"github.com/tzapio/tzap/cli/cmd/resolver"
 	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/tzapaction/action"
 	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
+	"github.com/tzapio/tzap/pkg/tzapaction/resolver"
 
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/types/openai"
@@ -103,7 +103,7 @@ func routerFunc(cmd *cobra.Command, args []string) {
 								if err != nil {
 									panic(err)
 								}
-								println("---")
+								println("\n---")
 								if tzapCliSettings.ApiMode {
 									fmt.Print(result)
 									os.Exit(0)
@@ -116,7 +116,10 @@ func routerFunc(cmd *cobra.Command, args []string) {
 
 								if err := json.Unmarshal([]byte(result), fWriter); err == nil {
 									for _, fileWrite := range fWriter.FileWrites {
-										cmdUI.EditFile(fileWrite)
+										err := cmdUI.EditFile(fileWrite)
+										if err != nil {
+											println(err.Error())
+										}
 									}
 								}
 							}

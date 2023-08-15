@@ -2,6 +2,7 @@ package action
 
 import (
 	"github.com/tzapio/tzap/cli/cmd/cmdutil"
+	"github.com/tzapio/tzap/internal/logging/tl"
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
@@ -46,9 +47,9 @@ func RouterWorkflow(promptWorkflowArgs *actionpb.PromptArgs) types.NamedWorkflow
 					t = t.RequestFunctionCompletion(Tfs)
 					println(cmdutil.Bold("\n---"))
 					if t.Data["content"].(types.CompletionMessage).FunctionCall != nil {
-						println(cmdutil.Bold("Function Call:"))
-						println(t.Data["content"].(types.CompletionMessage).FunctionCall.Name)
-						println(t.Data["content"].(types.CompletionMessage).FunctionCall.Arguments)
+						tl.Logger.Println(cmdutil.Bold("Function Call:"))
+						tl.Logger.Println(t.Data["content"].(types.CompletionMessage).FunctionCall.Name)
+						tl.Logger.Println(t.Data["content"].(types.CompletionMessage).FunctionCall.Arguments)
 					}
 					return t
 				})

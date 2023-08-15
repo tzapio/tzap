@@ -6,6 +6,7 @@ import (
 	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
 	"github.com/tzapio/tzap/pkg/tzapaction/cliworkflows/codegeneration"
 	"github.com/tzapio/tzap/pkg/util"
+	"github.com/tzapio/tzap/pkg/util/cleaner"
 )
 
 func Refactor(t *tzap.Tzap, refactorRequest *actionpb.RefactorRequest) (*actionpb.RefactorResponse, error) {
@@ -31,7 +32,7 @@ func Refactor(t *tzap.Tzap, refactorRequest *actionpb.RefactorRequest) (*actionp
 				Filein:     refactorArgs.FileIn,
 				Contentin:  contentIn,
 				Fileout:    refactorArgs.FileOut,
-				Contentout: contentOut,
+				Contentout: cleaner.FileWriteClean(contentOut),
 			},
 		},
 	}, nil

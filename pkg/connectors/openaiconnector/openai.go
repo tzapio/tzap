@@ -133,6 +133,7 @@ func (ot *OpenaiTgenerator) streamCompletion(ctx context.Context, request openai
 				q := response.Choices[0].Delta.FunctionCall
 				if functionCall.Name != q.Name && q.Name != "" {
 					functionCall.Name = q.Name
+					println(q.Name)
 				}
 				print(q.Arguments)
 				resultBuilder.WriteString(q.Arguments)
@@ -159,9 +160,6 @@ func (ot *OpenaiTgenerator) createChatCompletion(ctx context.Context, request op
 	if err != nil {
 		return types.CompletionMessage{}, fmt.Errorf("chatcompletion error: %v", err)
 	}
-
-	println(response.Choices[0].Message.FunctionCall.Name)
-	println(response.Choices[0].Message.FunctionCall.Arguments)
 	if response.Choices[0].Message.FunctionCall.Name != "" {
 		return types.CompletionMessage{FinishReason: types.FinishReason(response.Choices[0].FinishReason), FunctionCall: &types.FunctionCall{Name: response.Choices[0].Message.FunctionCall.Name, Arguments: response.Choices[0].Message.FunctionCall.Arguments}}, nil
 	}

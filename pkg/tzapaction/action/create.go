@@ -4,10 +4,16 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 	"github.com/tzapio/tzap/pkg/tzap"
 	"github.com/tzapio/tzap/pkg/tzapaction/actionpb"
+	"github.com/tzapio/tzap/pkg/util/cleaner"
 )
 
 func Create(t *tzap.Tzap, request *actionpb.EditRequest) (*actionpb.EditResponse, error) {
 	t = t.
+		ApplyWorkflow(SearchWorkflow(&actionpb.SearchArgs{
+			ExcludeFiles: []string{request.EditArgs.FileIn, request.EditArgs.FileOut},
+			SearchQuery:  request.EditArgs.Mission + " " + request.EditArgs.Task + " " + request.EditArgs.Plan,
+			EmbedsCount:  20,
+		})).
 		AddSystemMessage(
 			"The mission is: "+request.EditArgs.Mission,
 			"The plan is to: "+request.EditArgs.Plan,
@@ -22,6 +28,6 @@ func Create(t *tzap.Tzap, request *actionpb.EditRequest) (*actionpb.EditResponse
 	return &actionpb.EditResponse{
 		FileWrites: []*actionpb.FileWrite{{
 			Fileout:    request.EditArgs.FileIn,
-			Contentout: contentOut,
+			Contentout: cleaner.FileWriteClean(contentOut),
 		}}}, nil
 }

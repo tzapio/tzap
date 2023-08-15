@@ -7,7 +7,8 @@ import (
 
 func Implement(t *tzap.Tzap, writeCodeRequest *actionpb.ImplementRequest) (*actionpb.ImplementResponse, error) {
 	var fileWrites []*actionpb.FileWrite
-	for _, change := range writeCodeRequest.ImplementArgs.Changes {
+
+	for _, change := range writeCodeRequest.ImplementArgs.Tasks {
 		response, err := Edit(t, &actionpb.EditRequest{
 			EditArgs: &actionpb.EditArgs{
 				Mission: writeCodeRequest.ImplementArgs.Mission,

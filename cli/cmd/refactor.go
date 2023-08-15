@@ -14,7 +14,7 @@ import (
 )
 
 var refactorCmd = &cobra.Command{
-	Use:   "refactor [filein] [fileout] \nOR\n tzap refactor --refactorconfig refactorconfig.json \nOR\n tzap refactor --filein filein [--fileout fileout] [see for all params: tzap refactor --help] \n\n Json example: \n" + refactorJSONExample,
+	Use:   "trefactor [filein] [fileout] \nOR\n tzap refactor --refactorconfig refactorconfig.json \nOR\n tzap refactor --filein filein [--fileout fileout] [see for all params: tzap refactor --help] \n\n Json example: \n" + refactorJSONExample,
 	Short: "Refactors code",
 	Long: `The refactor command enables you to refactor code using either command-line flags or a configuration file. 
 It is used to generate refactor and document code or generate documentation files.`,

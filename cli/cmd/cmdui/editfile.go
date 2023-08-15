@@ -81,8 +81,9 @@ func editLoop(changes, file string, fileOut string) string {
 			}
 			return string(bytes)
 		}
-		if key == "e" || key == "exit" {
-			panic("Aborting")
+		if key == "q" || key == "exit" {
+			println("Aborting")
+			os.Exit(0)
 		}
 	}
 }
