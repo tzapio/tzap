@@ -13,19 +13,19 @@ replace github.com/tzapio/tzap/pkg/connectors/openaiconnector => ../pkg/connecto
 require (
 	github.com/fatih/color v1.15.0
 	github.com/fsnotify/fsnotify v1.6.0
-	github.com/labstack/echo/v4 v4.11.1
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
-	github.com/tzapio/tzap v0.8.9
-	github.com/tzapio/tzap/pkg/tzapaction v0.0.0-00010101000000-000000000000
-	github.com/tzapio/tzap/pkg/tzapconnect v0.7.16
+	github.com/tzapio/tzap v0.9.3
+	github.com/tzapio/tzap/pkg/tzapaction v0.9.3
+	github.com/tzapio/tzap/pkg/tzapconnect v0.9.3
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/labstack/echo/v4 v4.11.1 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
@@ -34,7 +34,7 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.7.16 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.9.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
