@@ -28,7 +28,9 @@ exRefactoring:
 exTesting:
 	go run examples/testing/main.go
 install:
-	go install ./cli 
+	go install ./cli
+	rm -rf /home/vscode/go/bin/tzap
+	mv /home/vscode/go/bin/cli /home/vscode/go/bin/tzap
 gomodtidy:
 	go mod tidy
 	cd pkg/tzapaction && go mod tidy
@@ -65,6 +67,5 @@ docu:
 dockerbuild:
 	docker build --no-cache -t tzapio/tzap .
 dockerpush:
-	make build
 	docker build --no-cache -t tzapio/tzap .
 	docker push tzapio/tzap
