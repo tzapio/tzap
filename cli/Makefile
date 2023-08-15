@@ -48,34 +48,22 @@ github-otherpkgs-release:
 	if [ -z "$(shell gh release list | grep -F pkg/connectors/openaiconnector/$(VERSION))" ]; then \
 		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
-	if [ -z "$(shell gh release list | grep -F pkg/connectors/googlevoiceconnector/$(VERSION))" ]; then \
-		gh release create pkg/connectors/googlevoiceconnector/$(VERSION) --prerelease --title "Release pkg/connectors/googlevoiceconnector/$(VERSION)" --notes "Golang specific release"; \
-	fi
-	if [ -z "$(shell gh release list | grep -F pkg/connectors/redisembeddbconnector/$(VERSION))" ]; then \
-		gh release create pkg/connectors/redisembeddbconnector/$(VERSION) --prerelease --title "Release pkg/connectors/redisembeddbconnector/$(VERSION)" --notes "Golang specific release"; \
-	fi
 
 
 remove-releases:
 	-gh release delete pkg/tzapconnect/$(VERSION) --yes
 	-gh release delete pkg/tzapaction/$(VERSION) --yes
 	-gh release delete pkg/connectors/openaiconnector/$(VERSION) --yes
-	-gh release delete pkg/connectors/googlevoiceconnector/$(VERSION) --yes
-	-gh release delete pkg/connectors/redisembeddbconnector/$(VERSION) --yes
 	-gh release delete $(VERSION) --yes
 
 	-git push --delete origin pkg/tzapconnect/$(VERSION)
 	-git push --delete origin pkg/tzapaction/$(VERSION)
 	-git push --delete origin pkg/connectors/openaiconnector/$(VERSION)
-	-git push --delete origin pkg/connectors/googlevoiceconnector/$(VERSION)
-	-git push --delete origin pkg/connectors/redisembeddbconnector/$(VERSION)
 	-git push --delete origin $(VERSION)
 
 	-git tag -d pkg/tzapconnect/$(VERSION)
 	-git tag -d pkg/tzapaction/$(VERSION)
 	-git tag -d pkg/connectors/openaiconnector/$(VERSION)
-	-git tag -d pkg/connectors/googlevoiceconnector/$(VERSION)
-	-git tag -d pkg/connectors/redisembeddbconnector/$(VERSION)
 	-git tag -d $(VERSION)
 
 .PHONY:

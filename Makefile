@@ -34,8 +34,6 @@ gomodtidy:
 	cd pkg/tzapaction && go mod tidy
 	cd pkg/connectors/openaiconnector && go mod tidy
 	cd pkg/tzapconnect && go mod tidy
-	cd pkg/connectors/redisembeddbconnector && go mod tidy
-	cd pkg/connectors/googlevoiceconnector && go mod tidy
 	cd examples && go mod tidy
 	cd cli && go mod tidy
 	go work sync
