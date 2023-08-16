@@ -49,7 +49,7 @@ github-otherpkgs-release:
 		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
 	if [ -z "$(shell gh release list | grep -F cli/$(VERSION))" ]; then \
-		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
+		gh release create cli/$(VERSION) --prerelease --title "Release cli/$(VERSION)" --notes "Golang specific release"; \
 	fi
 
 
