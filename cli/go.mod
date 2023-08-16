@@ -16,9 +16,9 @@ require (
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
-	github.com/tzapio/tzap v0.9.3
-	github.com/tzapio/tzap/pkg/tzapaction v0.9.3
-	github.com/tzapio/tzap/pkg/tzapconnect v0.9.3
+	github.com/tzapio/tzap v0.9.4
+	github.com/tzapio/tzap/pkg/tzapaction v0.9.4
+	github.com/tzapio/tzap/pkg/tzapconnect v0.9.4
 )
 
 require (
@@ -34,7 +34,7 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.9.3 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.9.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.11.0 // indirect

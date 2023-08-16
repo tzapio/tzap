@@ -14,9 +14,9 @@ require (
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/sashabaranov/go-openai v1.14.1
 	github.com/sergi/go-diff v1.3.1
-	github.com/tzapio/tzap v0.9.3
-	github.com/tzapio/tzap/cli v0.9.3
-	github.com/tzapio/tzap/pkg/tzapconnect v0.9.3
+	github.com/tzapio/tzap v0.9.4
+	github.com/tzapio/tzap/cli v0.9.4
+	github.com/tzapio/tzap/pkg/tzapconnect v0.9.4
 	go.uber.org/mock v0.2.0
 	google.golang.org/protobuf v1.31.0
 )
@@ -30,7 +30,7 @@ require (
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/sabhiram/go-gitignore v0.0.0-20210923224102-525f6e181f06 // indirect
 	github.com/tzapio/tokenizer v0.0.4 // indirect
-	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.9.3 // indirect
+	github.com/tzapio/tzap/pkg/connectors/openaiconnector v0.9.4 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.11.0 // indirect

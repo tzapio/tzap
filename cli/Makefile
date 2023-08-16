@@ -48,6 +48,9 @@ github-otherpkgs-release:
 	if [ -z "$(shell gh release list | grep -F pkg/connectors/openaiconnector/$(VERSION))" ]; then \
 		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
 	fi
+	if [ -z "$(shell gh release list | grep -F cli/$(VERSION))" ]; then \
+		gh release create pkg/connectors/openaiconnector/$(VERSION) --prerelease --title "Release pkg/connectors/openaiconnector/$(VERSION)" --notes "Golang specific release"; \
+	fi
 
 
 remove-releases:
@@ -59,11 +62,13 @@ remove-releases:
 	-git push --delete origin pkg/tzapconnect/$(VERSION)
 	-git push --delete origin pkg/tzapaction/$(VERSION)
 	-git push --delete origin pkg/connectors/openaiconnector/$(VERSION)
+	-git push --delete origin cli/$(VERSION)
 	-git push --delete origin $(VERSION)
 
 	-git tag -d pkg/tzapconnect/$(VERSION)
 	-git tag -d pkg/tzapaction/$(VERSION)
 	-git tag -d pkg/connectors/openaiconnector/$(VERSION)
+	-git tag -d cli/$(VERSION)
 	-git tag -d $(VERSION)
 
 .PHONY:
