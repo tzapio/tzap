@@ -64,7 +64,6 @@ func (ot *OpenaiTgenerator) fetchChatResponse(ctx context.Context, gptmodel stri
 		Temperature: config.Temperature,
 		Functions:   functionDefinitions,
 	}
-
 	if stream {
 		streamContent, err := ot.streamCompletion(ctx, request)
 		if err != nil {
@@ -160,7 +159,7 @@ func (ot *OpenaiTgenerator) createChatCompletion(ctx context.Context, request op
 	if err != nil {
 		return types.CompletionMessage{}, fmt.Errorf("chatcompletion error: %v", err)
 	}
-	if response.Choices[0].Message.FunctionCall.Name != "" {
+	if response.Choices[0].Message.FunctionCall != nil && response.Choices[0].Message.FunctionCall.Name != "" {
 		return types.CompletionMessage{FinishReason: types.FinishReason(response.Choices[0].FinishReason), FunctionCall: &types.FunctionCall{Name: response.Choices[0].Message.FunctionCall.Name, Arguments: response.Choices[0].Message.FunctionCall.Arguments}}, nil
 	}
 	return types.CompletionMessage{FinishReason: types.FinishReason(response.Choices[0].FinishReason), Content: response.Choices[0].Message.Content}, nil
