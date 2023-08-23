@@ -10,7 +10,6 @@ import "search.proto";
 message PromptArgs {
     repeated string inspirationFiles = 1;
     repeated string excludeFiles = 2;
-    string prompt = 3;
     repeated SearchArgs searchArgss = 4;
     repeated Message thread = 6;
 }
