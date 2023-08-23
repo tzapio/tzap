@@ -98,6 +98,7 @@ func BeforeProceedingWorkflow() types.NamedWorkflow[*tzap.Tzap, *tzap.Tzap] {
 			}
 			priorContent := t.Data["content"].(types.CompletionMessage)
 			priorContent.Content = BeforeProceeding(priorContent.Content)
+			t.Data["content"] = priorContent
 			return t
 		},
 	}
