@@ -26,6 +26,17 @@ func LocalRun(route string, jsonBody string) (string, error) {
 	rec := httptest.NewRecorder()
 
 	t := initializeSession()
+	e.POST("/completion", func(c echo.Context) error {
+		var completionArgs *actionpb.CompletionArgs
+		if err := json.NewDecoder(c.Request().Body).Decode(&completionArgs); err != nil {
+			return err
+		}
+		result, err := action.Completion(t, &actionpb.CompletionRequest{CompletionArgs: completionArgs})
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, result)
+	})
 	e.POST("/search", func(c echo.Context) error {
 		var searchArgs actionpb.SearchArgs
 		if err := json.NewDecoder(c.Request().Body).Decode(&searchArgs); err != nil {
