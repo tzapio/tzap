@@ -8,6 +8,28 @@ import (
 	"github.com/tzapio/tzap/pkg/types"
 )
 
+func SerializeMessageThread(messages []types.Message) (string, error) {
+	reversedMessages := []types.Message{}
+	for i := len(messages) - 1; i >= 0; i-- {
+		if strings.TrimSpace(messages[i].Content) == "" || strings.TrimSpace(messages[i].Role) == "" {
+			continue
+		}
+		reversedMessages = append(reversedMessages, messages[i])
+	}
+	s := strings.Builder{}
+	if len(reversedMessages) > 0 {
+		s.WriteString("\n\n")
+	}
+
+	for _, msg := range reversedMessages {
+		escapedContent := escapeHyphen(msg.Content)
+		if _, err := s.WriteString(fmt.Sprintf("---\n@role:%s\n%s\n", msg.Role, escapedContent)); err != nil {
+			return "", err
+		}
+	}
+	return s.String(), nil
+}
+
 func DeserializeMessageThread(content string) []types.Message {
 	var messages []types.Message
 	messageLines := regexp.MustCompile("(?m)^---$").Split(content, -1)
@@ -34,6 +56,7 @@ func DeserializeMessageThread(content string) []types.Message {
 	}
 	return reverseMessages
 }
+
 func stripEscapedHyphen(content string) string {
 	contentLines := strings.Split(content, "\n")
 	for i := range contentLines {
@@ -43,6 +66,7 @@ func stripEscapedHyphen(content string) string {
 	}
 	return strings.Join(contentLines, "\n")
 }
+
 func escapeHyphen(content string) string {
 	contentLines := strings.Split(content, "\n")
 	for i := range contentLines {
@@ -51,26 +75,4 @@ func escapeHyphen(content string) string {
 		}
 	}
 	return strings.Join(contentLines, "\n")
-}
-
-func SerializeMessageThread(messages []types.Message) (string, error) {
-	reversedMessages := []types.Message{}
-	for i := len(messages) - 1; i >= 0; i-- {
-		if strings.TrimSpace(messages[i].Content) == "" || strings.TrimSpace(messages[i].Role) == "" {
-			continue
-		}
-		reversedMessages = append(reversedMessages, messages[i])
-	}
-	s := strings.Builder{}
-	if len(reversedMessages) > 0 {
-		s.WriteString("\n\n")
-	}
-
-	for _, msg := range reversedMessages {
-		escapedContent := escapeHyphen(msg.Content)
-		if _, err := s.WriteString(fmt.Sprintf("---\n@role:%s\n%s\n", msg.Role, escapedContent)); err != nil {
-			return "", err
-		}
-	}
-	return s.String(), nil
 }
