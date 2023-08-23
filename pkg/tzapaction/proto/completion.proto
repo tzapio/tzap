@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package actionpb;
+
+option go_package = "./actionpb";
+
+import "common.proto";
+
+message CompletionArgs {
+    repeated Message thread = 6;
+}
+message CompletionRequest {
+    CompletionArgs completionArgs = 1;
+}
+message CompletionResponse {
+    repeated Message thread = 1;
+}
