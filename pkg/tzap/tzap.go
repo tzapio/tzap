@@ -16,8 +16,9 @@ func addId(t *Tzap) {
 	}
 	t.Id = count
 	count += 1
-
-	GlobalTzaps = append(GlobalTzaps, t)
+}
+func (t *Tzap) HandleShutdown() {
+	Flush()
 }
 
 // Tzap is a structure that holds data and methods related to Tzap objects.
