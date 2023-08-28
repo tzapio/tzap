@@ -1,0 +1,32 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize]
+
+name: test e2e
+
+jobs:
+  test:
+    name: test e2e
+    runs-on: ubuntu-latest
+
+    env:
+      OPENAI_APIKEY: ${{ secrets.OPENAI_API_KEY }}
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: test-e2e
+
+    steps:
+      - uses: actions/checkout@v2
+
+
+      - name: build test docker image
+        run: docker build --build-arg OPENAI_APIKEY=${OPENAI_APIKEY} . -t tzap-test-e2e
+        working-directory: test-e2e
+
+      - name: run refactor e2e test
+        run: docker run --rm tzap-test-e2e make test-refactor
+
