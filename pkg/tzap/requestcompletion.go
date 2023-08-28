@@ -91,7 +91,6 @@ func fetchChatResponse(t *Tzap, stream bool, functions string) (types.Completion
 	thread := TruncateToMaxTokens(t.TG, GetThread(t), config.TruncateLimit)
 
 	filelog.LogData(t.C, t, filelog.TzapLog)
-	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, thread, filelog.RequestLog)
 	tl.UILogger.Println("\n--- Completion:")
 	result, err := t.TG.GenerateChat(t.C, thread, stream, functions)
@@ -101,8 +100,6 @@ func fetchChatResponse(t *Tzap, stream bool, functions string) (types.Completion
 		return types.CompletionMessage{}, err
 	}
 	tl.UILogger.Println("\n---")
-	getMessagesGraphViz(t)
-	GenerateGraphvizDotFile(t, FillGraphVizGraph())
 	filelog.LogData(t.C, result, filelog.ResponseLog)
 
 	return result, nil
